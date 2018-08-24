@@ -1,5 +1,4 @@
 const {app, BrowserWindow, Menu} = require('electron')
-const path = require('path')
 
 let frame = null
 
@@ -8,7 +7,9 @@ function init() {
     title: 'Reex',
     width: 900,
     height: 600,
+    minWidth: 450,
     // frame: false,
+    transparent: true,
     webPreferences: {
       experimentalFeatures: true,
     },
@@ -43,16 +44,6 @@ function transferEvents() {
   })
   frame.on('unmaximize', () => {
     frame.webContents.send('unmaximize')
-  })
-  global.downloads = new Map()
-  frame.webContents.session.on('will-download', (e, item, webContents) => {
-    const target = path.join(
-      process.resourcesPath,
-      `${item.getFilename()}.download`,
-    )
-    item.setSavePath(target)
-    global.downloads.set(target, item)
-    webContents.send('will-download', target)
   })
 }
 

@@ -1,5 +1,13 @@
+@font-face {
+  font-style: normal;
+  font-family: 'Reex UI';
+  src: local('Noto Sans CJK SC'), local('PingFang SC'),
+    url("../../fonts/NotoSansCJKsc-Regular.otf")
+}
+
 body {
   margin: 0;
+  font-family: 'Reex UI';
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -9,4 +17,97 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(170, 170, 170, 0.5);
+}
+
+@font-face {
+  font-family: 'icomoon';
+  font-weight: normal;
+  font-style: normal;
+  src: url('./assets/fonts/icomoon.woff') format('woff');
+}
+.icon-arrow-left,
+.icon-arrow-right,
+.icon-arrow-up,
+.icon-chevron-right,
+.icon-download,
+.icon-eye,
+.icon-eye-off,
+.icon-file,
+.icon-film,
+.icon-folder,
+.icon-hard-drive,
+.icon-home,
+.icon-image,
+.icon-maximize-2,
+.icon-minimize-2,
+.icon-minus,
+.icon-monitor,
+.icon-music,
+.icon-sidebar,
+.icon-terminal,
+.icon-x {
+  font-family: 'icomoon';
+}
+.icon-arrow-left:before {
+  content: "\e900";
+}
+.icon-arrow-right:before {
+  content: "\e901";
+}
+.icon-arrow-up:before {
+  content: "\e902";
+}
+.icon-chevron-right:before {
+  content: "\e903";
+}
+.icon-download:before {
+  content: "\e904";
+}
+.icon-eye:before {
+  content: "\e905";
+}
+.icon-eye-off:before {
+  content: "\e906";
+}
+.icon-file:before {
+  content: "\e907";
+}
+.icon-film:before {
+  content: "\e908";
+}
+.icon-folder:before {
+  content: "\e909";
+}
+.icon-hard-drive:before {
+  content: "\e90a";
+}
+.icon-home:before {
+  content: "\e90b";
+}
+.icon-image:before {
+  content: "\e90c";
+}
+.icon-maximize-2:before {
+  content: "\e90d";
+}
+.icon-minimize-2:before {
+  content: "\e90e";
+}
+.icon-minus:before {
+  content: "\e90f";
+}
+.icon-monitor:before {
+  content: "\e910";
+}
+.icon-music:before {
+  content: "\e911";
+}
+.icon-sidebar:before {
+  content: "\e912";
+}
+.icon-terminal:before {
+  content: "\e913";
+}
+.icon-x:before {
+  content: "\e914";
 }

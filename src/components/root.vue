@@ -1,12 +1,19 @@
 <template>
   <div id="main">
+    <quick-access></quick-access>
+    <file-explorer></file-explorer>
   </div>
 </template>
 
 <script>
+import QuickAccess from './quick-access'
+import FileExplorer from './file-explorer'
+
 export default {
   el: '#main',
   components: {
+    'quick-access': QuickAccess,
+    'file-explorer': FileExplorer,
   },
   data: {
   },
@@ -29,3 +36,10 @@ export default {
   }
 }
 </script>
+
+<style>
+#main {
+  display: flex;
+  height: 100vh;
+}
+</style>
