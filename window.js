@@ -8,7 +8,7 @@ function init() {
     width: 900,
     height: 600,
     minWidth: 450,
-    // frame: false,
+    frame: false,
     transparent: true,
     webPreferences: {
       experimentalFeatures: true,

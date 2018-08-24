@@ -8,6 +8,8 @@
 body {
   margin: 0;
   font-family: 'Reex UI';
+  color: #353d46;
+  font-size: 14px;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }

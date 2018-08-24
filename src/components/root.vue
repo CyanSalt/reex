@@ -34,8 +34,7 @@ export default {
     this.$storage.load('settings.json', (err, data) => {
       const copied = JSON.parse(JSON.stringify(settings))
       data = err ? copied : {...copied, ...data}
-      this.$flux.set('global/settings', data)
-      this.$flux.emit('settings/loaded', data)
+      this.$flux.dispatch('settings/load', data)
       // filter default values on saving
       const reducer = (diff, [key, value]) => {
         if (JSON.stringify(value) !== JSON.stringify(data[key])) {

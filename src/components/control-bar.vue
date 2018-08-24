@@ -1,10 +1,12 @@
 <template>
   <div class="control-bar">
     <div class="directory-control">
-      <div class="back button">
+      <div :class="['back', 'button', { disabled: !pathStack.length }]"
+        @click="back">
         <span class="icon-arrow-left"></span>
       </div>
-      <div class="forward button">
+      <div :class="['forward', 'button', { disabled: !pathForwards.length }]"
+        @click="forward">
         <span class="icon-arrow-right"></span>
       </div>
       <div class="parent button">
@@ -30,6 +32,7 @@
 
 <script>
 import {remote, ipcRenderer} from 'electron'
+import {state} from '../plugins/flux'
 
 export default {
   name: 'control-bar',
@@ -41,7 +44,17 @@ export default {
       visible: true,
     }
   },
+  computed: {
+    pathStack: state('explorer/pathStack'),
+    pathForwards: state('explorer/pathForwards'),
+  },
   methods: {
+    back() {
+      this.$flux.dispatch('path/back')
+    },
+    forward() {
+      this.$flux.dispatch('path/forward')
+    },
     vision() {
       this.visible = !this.visible
     },
@@ -75,11 +88,15 @@ export default {
   display: flex;
   justify-content: space-between;
   color: #a7adba;
+  -webkit-app-region: drag;
+  user-select: none;
 }
 .control-bar .directory-control,
 .control-bar .window-control {
   padding: 8px;
   display: flex;
+  font-size: 16px;
+  -webkit-app-region: no-drag;
 }
 .control-bar .button {
   width: 32px;
@@ -90,9 +107,12 @@ export default {
 .control-bar .button + .button {
   margin-left: 4px;
 }
-.control-bar .button:hover {
+.control-bar .button.disabled {
+  color: #eaeef3;
+}
+.control-bar .button:not(.disabled):hover {
   color: #353d46;
-  background: #d8dee9;
+  background: #eaeef3;
 }
 .control-bar .button.minimize:hover {
   color: #259b24;
