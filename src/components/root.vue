@@ -8,18 +8,13 @@
 <script>
 import QuickAccess from './quick-access'
 import FileExplorer from './file-explorer'
+import settings from '../resources/default/settings.json'
 
 export default {
   el: '#main',
   components: {
     'quick-access': QuickAccess,
     'file-explorer': FileExplorer,
-  },
-  data: {
-  },
-  computed: {
-  },
-  methods: {
   },
   beforeCreate() {
     // custom stylesheet
@@ -31,8 +26,28 @@ export default {
     }
   },
   created() {
+    // load default settings
+    this.$flux.set('global/defaultSettings', settings)
     // custom script
     this.$storage.require('custom.js', init => init(this))
+    // load user settings
+    this.$storage.load('settings.json', (err, data) => {
+      const copied = JSON.parse(JSON.stringify(settings))
+      data = err ? copied : {...copied, ...data}
+      this.$flux.set('global/settings', data)
+      this.$flux.emit('settings/loaded', data)
+      // filter default values on saving
+      const reducer = (diff, [key, value]) => {
+        if (JSON.stringify(value) !== JSON.stringify(data[key])) {
+          diff[key] = data[key]
+        }
+        return diff
+      }
+      this.$flux.on('settings/save', () => {
+        const computed = Object.entries(settings).reduce(reducer, {})
+        this.$storage.save('settings.json', computed)
+      })
+    })
   }
 }
 </script>

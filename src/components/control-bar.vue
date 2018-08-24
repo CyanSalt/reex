@@ -10,6 +10,9 @@
       <div class="parent button">
         <span class="icon-arrow-up"></span>
       </div>
+      <div class="vision button" @click="vision">
+        <span :class="visible ? 'icon-eye-off' : 'icon-eye'"></span>
+      </div>
     </div>
     <div class="window-control">
       <div class="minimize button" @click="minimize">
@@ -34,10 +37,14 @@ export default {
     const frame = remote.getCurrentWindow()
     return {
       frame,
-      maximized: frame.isMaximized()
+      maximized: frame.isMaximized(),
+      visible: true,
     }
   },
   methods: {
+    vision() {
+      this.visible = !this.visible
+    },
     minimize() {
       this.frame.minimize()
     },
