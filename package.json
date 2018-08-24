@@ -1,0 +1,34 @@
+{
+  "name": "reex",
+  "version": "0.0.1",
+  "productName": "Reex",
+  "author": "CyanSalt",
+  "description": "A cross platform file manager.",
+  "main": "window.js",
+  "scripts": {
+    "build": "webpack --mode=production && node makefile.js",
+    "dev": "webpack --mode=development && electron .",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CyanSalt/reex.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.5.0"
+  },
+  "devDependencies": {
+    "css-loader": "^1.0.0",
+    "electron": "^2.0.8",
+    "electron-packager": "^12.1.1",
+    "mini-css-extract-plugin": "^0.4.2",
+    "png2icons": "^1.0.1",
+    "vue": "^2.5.17",
+    "vue-loader": "^15.4.0",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.17.1",
+    "webpack-cli": "^3.1.0"
+  }
+}
