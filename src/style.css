@@ -11,6 +11,7 @@ body {
   color: #353d46;
   font-size: 14px;
   user-select: none;
+  cursor: default;
   -webkit-tap-highlight-color: transparent;
 }
 ::-webkit-scrollbar {

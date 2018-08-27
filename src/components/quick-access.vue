@@ -12,6 +12,6 @@ export default {
 .quick-access {
   flex: none;
   width: 210px;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
 }
 </style>

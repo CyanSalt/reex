@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu} = require('electron')
+const {app, BrowserWindow, Menu, ipcMain, webContents} = require('electron')
 
 let frame = null
 
@@ -45,20 +45,25 @@ function transferEvents() {
   frame.on('unmaximize', () => {
     frame.webContents.send('unmaximize')
   })
+  ipcMain.on('contextmenu', (event, args) => {
+    Menu.buildFromTemplate(buildContextMenu(args)).popup({})
+  })
 }
 
-const second = app.makeSingleInstance((argv, directory) => {
-  if (frame) {
-    if (frame.isMinimized()) {
-      frame.restore()
-    }
-    frame.focus()
+function buildContextMenu(args) {
+  if (Array.isArray(args)) {
+    return args.map(buildContextMenu)
   }
-  return true
-})
-
-if (second) {
-  app.quit()
+  if (typeof args !== 'object') {
+    return args
+  }
+  return {
+    label: args.label,
+    click() {
+      const contents = webContents.getFocusedWebContents()
+      contents.send(args.action)
+    }
+  }
 }
 
 app.on('ready', init)
@@ -70,5 +75,7 @@ app.on('activate', () => {
 })
 
 app.on('window-all-closed', () => {
-  app.quit()
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
 })
