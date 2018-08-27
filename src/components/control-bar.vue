@@ -13,8 +13,8 @@
         @click="upward">
         <span class="icon-arrow-up"></span>
       </div>
-      <div class="vision button" @click="vision">
-        <span :class="visible ? 'icon-eye-off' : 'icon-eye'"></span>
+      <div class="vision button" @click="blink">
+        <span :class="vision ? 'icon-eye-off' : 'icon-eye'"></span>
       </div>
     </div>
     <div class="window-control">
@@ -33,7 +33,7 @@
 
 <script>
 import {remote, ipcRenderer} from 'electron'
-import {state} from '../plugins/flux'
+import {state, action} from '../plugins/flux'
 
 export default {
   name: 'control-bar',
@@ -42,27 +42,19 @@ export default {
     return {
       frame,
       maximized: frame.isMaximized(),
-      visible: true,
     }
   },
   computed: {
     floors: state('path/floors'),
     stack: state('path/stack'),
     forwards: state('path/forwards'),
+    vision: state('files/vision'),
   },
   methods: {
-    back() {
-      this.$flux.dispatch('path/back')
-    },
-    forward() {
-      this.$flux.dispatch('path/forward')
-    },
-    upward() {
-      this.$flux.dispatch('path/upward')
-    },
-    vision() {
-      this.visible = !this.visible
-    },
+    back: action('path/back'),
+    forward: action('path/forward'),
+    upward: action('path/upward'),
+    blink: action('vision/toggle'),
     minimize() {
       this.frame.minimize()
     },
@@ -90,6 +82,7 @@ export default {
 
 <style>
 .control-bar {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   color: #a7adba;

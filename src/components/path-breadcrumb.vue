@@ -27,6 +27,7 @@ export default {
 
 <style>
 .path-breadcrumb {
+  flex-shrink: 0;
   display: flex;
   margin: 0 12px;
   height: 32px;

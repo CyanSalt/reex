@@ -1,5 +1,6 @@
 import {remote} from 'electron'
 import {sep} from 'path'
+import {readdir} from 'fs'
 
 export default {
   data: {
@@ -8,6 +9,8 @@ export default {
     'path/full': '',
     'path/stack': [],
     'path/forwards': [],
+    'files/all': [],
+    'files/vision': false,
   },
   computed: {
     'path/floors'() {
@@ -20,7 +23,11 @@ export default {
         }
         return floor
       })
-    }
+    },
+    'files/visible'() {
+      if (this['files/vision']) return this['files/all']
+      return this['files/all'].filter(file => !this['file/hidden'](file))
+    },
   },
   methods: {
     'settings/load'(data) {
@@ -28,19 +35,28 @@ export default {
       // load other states in store
       const path = data['explorer.startup.path']
       this['path/full'] = this['path/interpret'](path)
+      this['path/load']()
       // emit loaded event
       this.$emit('settings/loaded', data)
+    },
+    'path/load'() {
+      readdir(this['path/full'], (err, files) => {
+        if (err) return
+        this['files/all'] = files
+      })
     },
     'path/redirect'(path) {
       this['path/stack'].push(this['path/full'])
       this['path/forwards'] = []
       this['path/full'] = path
+      this['path/load']()
     },
     'path/back'() {
       if (this['path/stack'].length) {
         const path = this['path/stack'].pop()
         this['path/forwards'].push(this['path/full'])
         this['path/full'] = path
+        this['path/load']()
       }
     },
     'path/forward'() {
@@ -48,10 +64,11 @@ export default {
         const path = this['path/forwards'].pop()
         this['path/stack'].push(this['path/full'])
         this['path/full'] = path
+        this['path/load']()
       }
     },
     'path/stop'(index) {
-      const path = this['path/floors'].slice(0, index + 1).join(sep)
+      const path = this['path/floors'].slice(0, index + 1).join(sep) || '/'
       this['path/redirect'](path)
     },
     'path/upward'() {
@@ -85,6 +102,12 @@ export default {
       return path.replace(windowsVariables, systemReplacement)
         .replace(unixVariables, systemReplacement)
         .replace(electronVariables, electronReplacement)
-    }
+    },
+    'vision/toggle'() {
+      this['files/vision'] = !this['files/vision']
+    },
+    'file/hidden'(file) {
+      return file.charAt(0) === '.'
+    },
   },
 }
