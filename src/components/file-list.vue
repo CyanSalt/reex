@@ -21,9 +21,11 @@ export default {
 
 <style>
 .file-list {
-  flex-grow: 1;
+  flex: auto;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
+  padding: 8px;
   overflow: auto;
 }
 </style>

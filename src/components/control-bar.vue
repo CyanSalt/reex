@@ -82,7 +82,7 @@ export default {
 
 <style>
 .control-bar {
-  flex-shrink: 0;
+  flex: none;
   display: flex;
   justify-content: space-between;
   color: #a7adba;

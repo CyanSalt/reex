@@ -34,6 +34,12 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
+        options: {
+          transformAssetUrls: {
+            img: [],
+            image: [],
+          },
+        },
       },
       {
         test: /\.css$/,

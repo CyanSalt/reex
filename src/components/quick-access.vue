@@ -10,7 +10,7 @@ export default {
 
 <style>
 .quick-access {
-  flex-shrink: 0;
+  flex: none;
   width: 210px;
   background: rgba(255, 255, 255, 0.8);
 }
