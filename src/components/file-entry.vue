@@ -3,7 +3,7 @@
     <div class="file-icon-wrapper">
       <template v-if="stat">
         <img class="folder-icon" src="./assets/images/folder.svg" v-if="isdir">
-        <file-icon :height="60" v-else></file-icon>
+        <file-icon :ext="extname" :height="60" v-else></file-icon>
       </template>
     </div>
     <div class="file-name">{{ name }}</div>
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import {join} from 'path'
+import {join, extname} from 'path'
 import {lstat} from 'fs'
 import FileIcon from './file-icon'
 import {state} from '../plugins/flux'
@@ -31,6 +31,9 @@ export default {
   },
   computed: {
     path: state('path/full'),
+    extname() {
+      return extname(this.name)
+    },
     isdir() {
       return this.stat && this.stat.isDirectory()
     }
