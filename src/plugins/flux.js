@@ -29,6 +29,12 @@ export function state(name) {
   }
 }
 
+export function action(name) {
+  return function (payload) {
+    return Flux.dispatch(name, payload)
+  }
+}
+
 export default {
   install(Vue, options) {
     store = new Vue(options)

@@ -27,7 +27,7 @@ export default {
   },
   created() {
     // load default settings
-    this.$flux.set('global/defaultSettings', settings)
+    this.$flux.set('settings/default', settings)
     // custom script
     this.$storage.require('custom.js', init => init(this))
     // load user settings

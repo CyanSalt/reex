@@ -1,15 +1,16 @@
 <template>
   <div class="control-bar">
     <div class="directory-control">
-      <div :class="['back', 'button', { disabled: !pathStack.length }]"
+      <div :class="['back', 'button', { disabled: !stack.length }]"
         @click="back">
         <span class="icon-arrow-left"></span>
       </div>
-      <div :class="['forward', 'button', { disabled: !pathForwards.length }]"
+      <div :class="['forward', 'button', { disabled: !forwards.length }]"
         @click="forward">
         <span class="icon-arrow-right"></span>
       </div>
-      <div class="parent button">
+      <div :class="['upward', 'button', { disabled: floors.length <= 1 }]"
+        @click="upward">
         <span class="icon-arrow-up"></span>
       </div>
       <div class="vision button" @click="vision">
@@ -45,8 +46,9 @@ export default {
     }
   },
   computed: {
-    pathStack: state('explorer/pathStack'),
-    pathForwards: state('explorer/pathForwards'),
+    floors: state('path/floors'),
+    stack: state('path/stack'),
+    forwards: state('path/forwards'),
   },
   methods: {
     back() {
@@ -54,6 +56,9 @@ export default {
     },
     forward() {
       this.$flux.dispatch('path/forward')
+    },
+    upward() {
+      this.$flux.dispatch('path/upward')
     },
     vision() {
       this.visible = !this.visible

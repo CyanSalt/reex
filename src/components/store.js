@@ -1,39 +1,62 @@
 import {remote} from 'electron'
+import {sep} from 'path'
 
 export default {
   data: {
-    'global/defaultSettings': {},
-    'global/settings': {},
-    'explorer/path': '',
-    'explorer/pathStack': [],
-    'explorer/pathForwards': [],
+    'settings/default': {},
+    'settings/user': {},
+    'path/full': '',
+    'path/stack': [],
+    'path/forwards': [],
+  },
+  computed: {
+    'path/floors'() {
+      return this['path/full'].split(sep)
+    },
+    'path/names'() {
+      return this['path/floors'].map((floor, index) => {
+        if (!floor && index === 0) {
+          return '/'
+        }
+        return floor
+      })
+    }
   },
   methods: {
     'settings/load'(data) {
-      this['global/settings'] = data
+      this['settings/user'] = data
       // load other states in store
       const path = data['explorer.startup.path']
-      this['explorer/path'] = this['path/interpret'](path)
+      this['path/full'] = this['path/interpret'](path)
       // emit loaded event
       this.$emit('settings/loaded', data)
     },
     'path/redirect'(path) {
-      this['explorer/pathStack'].push(this['explorer/path'])
-      this['explorer/pathForwards'] = []
-      this['explorer/path'] = path
+      this['path/stack'].push(this['path/full'])
+      this['path/forwards'] = []
+      this['path/full'] = path
     },
     'path/back'() {
-      if (this['explorer/pathStack'].length) {
-        const path = this['explorer/pathStack'].pop()
-        this['explorer/pathForwards'].push(this['explorer/path'])
-        this['explorer/path'] = path
+      if (this['path/stack'].length) {
+        const path = this['path/stack'].pop()
+        this['path/forwards'].push(this['path/full'])
+        this['path/full'] = path
       }
     },
     'path/forward'() {
-      if (this['explorer/pathForwards'].length) {
-        const path = this['explorer/pathForwards'].pop()
-        this['explorer/pathStack'].push(this['explorer/path'])
-        this['explorer/path'] = path
+      if (this['path/forwards'].length) {
+        const path = this['path/forwards'].pop()
+        this['path/stack'].push(this['path/full'])
+        this['path/full'] = path
+      }
+    },
+    'path/stop'(index) {
+      const path = this['path/floors'].slice(0, index + 1).join(sep)
+      this['path/redirect'](path)
+    },
+    'path/upward'() {
+      if (this['path/floors'].length > 1) {
+        this['path/stop'](this['path/floors'].length - 2)
       }
     },
     'path/interpret'(path) {
@@ -52,7 +75,7 @@ export default {
       }
       const electronReplacement = (full, name) => {
         try {
-          if (name === 'aniwhere') {
+          if (name === 'reex') {
             return remote.app.getAppPath()
           }
           return remote.app.getPath(name)

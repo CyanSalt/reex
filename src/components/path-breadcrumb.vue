@@ -2,8 +2,7 @@
   <div class="path-breadcrumb">
     <template v-for="(floor, index) in floors">
       <div :class="['path-floor', { current: index === floors.length - 1 }]"
-        @click="redirect(index)"
-        >{{ name(floor, index) }}</div>
+        @click="stop(index)">{{ names[index] }}</div>
       <div class="path-sep" v-if="index < floors.length - 1">
         <span class="icon-chevron-right"></span>
       </div>
@@ -12,28 +11,16 @@
 </template>
 
 <script>
-import {state} from '../plugins/flux'
-import {sep} from 'path'
+import {state, action} from '../plugins/flux'
 
 export default {
   name: 'path-breadcrumb',
   computed: {
-    path: state('explorer/path'),
-    floors() {
-      return this.path.split(sep)
-    }
+    floors: state('path/floors'),
+    names: state('path/names'),
   },
   methods: {
-    name(floor, index) {
-      if (!floor && index === 0) {
-        return '/'
-      }
-      return floor
-    },
-    redirect(index) {
-      const path = this.floors.slice(0, index + 1).join(sep)
-      this.$flux.dispatch('path/redirect', path)
-    }
+    stop: action('path/stop'),
   }
 }
 </script>
