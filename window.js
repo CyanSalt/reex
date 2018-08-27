@@ -5,9 +5,9 @@ let frame = null
 function init() {
   frame = new BrowserWindow({
     title: 'Reex',
-    width: 900,
+    width: 952,
     height: 600,
-    minWidth: 450,
+    minWidth: 472,
     frame: false,
     transparent: true,
     webPreferences: {

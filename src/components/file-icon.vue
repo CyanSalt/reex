@@ -6,7 +6,7 @@
     <g v-if="ext">
       <path d="M50,44L50,62c0,4,0,4,-4,4L4,66c-4,0,-4,0,-4,-4L0,44Z"
         :fill="color"/>
-      <text x="25" y="60" font-size="16" text-anchor="middle"
+      <text x="25" y="60" font-size="14" text-anchor="middle"
         fill="#fff">{{ extname }}</text>
     </g>
   </svg>

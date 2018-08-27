@@ -11,10 +11,12 @@ export default {
     'path/forwards': [],
     'files/all': [],
     'files/vision': false,
+    'files/selected': [],
   },
   computed: {
     'path/floors'() {
-      return this['path/full'].split(sep)
+      const floors = this['path/full'].split(sep)
+      return floors[floors.length - 1] ? floors : floors.slice(-1)
     },
     'path/names'() {
       return this['path/floors'].map((floor, index) => {
@@ -43,6 +45,7 @@ export default {
       readdir(this['path/full'], (err, files) => {
         if (err) return
         this['files/all'] = files
+        this['files/selected'] = []
       })
     },
     'path/redirect'(path) {
@@ -108,6 +111,14 @@ export default {
     },
     'file/hidden'(file) {
       return file.charAt(0) === '.'
+    },
+    'file/select'(file) {
+      if (!this['files/selected'].includes(file)) {
+        this['files/selected'].push(file)
+      }
+    },
+    'file/specify'(file) {
+      this['files/selected'] = [file]
     },
   },
 }

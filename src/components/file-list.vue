@@ -15,6 +15,7 @@ export default {
   },
   computed: {
     files: state('files/visible'),
+    selected: state('files/selected'),
   },
 }
 </script>

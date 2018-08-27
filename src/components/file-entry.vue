@@ -1,5 +1,6 @@
 <template>
-  <div class="file-entry">
+  <div :class="['file-entry', { selected: focused }]"
+    @mousedown="select" @dblclick="execute">
     <div class="file-icon-wrapper">
       <template v-if="stat">
         <img class="folder-icon" src="./assets/images/folder.svg" v-if="isdir">
@@ -30,16 +31,37 @@ export default {
     }
   },
   computed: {
-    path: state('path/full'),
+    location: state('path/full'),
+    selected: state('files/selected'),
+    path() {
+      return join(this.location, this.name)
+    },
     extname() {
       return extname(this.name)
     },
     isdir() {
       return this.stat && this.stat.isDirectory()
+    },
+    focused() {
+      return this.selected.includes(this.path)
     }
   },
+  methods: {
+    select(e) {
+      if (e.ctrlKey) {
+        this.$flux.dispatch('file/select', this.path)
+      } else {
+        this.$flux.dispatch('file/specify', this.path)
+      }
+    },
+    execute() {
+      if (this.isdir) {
+        this.$flux.dispatch('path/redirect', this.path)
+      }
+    },
+  },
   created() {
-    lstat(join(this.path, this.name), (err, stat) => {
+    lstat(this.path, (err, stat) => {
       if (err) return
       this.stat = stat
     })
@@ -53,6 +75,9 @@ export default {
   width: 96px;
   height: 96px;
   text-align: center;
+}
+.file-entry.selected {
+  background: #eaeef3;
 }
 .file-entry .file-icon-wrapper {
   height: 72px;
@@ -71,5 +96,6 @@ export default {
   line-height: 24px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
