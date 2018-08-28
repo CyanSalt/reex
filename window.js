@@ -63,7 +63,7 @@ function buildRendererMenu(args) {
   if (args.action) {
     args.click = function () {
       const contents = webContents.getFocusedWebContents()
-      contents.send('contextmenu', {action: args.action})
+      contents.send('contextmenu', {action: args.action, data: args.data})
     }
   }
   return args

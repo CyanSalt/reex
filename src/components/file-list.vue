@@ -22,12 +22,33 @@ export default {
     free() {
       this.$flux.dispatch('file/specify', null)
     },
-    contextmenu() {
+    async contextmenu() {
+      const creation = {
+        label: this.i18n('Create new file#!9'),
+      }
+      const templates = await this.$flux.dispatch('templates/load')
+      if (templates.length) {
+        creation.submenu = templates.map(template => {
+          return {
+            label: template,
+            data: template,
+            action: 'create-file'
+          }
+        })
+      } else {
+        creation.action = 'create-file'
+      }
       ipcRenderer.send('contextmenu', [
+        {
+          label: this.i18n('Refresh#!11'),
+          action: 'refresh',
+        },
+        {type: 'separator'},
         {
           label: this.i18n('Create new folder#!7'),
           action: 'create-folder',
-        }
+        },
+        creation,
       ])
     },
   },

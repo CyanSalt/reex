@@ -1,6 +1,6 @@
 import {remote} from 'electron'
 import {sep, join, basename, dirname} from 'path'
-import {readdir, watch, mkdir} from 'fs'
+import {readdir, watch, mkdir, copyFile, writeFile} from 'fs'
 
 export default {
   data: {
@@ -167,6 +167,14 @@ export default {
       const target = this['path/defined'].find(data => data.path === file)
       return (target && target.name) || basename(file) || '/'
     },
+    'templates/load'() {
+      const templates = this.$storage.filename('templates')
+      return new Promise(resolve => {
+        readdir(templates, (err, files) => {
+          resolve(err ? [] : files)
+        })
+      })
+    },
     // Context menu actions
     'contextmenu/create-folder'() {
       const path = this['path/full']
@@ -177,6 +185,25 @@ export default {
           if (err) create(times + 1)
         })
       })(0)
+    },
+    'contextmenu/create-file'({data}) {
+      const path = this['path/full']
+      const name = data || this.i18n('New file#!10')
+      const templates = this.$storage.filename('templates')
+      ;(function create(times) {
+        const realname = times ? `${name} (${times})` : name
+        const callback = err => {
+          if (err) create(times + 1)
+        }
+        if (data) {
+          copyFile(join(templates, name), join(path, realname), callback)
+        } else {
+          writeFile(join(path, realname), '', {flag: 'wx'}, callback)
+        }
+      })(0)
+    },
+    'contextmenu/refresh'() {
+      this['path/load']()
     },
   },
 }

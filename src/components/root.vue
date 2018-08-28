@@ -50,7 +50,7 @@ export default {
       })
     })
     ipcRenderer.on('contextmenu', (e, args) => {
-      if (args.action) this.$flux.dispatch(`contextmenu/${args.action}`)
+      if (args.action) this.$flux.dispatch(`contextmenu/${args.action}`, args)
     })
   }
 }
