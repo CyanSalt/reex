@@ -1,10 +1,14 @@
 import {remote, shell} from 'electron'
-import {sep, join, basename, dirname} from 'path'
-import {readdir, watch, mkdir, copyFile, writeFile, lstat} from 'fs'
+import {sep, join, basename, dirname, resolve} from 'path'
+import {readdir, watch, mkdir, copyFile, writeFile, lstat, readlink, stat} from 'fs'
 import {promisify} from 'util'
 import settings from '../resources/default/settings.json'
 
-const lstatAsync = promisify(lstat)
+const promises = {
+  lstat: promisify(lstat),
+  readlink: promisify(readlink),
+  stat: promisify(stat),
+}
 
 export default {
   data: {
@@ -79,10 +83,18 @@ export default {
         }
         Promise.all(files.map(file => {
           const fullpath = join(path, file)
-          return lstatAsync(fullpath)
-            .then(stats => ({path: fullpath, stats}))
+          return promises.lstat(fullpath)
+            .then(stats => {
+              const info = {path: fullpath, stats}
+              if (!stats.isSymbolicLink()) {
+                return info
+              }
+              return this['file/follow'](info).then(link => {
+                return Object.assign(info, {link})
+              })
+            })
         })).then(entries => {
-          this['files/info'] = entries
+          this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
           this['files/selected'] = []
         })
       })
@@ -197,6 +209,27 @@ export default {
       const target = this['path/defined'].find(data => data.path === path)
       return (target && target.name) || basename(path) || '/'
     },
+    'file/follow'(info) {
+      const {path, stats} = info
+      if (!stats.isSymbolicLink()) return info
+      return promises.readlink(path).then(link => {
+        const targetPath = resolve(dirname(path), link)
+        return promises.stat(targetPath).then(targetStats => {
+          return {path: targetPath, stats: targetStats}
+        })
+      })
+    },
+    'file/sort'([a, b]) {
+      const statsA = a.link ? a.link.stats : a.stats
+      const statsB = b.link ? b.link.stats : b.stats
+      const dirA = statsA.isDirectory()
+      const dirB = statsB.isDirectory()
+      const baseA = basename(a.path)
+      const baseB = basename(b.path)
+      if (dirA && !dirB) return -1
+      if (!dirA && dirB) return 1
+      return baseA.localeCompare(baseB)
+    },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
       const watchers = []
@@ -221,7 +254,7 @@ export default {
       readdir(templates, (err, files) => {
         if (err) return
         Promise.all(files.map(
-          file => lstatAsync(join(templates, file))
+          file => promises.lstat(join(templates, file))
             .then(stats => [file, stats])
         )).then(entries => {
           this['templates/all'] = entries

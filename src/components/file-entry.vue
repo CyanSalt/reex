@@ -14,8 +14,7 @@
 
 <script>
 import {shell, ipcRenderer} from 'electron'
-import {readlink, stat} from 'fs'
-import {extname, resolve, dirname} from 'path'
+import {extname} from 'path'
 import FileIcon from './file-icon'
 import {state} from '../plugins/flux'
 
@@ -27,11 +26,7 @@ export default {
   props: {
     path: String,
     stats: Object,
-  },
-  data() {
-    return {
-      link: null
-    }
+    link: Object,
   },
   computed: {
     location: state('path/full'),
@@ -88,18 +83,6 @@ export default {
         },
       ])
     },
-  },
-  created() {
-    if (this.stats.isSymbolicLink()) {
-      readlink(this.path, (err, link) => {
-        if (err) return
-        const path = resolve(dirname(this.path), link)
-        stat(path, (error, stats) => {
-          if (error) return
-          this.link = {path, stats}
-        })
-      })
-    }
   },
 }
 </script>

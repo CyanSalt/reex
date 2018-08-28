@@ -186,7 +186,7 @@ module.exports = {
       code: 80, ignoreStrings: true, ignoreTemplateLiterals: true,
       ignoreRegExpLiterals: true
     }],
-    'max-lines': ['error', { max: 300 }],
+    // 'max-lines': 'off',
     'max-lines-per-function': ['error', { max: 50 }],
     'max-nested-callbacks': ['error', { max: 4 }],
     'max-params': ['error', { max: 3 }],
