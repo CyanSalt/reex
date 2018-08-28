@@ -32,8 +32,11 @@ export default {
   margin: 0 12px;
   height: 32px;
   line-height: 32px;
+  white-space: nowrap;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 .path-floor {
   padding: 0 8px;

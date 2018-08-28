@@ -17,6 +17,7 @@ body {
 ::-webkit-scrollbar {
   background: inherit;
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(170, 170, 170, 0.5);

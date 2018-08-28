@@ -23,6 +23,7 @@ export default {
 
 <style>
 .file-explorer {
+  width: 0;
   flex: auto;
   display: flex;
   flex-direction: column;
