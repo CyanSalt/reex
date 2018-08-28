@@ -2,6 +2,7 @@ import {remote} from 'electron'
 import {sep, join, basename, dirname} from 'path'
 import {readdir, watch, mkdir, copyFile, writeFile, lstat} from 'fs'
 import {promisify} from 'util'
+import settings from '../resources/default/settings.json'
 
 export default {
   data: {
@@ -35,13 +36,33 @@ export default {
     },
   },
   methods: {
-    'settings/load'(data) {
-      this['settings/user'] = data
-      // load other states in store
-      const path = data['explorer.startup.path']
-      this['path/replace'](this['path/interpret'](path))
-      // emit loaded event
-      this.$emit('settings/loaded', data)
+    'settings/load'() {
+      // load default settings
+      this.$flux.set('settings/default', settings)
+      // custom script
+      this.$storage.require('custom.js', init => init(this))
+      // load user settings
+      this.$storage.load('settings.json', (err, data) => {
+        const copied = JSON.parse(JSON.stringify(settings))
+        data = err ? copied : {...copied, ...data}
+        this['settings/user'] = data
+        // load other states in store
+        const path = data['explorer.startup.path']
+        this['path/replace'](this['path/interpret'](path))
+        // emit loaded event
+        this.$emit('settings/loaded', data)
+        // filter default values on saving
+        const reducer = (diff, [key, value]) => {
+          if (JSON.stringify(value) !== JSON.stringify(data[key])) {
+            diff[key] = data[key]
+          }
+          return diff
+        }
+        this.$flux.on('settings/save', () => {
+          const computed = Object.entries(settings).reduce(reducer, {})
+          this.$storage.save('settings.json', computed)
+        })
+      })
     },
     'path/load'() {
       readdir(this['path/full'], (err, files) => {

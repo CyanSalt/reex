@@ -9,7 +9,6 @@
 import {ipcRenderer} from 'electron'
 import QuickAccess from './quick-access'
 import FileExplorer from './file-explorer'
-import settings from '../resources/default/settings.json'
 
 export default {
   el: '#main',
@@ -28,30 +27,7 @@ export default {
   },
   created() {
     this.$flux.dispatch('path/preload')
-    // load default settings
-    this.$flux.set('settings/default', settings)
-    // custom script
-    this.$storage.require('custom.js', init => init(this))
-    // load user settings
-    this.$storage.load('settings.json', (err, data) => {
-      const copied = JSON.parse(JSON.stringify(settings))
-      data = err ? copied : {...copied, ...data}
-      this.$flux.dispatch('settings/load', data)
-      // filter default values on saving
-      const reducer = (diff, [key, value]) => {
-        if (JSON.stringify(value) !== JSON.stringify(data[key])) {
-          diff[key] = data[key]
-        }
-        return diff
-      }
-      this.$flux.on('settings/save', () => {
-        const computed = Object.entries(settings).reduce(reducer, {})
-        this.$storage.save('settings.json', computed)
-      })
-    })
-    ipcRenderer.on('contextmenu', (e, args) => {
-      if (args.action) this.$flux.dispatch(`contextmenu/${args.action}`, args)
-    })
+    this.$flux.dispatch('settings/load')
     // load file templates
     this.$flux.dispatch('templates/load')
     this.$flux.dispatch('folder/watch', {
@@ -60,6 +36,12 @@ export default {
         this.$flux.dispatch('templates/load')
       }
     })
+    ipcRenderer.on('contextmenu', (e, args) => {
+      if (!args.action) return
+      this.$flux.dispatch(`contextmenu/${args.action}`, args)
+    })
+    // custom script
+    this.$storage.require('custom.js', init => init(this))
   }
 }
 </script>
