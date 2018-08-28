@@ -26,6 +26,7 @@ export default {
     }
   },
   created() {
+    this.$flux.dispatch('path/preload')
     // load default settings
     this.$flux.set('settings/default', settings)
     // custom script

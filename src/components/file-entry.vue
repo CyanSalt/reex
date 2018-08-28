@@ -7,7 +7,7 @@
         <file-icon :ext="extname" :height="60" v-else></file-icon>
       </template>
     </div>
-    <div class="file-name">{{ name }}</div>
+    <div class="file-name">{{ nickname }}</div>
   </div>
 </template>
 
@@ -44,7 +44,10 @@ export default {
     },
     focused() {
       return this.selected.includes(this.path)
-    }
+    },
+    nickname() {
+      return this.$flux.dispatch('file/name', this.path)
+    },
   },
   methods: {
     select(e) {

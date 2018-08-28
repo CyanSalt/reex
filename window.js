@@ -46,24 +46,27 @@ function transferEvents() {
     frame.webContents.send('unmaximize')
   })
   ipcMain.on('contextmenu', (event, args) => {
-    Menu.buildFromTemplate(buildContextMenu(args)).popup({})
+    Menu.buildFromTemplate(buildRendererMenu(args)).popup({})
   })
 }
 
-function buildContextMenu(args) {
+function buildRendererMenu(args) {
   if (Array.isArray(args)) {
-    return args.map(buildContextMenu)
+    return args.map(buildRendererMenu)
   }
   if (typeof args !== 'object') {
     return args
   }
-  return {
-    label: args.label,
-    click() {
+  if (args.submenu) {
+    args.submenu = buildRendererMenu(args.submenu)
+  }
+  if (args.action) {
+    args.click = function () {
       const contents = webContents.getFocusedWebContents()
       contents.send(args.action)
     }
   }
+  return args
 }
 
 app.on('ready', init)

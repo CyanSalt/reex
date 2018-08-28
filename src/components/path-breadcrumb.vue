@@ -1,9 +1,9 @@
 <template>
   <div class="path-breadcrumb">
-    <template v-for="(floor, index) in floors">
-      <div :class="['path-floor', { current: index === floors.length - 1 }]"
-        @click="stop(index)">{{ names[index] }}</div>
-      <div class="path-sep" v-if="index < floors.length - 1">
+    <template v-for="(step, index) in steps">
+      <div :class="['path-floor', { current: index === steps.length - 1 }]"
+        @click="redirect(step.path)">{{ step.name }}</div>
+      <div class="path-sep" v-if="index < steps.length - 1">
         <span class="icon-chevron-right"></span>
       </div>
     </template>
@@ -17,10 +17,10 @@ export default {
   name: 'path-breadcrumb',
   computed: {
     floors: state('path/floors'),
-    names: state('path/names'),
+    steps: state('path/steps'),
   },
   methods: {
-    stop: action('path/stop'),
+    redirect: action('path/redirect'),
   }
 }
 </script>

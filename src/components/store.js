@@ -1,5 +1,5 @@
 import {remote} from 'electron'
-import {sep} from 'path'
+import {sep, basename} from 'path'
 import {readdir} from 'fs'
 
 export default {
@@ -9,6 +9,7 @@ export default {
     'path/full': '',
     'path/stack': [],
     'path/forwards': [],
+    'path/defined': [],
     'files/all': [],
     'files/vision': false,
     'files/selected': [],
@@ -16,14 +17,13 @@ export default {
   computed: {
     'path/floors'() {
       const floors = this['path/full'].split(sep)
-      return floors[floors.length - 1] ? floors : floors.slice(-1)
+      return floors[floors.length - 1] ? floors : floors.slice(0, -1)
     },
-    'path/names'() {
+    'path/steps'() {
       return this['path/floors'].map((floor, index) => {
-        if (!floor && index === 0) {
-          return '/'
-        }
-        return floor
+        const path = this['path/floors'].slice(0, index + 1).join(sep)
+        const name = this['file/name'](path)
+        return {name, path}
       })
     },
     'files/visible'() {
@@ -70,23 +70,39 @@ export default {
         this['path/load']()
       }
     },
-    'path/stop'(index) {
-      const path = this['path/floors'].slice(0, index + 1).join(sep) || '/'
-      this['path/redirect'](path)
-    },
     'path/upward'() {
-      if (this['path/floors'].length > 1) {
-        this['path/stop'](this['path/floors'].length - 2)
+      const {length} = this['path/floors']
+      if (length > 1) {
+        const path = this['path/floors'].slice(0, length - 1).join(sep) || '/'
+        this['path/redirect'](path)
       }
+    },
+    'path/preload'() {
+      const electronPaths = [
+        {shortname: 'reex'},
+        {shortname: 'home'},
+        {shortname: 'appData'},
+        {shortname: 'temp'},
+        {shortname: 'desktop', name: 'Desktop#!1'},
+        {shortname: 'documents', name: 'Documents#!2'},
+        {shortname: 'downloads', name: 'Downloads#!3'},
+        {shortname: 'music', name: 'Music#!4'},
+        {shortname: 'pictures', name: 'Pictures#!5'},
+        {shortname: 'videos', name: 'Videos#!6'},
+      ]
+      for (const data of electronPaths) {
+        try {
+          if (data.name) data.name = this.i18n(data.name)
+          data.path = data.shortname === 'reex' ? remote.app.getAppPath() :
+            remote.app.getPath(data.shortname)
+        } catch (e) {}
+      }
+      this['path/defined'] = electronPaths
     },
     'path/interpret'(path) {
       const windowsVariables = /%([^%]+)%/g
       const unixVariables = /\$\{([^}]+)\}/g
-      const electronPaths = [
-        'aniwhere', 'home', 'appData', 'temp',
-        'desktop', 'documents', 'downloads',
-        'music', 'pictures', 'videos',
-      ]
+      const electronPaths = this['path/defined'].map(data => data.shortname)
       const electronVariables = new RegExp(`\\[(${
         electronPaths.join('|')
       })\\]`, 'g')
@@ -94,13 +110,10 @@ export default {
         return process.env[name] || full
       }
       const electronReplacement = (full, name) => {
-        try {
-          if (name === 'reex') {
-            return remote.app.getAppPath()
-          }
-          return remote.app.getPath(name)
-        } catch (e) {}
-        return full
+        const target = this['path/defined'].find(
+          data => data.shortname === name
+        )
+        return target ? target.path : full
       }
       return path.replace(windowsVariables, systemReplacement)
         .replace(unixVariables, systemReplacement)
@@ -119,6 +132,10 @@ export default {
     },
     'file/specify'(file) {
       this['files/selected'] = file ? [file] : []
+    },
+    'file/name'(file) {
+      const target = this['path/defined'].find(data => data.path === file)
+      return (target && target.name) || basename(file) || '/'
     },
   },
 }
