@@ -32,7 +32,9 @@ export default {
       return colors[digit % colors.length]
     },
     extname() {
-      return this.ext.slice(1, 5).toUpperCase()
+      let ext = this.ext
+      while (ext[0] === '.') ext = ext.slice(1)
+      return ext.slice(0, 4).toUpperCase()
     },
   },
 }

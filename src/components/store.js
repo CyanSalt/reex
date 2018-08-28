@@ -26,7 +26,8 @@ export default {
     },
     'path/steps'() {
       return this['path/floors'].map((floor, index) => {
-        const path = this['path/floors'].slice(0, index + 1).join(sep)
+        const path = index === 0 && !floor ? '/' :
+          this['path/floors'].slice(0, index + 1).join(sep)
         const name = this['file/name'](path)
         return {name, path}
       })
