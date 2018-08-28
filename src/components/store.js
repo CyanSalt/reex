@@ -1,4 +1,4 @@
-import {remote} from 'electron'
+import {remote, shell} from 'electron'
 import {sep, join, basename, dirname} from 'path'
 import {readdir, watch, mkdir, copyFile, writeFile, lstat} from 'fs'
 import {promisify} from 'util'
@@ -16,6 +16,7 @@ export default {
     'files/all': [],
     'files/vision': false,
     'files/selected': [],
+    'files/recentlog': {},
     'templates/all': [],
   },
   computed: {
@@ -94,7 +95,7 @@ export default {
       }
       this['path/watcher'] = this['folder/watch']({
         path: this['path/full'],
-        callback() {
+        callback: () => {
           this['path/load']()
         }
       })
@@ -173,6 +174,12 @@ export default {
         this['files/selected'].push(file)
       }
     },
+    'file/unselect'(file) {
+      const index = this['files/selected'].indexOf(file)
+      if (index !== -1) {
+        this['files/selected'].splice(index, 1)
+      }
+    },
     'file/specify'(file) {
       this['files/selected'] = file ? [file] : []
     },
@@ -243,6 +250,16 @@ export default {
     },
     'contextmenu/refresh'() {
       this['path/load']()
+    },
+    'contextmenu/delete'() {
+      const files = this['files/selected']
+      for (const file of files) {
+        shell.moveItemToTrash(file)
+      }
+      this['files/recentlog'] = {
+        action: 'delete',
+        target: files,
+      }
     },
   },
 }

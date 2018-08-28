@@ -1,6 +1,6 @@
 <template>
-  <div :class="['file-entry', { selected: focused }]"
-    @mousedown="select" @dblclick="execute">
+  <div :class="['file-entry', { selected: focused }]" @mousedown="select"
+    @contextmenu="contextmenu" @dblclick="execute">
     <div class="file-icon-wrapper">
       <template v-if="stat">
         <img class="folder-icon" src="./assets/images/folder.svg" v-if="isdir">
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import {shell} from 'electron'
+import {shell, ipcRenderer} from 'electron'
 import {join, extname} from 'path'
 import {lstat} from 'fs'
 import FileIcon from './file-icon'
@@ -52,10 +52,20 @@ export default {
   },
   methods: {
     select(e) {
-      if (e.ctrlKey) {
-        this.$flux.dispatch('file/select', this.path)
-      } else {
+      const multiple = process.platform === 'darwin' ?
+        e.metaKey : e.ctrlKey
+      const rightclick = e.button === 2 || e.button === 3
+      const selected = this.selected.includes(this.path)
+      if (rightclick) {
+        if (!selected) {
+          this.$flux.dispatch('file/specify', this.path)
+        }
+      } else if (!multiple) {
         this.$flux.dispatch('file/specify', this.path)
+      } else if (selected) {
+        this.$flux.dispatch('file/unselect', this.path)
+      } else {
+        this.$flux.dispatch('file/select', this.path)
       }
     },
     execute() {
@@ -64,6 +74,14 @@ export default {
       } else {
         shell.openItem(this.path)
       }
+    },
+    contextmenu() {
+      ipcRenderer.send('contextmenu', [
+        {
+          label: this.i18n('Delete#!12'),
+          action: 'delete',
+        },
+      ])
     },
   },
   created() {
