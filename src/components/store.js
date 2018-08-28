@@ -118,7 +118,7 @@ export default {
       }
     },
     'file/specify'(file) {
-      this['files/selected'] = [file]
+      this['files/selected'] = file ? [file] : []
     },
   },
 }

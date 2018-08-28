@@ -1,5 +1,5 @@
 <template>
-  <div class="file-list" @contextmenu="contextmenu">
+  <div class="file-list" @click.self="free" @contextmenu.self="contextmenu">
     <file-entry v-for="file in files" :name="file" :key="file"></file-entry>
   </div>
 </template>
@@ -19,9 +19,12 @@ export default {
     selected: state('files/selected'),
   },
   methods: {
+    free() {
+      this.$flux.dispatch('file/specify', null)
+    },
     contextmenu() {
       ipcRenderer.send('contextmenu', [])
-    }
+    },
   },
 }
 </script>
