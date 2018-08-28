@@ -1,6 +1,7 @@
 import {remote} from 'electron'
 import {sep, join, basename, dirname} from 'path'
-import {readdir, watch, mkdir, copyFile, writeFile} from 'fs'
+import {readdir, watch, mkdir, copyFile, writeFile, lstat} from 'fs'
+import {promisify} from 'util'
 
 export default {
   data: {
@@ -14,6 +15,7 @@ export default {
     'files/all': [],
     'files/vision': false,
     'files/selected': [],
+    'templates/all': [],
   },
   computed: {
     'path/floors'() {
@@ -66,25 +68,15 @@ export default {
       this['path/watch']()
     },
     'path/watch'() {
-      const path = this['path/full']
-      const parent = dirname(path)
       if (this['path/watcher'].length) {
         this['path/watcher'].forEach(watcher => watcher.close())
       }
-      const watchers = []
-      watchers[0] = watch(path, (type, file) => {
-        if (file === '.DS_Store') return
-        this['path/load']()
+      this['path/watcher'] = this['folder/watch']({
+        path: this['path/full'],
+        callback() {
+          this['path/load']()
+        }
       })
-      if (parent && parent !== path) {
-        watchers[1] = watch(parent, (type, file) => {
-          if (file === '.DS_Store') return
-          if (join(parent, file) === path) {
-            this['path/load']()
-          }
-        })
-      }
-      this['path/watcher'] = watchers
     },
     'path/back'() {
       if (this['path/stack'].length) {
@@ -167,11 +159,37 @@ export default {
       const target = this['path/defined'].find(data => data.path === file)
       return (target && target.name) || basename(file) || '/'
     },
+    'folder/watch'({path, callback}) {
+      const parent = dirname(path)
+      const watchers = []
+      try {
+        watchers[0] = watch(path, (type, file) => {
+          if (file === '.DS_Store') return
+          callback()
+        })
+        if (parent && parent !== path) {
+          watchers[1] = watch(parent, (type, file) => {
+            if (file === '.DS_Store') return
+            if (join(parent, file) === path) {
+              callback()
+            }
+          })
+        }
+      } catch (e) {}
+      return watchers
+    },
     'templates/load'() {
       const templates = this.$storage.filename('templates')
-      return new Promise(resolve => {
-        readdir(templates, (err, files) => {
-          resolve(err ? [] : files)
+      const lstatAsync = promisify(lstat)
+      readdir(templates, (err, files) => {
+        if (err) return
+        Promise.all(files.map(
+          file => lstatAsync(join(templates, file))
+            .then(stats => [file, stats])
+        )).then(entries => {
+          this['templates/all'] = entries
+            .filter(([file, stats]) => stats.isFile())
+            .map(([file, stats]) => file)
         })
       })
     },

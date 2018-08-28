@@ -22,11 +22,11 @@ export default {
     free() {
       this.$flux.dispatch('file/specify', null)
     },
-    async contextmenu() {
+    contextmenu() {
       const creation = {
         label: this.i18n('Create new file#!9'),
       }
-      const templates = await this.$flux.dispatch('templates/load')
+      const templates = this.$flux.get('templates/all')
       if (templates.length) {
         creation.submenu = templates.map(template => {
           return {

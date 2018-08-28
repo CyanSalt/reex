@@ -52,6 +52,14 @@ export default {
     ipcRenderer.on('contextmenu', (e, args) => {
       if (args.action) this.$flux.dispatch(`contextmenu/${args.action}`, args)
     })
+    // load file templates
+    this.$flux.dispatch('templates/load')
+    this.$flux.dispatch('folder/watch', {
+      path: this.$storage.filename('templates'),
+      callback: () => {
+        this.$flux.dispatch('templates/load')
+      }
+    })
   }
 }
 </script>
