@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import {ipcRenderer} from 'electron'
 import QuickAccess from './quick-access'
 import FileExplorer from './file-explorer'
 import settings from '../resources/default/settings.json'
@@ -47,6 +48,9 @@ export default {
         const computed = Object.entries(settings).reduce(reducer, {})
         this.$storage.save('settings.json', computed)
       })
+    })
+    ipcRenderer.on('contextmenu', (e, args) => {
+      if (args.action) this.$flux.dispatch(`contextmenu/${args.action}`)
     })
   }
 }

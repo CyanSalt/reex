@@ -1,6 +1,6 @@
 import {remote} from 'electron'
 import {sep, join, basename, dirname} from 'path'
-import {readdir, watch, access} from 'fs'
+import {readdir, watch, mkdir} from 'fs'
 
 export default {
   data: {
@@ -54,6 +54,7 @@ export default {
       })
     },
     'path/redirect'(path) {
+      if (path === this['path/full']) return
       this['path/stack'].push(this['path/full'])
       this['path/forwards'] = []
       this['path/replace'](path)
@@ -73,10 +74,7 @@ export default {
       const watchers = []
       watchers[0] = watch(path, (type, file) => {
         if (file === '.DS_Store') return
-        access(join(path, file), err => {
-          if (err) return
-          this['path/load']()
-        })
+        this['path/load']()
       })
       if (parent && parent !== path) {
         watchers[1] = watch(parent, (type, file) => {
@@ -168,6 +166,17 @@ export default {
     'file/name'(file) {
       const target = this['path/defined'].find(data => data.path === file)
       return (target && target.name) || basename(file) || '/'
+    },
+    // Context menu actions
+    'contextmenu/create-folder'() {
+      const path = this['path/full']
+      const name = this.i18n('New folder#!8')
+      ;(function create(times) {
+        const realname = times ? `${name} (${times})` : name
+        mkdir(join(path, realname), err => {
+          if (err) create(times + 1)
+        })
+      })(0)
     },
   },
 }

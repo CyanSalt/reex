@@ -23,7 +23,12 @@ export default {
       this.$flux.dispatch('file/specify', null)
     },
     contextmenu() {
-      ipcRenderer.send('contextmenu', [])
+      ipcRenderer.send('contextmenu', [
+        {
+          label: this.i18n('Create new folder#!7'),
+          action: 'create-folder',
+        }
+      ])
     },
   },
 }
