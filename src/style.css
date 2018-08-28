@@ -33,6 +33,7 @@ body {
 .icon-arrow-right,
 .icon-arrow-up,
 .icon-chevron-right,
+.icon-corner-up-right,
 .icon-download,
 .icon-eye,
 .icon-eye-off,
@@ -64,54 +65,57 @@ body {
 .icon-chevron-right:before {
   content: "\e903";
 }
-.icon-download:before {
+.icon-corner-up-right:before {
   content: "\e904";
 }
-.icon-eye:before {
+.icon-download:before {
   content: "\e905";
 }
-.icon-eye-off:before {
+.icon-eye:before {
   content: "\e906";
 }
-.icon-file:before {
+.icon-eye-off:before {
   content: "\e907";
 }
-.icon-film:before {
+.icon-file:before {
   content: "\e908";
 }
-.icon-folder:before {
+.icon-film:before {
   content: "\e909";
 }
-.icon-hard-drive:before {
+.icon-folder:before {
   content: "\e90a";
 }
-.icon-home:before {
+.icon-hard-drive:before {
   content: "\e90b";
 }
-.icon-image:before {
+.icon-home:before {
   content: "\e90c";
 }
-.icon-maximize-2:before {
+.icon-image:before {
   content: "\e90d";
 }
-.icon-minimize-2:before {
+.icon-maximize-2:before {
   content: "\e90e";
 }
-.icon-minus:before {
+.icon-minimize-2:before {
   content: "\e90f";
 }
-.icon-monitor:before {
+.icon-minus:before {
   content: "\e910";
 }
-.icon-music:before {
+.icon-monitor:before {
   content: "\e911";
 }
-.icon-sidebar:before {
+.icon-music:before {
   content: "\e912";
 }
-.icon-terminal:before {
+.icon-sidebar:before {
   content: "\e913";
 }
-.icon-x:before {
+.icon-terminal:before {
   content: "\e914";
+}
+.icon-x:before {
+  content: "\e915";
 }

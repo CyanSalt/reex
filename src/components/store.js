@@ -4,6 +4,8 @@ import {readdir, watch, mkdir, copyFile, writeFile, lstat} from 'fs'
 import {promisify} from 'util'
 import settings from '../resources/default/settings.json'
 
+const lstatAsync = promisify(lstat)
+
 export default {
   data: {
     'settings/default': {},
@@ -13,7 +15,7 @@ export default {
     'path/forwards': [],
     'path/defined': [],
     'path/watcher': [],
-    'files/all': [],
+    'files/info': [],
     'files/vision': false,
     'files/selected': [],
     'files/recentlog': {},
@@ -33,8 +35,8 @@ export default {
       })
     },
     'files/visible'() {
-      if (this['files/vision']) return this['files/all']
-      return this['files/all'].filter(file => !this['file/hidden'](file))
+      if (this['files/vision']) return this['files/info']
+      return this['files/info'].filter(file => !this['file/hidden'](file.path))
     },
   },
   methods: {
@@ -67,15 +69,22 @@ export default {
       })
     },
     'path/load'() {
-      readdir(this['path/full'], (err, files) => {
+      const path = this['path/full']
+      readdir(path, (err, files) => {
         if (err) {
           if (err.code === 'ENOENT') {
             this['path/upward']()
           }
           return
         }
-        this['files/all'] = files
-        this['files/selected'] = []
+        Promise.all(files.map(file => {
+          const fullpath = join(path, file)
+          return lstatAsync(fullpath)
+            .then(stats => ({path: fullpath, stats}))
+        })).then(entries => {
+          this['files/info'] = entries
+          this['files/selected'] = []
+        })
       })
     },
     'path/redirect'(path) {
@@ -167,26 +176,26 @@ export default {
     'vision/toggle'() {
       this['files/vision'] = !this['files/vision']
     },
-    'file/hidden'(file) {
-      return file.charAt(0) === '.'
+    'file/hidden'(path) {
+      return basename(path).charAt(0) === '.'
     },
-    'file/select'(file) {
-      if (!this['files/selected'].includes(file)) {
-        this['files/selected'].push(file)
+    'file/select'(path) {
+      if (!this['files/selected'].includes(path)) {
+        this['files/selected'].push(path)
       }
     },
-    'file/unselect'(file) {
-      const index = this['files/selected'].indexOf(file)
+    'file/unselect'(path) {
+      const index = this['files/selected'].indexOf(path)
       if (index !== -1) {
         this['files/selected'].splice(index, 1)
       }
     },
-    'file/specify'(file) {
-      this['files/selected'] = file ? [file] : []
+    'file/specify'(path) {
+      this['files/selected'] = path ? [path] : []
     },
-    'file/name'(file) {
-      const target = this['path/defined'].find(data => data.path === file)
-      return (target && target.name) || basename(file) || '/'
+    'file/name'(path) {
+      const target = this['path/defined'].find(data => data.path === path)
+      return (target && target.name) || basename(path) || '/'
     },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
@@ -209,7 +218,6 @@ export default {
     },
     'templates/load'() {
       const templates = this.$storage.filename('templates')
-      const lstatAsync = promisify(lstat)
       readdir(templates, (err, files) => {
         if (err) return
         Promise.all(files.map(

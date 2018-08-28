@@ -1,6 +1,7 @@
 <template>
   <div class="file-list" @click.self="free" @contextmenu.self="contextmenu">
-    <file-entry v-for="file in files" :name="file" :key="file"></file-entry>
+    <file-entry v-for="file in files" :path="file.path" :stats="file.stats"
+      :key="file.path"></file-entry>
   </div>
 </template>
 

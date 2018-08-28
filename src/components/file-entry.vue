@@ -2,10 +2,11 @@
   <div :class="['file-entry', { selected: focused }]" @mousedown="select"
     @contextmenu="contextmenu" @dblclick="execute">
     <div class="file-icon-wrapper">
-      <template v-if="stat">
-        <img class="folder-icon" src="./assets/images/folder.svg" v-if="isdir">
-        <file-icon :ext="extname" :height="60" v-else></file-icon>
-      </template>
+      <img class="folder-icon" src="./assets/images/folder.svg" v-if="isdir">
+      <file-icon :ext="extname" :height="60" v-else></file-icon>
+      <div class="symbolic-link" v-if="link">
+        <span class="icon-corner-up-right"></span>
+      </div>
     </div>
     <div class="file-name">{{ nickname }}</div>
   </div>
@@ -13,8 +14,8 @@
 
 <script>
 import {shell, ipcRenderer} from 'electron'
-import {join, extname} from 'path'
-import {lstat} from 'fs'
+import {readlink, stat} from 'fs'
+import {extname, resolve, dirname} from 'path'
 import FileIcon from './file-icon'
 import {state} from '../plugins/flux'
 
@@ -24,30 +25,34 @@ export default {
     'file-icon': FileIcon,
   },
   props: {
-    name: String,
+    path: String,
+    stats: Object,
   },
   data() {
     return {
-      stat: null,
+      link: null
     }
   },
   computed: {
     location: state('path/full'),
     selected: state('files/selected'),
-    path() {
-      return join(this.location, this.name)
-    },
     extname() {
-      return extname(this.name)
+      return extname(this.path)
     },
     isdir() {
-      return this.stat && this.stat.isDirectory()
+      return this.realstats.isDirectory()
     },
     focused() {
       return this.selected.includes(this.path)
     },
     nickname() {
       return this.$flux.dispatch('file/name', this.path)
+    },
+    realpath() {
+      return this.link ? this.link.path : this.path
+    },
+    realstats() {
+      return this.link ? this.link.stats : this.stats
     },
   },
   methods: {
@@ -70,7 +75,7 @@ export default {
     },
     execute() {
       if (this.isdir) {
-        this.$flux.dispatch('path/redirect', this.path)
+        this.$flux.dispatch('path/redirect', this.realpath)
       } else {
         shell.openItem(this.path)
       }
@@ -85,10 +90,16 @@ export default {
     },
   },
   created() {
-    lstat(this.path, (err, stat) => {
-      if (err) return
-      this.stat = stat
-    })
+    if (this.stats.isSymbolicLink()) {
+      readlink(this.path, (err, link) => {
+        if (err) return
+        const path = resolve(dirname(this.path), link)
+        stat(path, (error, stats) => {
+          if (error) return
+          this.link = {path, stats}
+        })
+      })
+    }
   },
 }
 </script>
@@ -114,6 +125,21 @@ export default {
 }
 .file-entry .folder-icon {
   height: 56px;
+}
+.file-entry .file-icon-wrapper {
+  position: relative;
+}
+.file-entry .symbolic-link {
+  position: absolute;
+  line-height: initial;
+}
+.file-entry .folder-icon + .symbolic-link {
+  right: 12px;
+  bottom: 2px;
+}
+.file-entry .file-icon + .symbolic-link {
+  right: 18px;
+  bottom: 0;
 }
 .file-entry .file-name {
   height: 24px;
