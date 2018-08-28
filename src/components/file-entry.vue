@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import {shell} from 'electron'
 import {join, extname} from 'path'
 import {lstat} from 'fs'
 import FileIcon from './file-icon'
@@ -60,6 +61,8 @@ export default {
     execute() {
       if (this.isdir) {
         this.$flux.dispatch('path/redirect', this.path)
+      } else {
+        shell.openItem(this.path)
       }
     },
   },

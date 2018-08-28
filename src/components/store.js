@@ -1,6 +1,6 @@
 import {remote} from 'electron'
-import {sep, basename} from 'path'
-import {readdir} from 'fs'
+import {sep, join, basename, dirname} from 'path'
+import {readdir, watch, access} from 'fs'
 
 export default {
   data: {
@@ -10,6 +10,7 @@ export default {
     'path/stack': [],
     'path/forwards': [],
     'path/defined': [],
+    'path/watcher': [],
     'files/all': [],
     'files/vision': false,
     'files/selected': [],
@@ -36,14 +37,18 @@ export default {
       this['settings/user'] = data
       // load other states in store
       const path = data['explorer.startup.path']
-      this['path/full'] = this['path/interpret'](path)
-      this['path/load']()
+      this['path/replace'](this['path/interpret'](path))
       // emit loaded event
       this.$emit('settings/loaded', data)
     },
     'path/load'() {
       readdir(this['path/full'], (err, files) => {
-        if (err) return
+        if (err) {
+          if (err.code === 'ENOENT') {
+            this['path/upward']()
+          }
+          return
+        }
         this['files/all'] = files
         this['files/selected'] = []
       })
@@ -51,23 +56,50 @@ export default {
     'path/redirect'(path) {
       this['path/stack'].push(this['path/full'])
       this['path/forwards'] = []
+      this['path/replace'](path)
+    },
+    'path/replace'(path) {
+      if (path === this['path/full']) return
       this['path/full'] = path
       this['path/load']()
+      this['path/watch']()
+    },
+    'path/watch'() {
+      const path = this['path/full']
+      const parent = dirname(path)
+      if (this['path/watcher'].length) {
+        this['path/watcher'].forEach(watcher => watcher.close())
+      }
+      const watchers = []
+      watchers[0] = watch(path, (type, file) => {
+        if (file === '.DS_Store') return
+        access(join(path, file), err => {
+          if (err) return
+          this['path/load']()
+        })
+      })
+      if (parent && parent !== path) {
+        watchers[1] = watch(parent, (type, file) => {
+          if (file === '.DS_Store') return
+          if (join(parent, file) === path) {
+            this['path/load']()
+          }
+        })
+      }
+      this['path/watcher'] = watchers
     },
     'path/back'() {
       if (this['path/stack'].length) {
         const path = this['path/stack'].pop()
         this['path/forwards'].push(this['path/full'])
-        this['path/full'] = path
-        this['path/load']()
+        this['path/replace'](path)
       }
     },
     'path/forward'() {
       if (this['path/forwards'].length) {
         const path = this['path/forwards'].pop()
         this['path/stack'].push(this['path/full'])
-        this['path/full'] = path
-        this['path/load']()
+        this['path/replace'](path)
       }
     },
     'path/upward'() {
