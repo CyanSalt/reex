@@ -4,11 +4,12 @@
     <image v-pre x="0" y="0" width="50" height="66"
       xlink:href="./assets/images/file.svg"/>
     <g v-if="ext">
-      <path d="M50,44L50,62c0,4,0,4,-4,4L4,66c-4,0,-4,0,-4,-4L0,44Z"
-        :fill="color"/>
+      <path d="M50,44V62c0,4,0,4,-4,4H4c-4,0,-4,0,-4,-4V44Z" :fill="color"/>
       <text x="25" y="60" font-size="14" text-anchor="middle"
         fill="#fff">{{ extname }}</text>
     </g>
+    <text x="51" y="66" font-size="14" text-anchor="end"
+      font-family="icomoon" fill="#353d46" v-if="link">&#xe904;</text>
   </svg>
 </template>
 
@@ -17,6 +18,7 @@ export default {
   name: 'file-icon',
   props: {
     ext: String,
+    link: Boolean,
   },
   computed: {
     color() {

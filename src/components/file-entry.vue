@@ -2,14 +2,8 @@
   <div :class="['file-entry', { selected: focused }]" @mousedown="select"
     @contextmenu="contextmenu" @dblclick="execute">
     <div class="file-icon-wrapper">
-      <img class="folder-icon" src="./assets/images/folder.svg" v-if="isdir">
-      <file-icon :ext="extname" height="60" v-else></file-icon>
-      <div class="symbolic-link" v-if="link">
-        <span class="icon-corner-up-right"></span>
-      </div>
-      <div class="file-icon-watermark" v-if="watermark">
-        <span :class="watermark"></span>
-      </div>
+      <folder-icon :watermark="watermark" :link="!!link" v-if="isdir"></folder-icon>
+      <file-icon :ext="extname" :link="!!link" v-else></file-icon>
     </div>
     <div class="file-name">{{ nickname }}</div>
   </div>
@@ -19,12 +13,14 @@
 import {shell, ipcRenderer} from 'electron'
 import {extname} from 'path'
 import FileIcon from './file-icon'
+import FolderIcon from './folder-icon'
 import {state} from '../plugins/flux'
 
 export default {
   name: 'file-entry',
   components: {
     'file-icon': FileIcon,
+    'folder-icon': FolderIcon,
   },
   props: {
     path: String,
@@ -47,6 +43,7 @@ export default {
       return this.$flux.dispatch('file/name', this.path)
     },
     watermark() {
+      if (!this.isdir) return null
       return this.$flux.dispatch('file/watermark', this.realpath)
     },
     realpath() {
@@ -112,31 +109,11 @@ export default {
   display: inline-block;
   vertical-align: middle;
 }
+.file-entry .file-icon {
+  height: 60px;
+}
 .file-entry .folder-icon {
   height: 56px;
-}
-.file-entry .file-icon-wrapper {
-  position: relative;
-}
-.file-entry .symbolic-link {
-  position: absolute;
-  line-height: initial;
-}
-.file-entry .folder-icon + .symbolic-link {
-  right: 12px;
-  bottom: 2px;
-}
-.file-entry .file-icon + .symbolic-link {
-  right: 18px;
-  bottom: 0;
-}
-.file-entry .file-icon-watermark {
-  position: absolute;
-  top: 6px;
-  left: 0;
-  right: 0;
-  font-size: 24px;
-  color: rgba(0, 0, 0, 0.2);
 }
 .file-entry .file-name {
   height: 24px;

@@ -131,15 +131,15 @@ export default {
     'path/preload'() {
       const electronPaths = [
         {shortname: 'reex'},
-        {shortname: 'home', watermark: 'icon-home'},
+        {shortname: 'home', watermark: '\ue90c'},
         {shortname: 'appData'},
         {shortname: 'temp'},
-        {shortname: 'desktop', name: 'Desktop#!1', watermark: 'icon-monitor'},
-        {shortname: 'documents', name: 'Documents#!2', watermark: 'icon-file'},
-        {shortname: 'downloads', name: 'Downloads#!3', watermark: 'icon-download'},
-        {shortname: 'music', name: 'Music#!4', watermark: 'icon-music'},
-        {shortname: 'pictures', name: 'Pictures#!5', watermark: 'icon-image'},
-        {shortname: 'videos', name: 'Videos#!6', watermark: 'icon-film'},
+        {shortname: 'desktop', name: 'Desktop#!1', watermark: '\ue911'},
+        {shortname: 'documents', name: 'Documents#!2', watermark: '\ue908'},
+        {shortname: 'downloads', name: 'Downloads#!3', watermark: '\ue905'},
+        {shortname: 'music', name: 'Music#!4', watermark: '\ue912'},
+        {shortname: 'pictures', name: 'Pictures#!5', watermark: '\ue90d'},
+        {shortname: 'videos', name: 'Videos#!6', watermark: '\ue909'},
       ]
       for (const data of electronPaths) {
         try {
