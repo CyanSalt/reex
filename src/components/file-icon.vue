@@ -1,8 +1,7 @@
 <template>
   <svg class="file-icon" version="1.1" baseProfile="full" viewBox="0 0 50 66"
     xmlns="http://www.w3.org/2000/svg">
-    <image v-pre x="0" y="0" width="50" height="66"
-      xlink:href="./assets/images/file.svg"/>
+    <use xlink:href="./assets/images/file-icons.svg#file"/>
     <g v-if="ext">
       <path d="M50,44V62c0,4,0,4,-4,4H4c-4,0,-4,0,-4,-4V44Z" :fill="color"/>
       <text x="25" y="60" font-size="14" text-anchor="middle"

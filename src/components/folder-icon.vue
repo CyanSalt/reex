@@ -1,8 +1,7 @@
 <template>
   <svg class="folder-icon" version="1.1" baseProfile="full" viewBox="0 0 64 60"
     xmlns="http://www.w3.org/2000/svg">
-    <image v-pre x="0" y="0" width="64" height="60"
-      xlink:href="./assets/images/folder.svg"/>
+    <use xlink:href="./assets/images/file-icons.svg#folder"/>
     <text x="32" y="46" font-size="24" text-anchor="middle"
       font-family="icomoon" fill="black" opacity="0.2" v-if="watermark"
       >{{ watermark }}</text>
