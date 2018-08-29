@@ -4,10 +4,11 @@
     <image v-pre x="0" y="0" width="64" height="60"
       xlink:href="./assets/images/folder.svg"/>
     <text x="32" y="46" font-size="24" text-anchor="middle"
-      font-family="icomoon" fill="#000" opacity="0.2" v-if="watermark"
+      font-family="icomoon" fill="black" opacity="0.2" v-if="watermark"
       >{{ watermark }}</text>
-    <text x="65" y="60" font-size="14" text-anchor="end"
-      font-family="icomoon" fill="#353d46" v-if="link">&#xe904;</text>
+    <text x="65" y="60" font-size="14" text-anchor="end" font-family="icomoon"
+      fill="#353d46" v-if="link" stroke="white" stroke-width="3"
+      paint-order="stroke">&#xe904;</text>
   </svg>
 </template>
 

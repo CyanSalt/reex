@@ -120,6 +120,6 @@ export default {
 }
 .control-bar .button.close:hover {
   background: #ed5e63;
-  color: #fff;
+  color: white;
 }
 </style>

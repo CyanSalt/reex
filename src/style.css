@@ -2,7 +2,7 @@
   font-style: normal;
   font-family: 'Reex UI';
   src: local('Noto Sans CJK SC'), local('PingFang SC'),
-    url("../../fonts/NotoSansCJKsc-Regular.otf")
+    url('../../fonts/NotoSansCJKsc-Regular.otf')
 }
 
 body {
@@ -53,69 +53,69 @@ body {
 .icon-x {
   font-family: 'icomoon';
 }
-.icon-arrow-left:before {
-  content: "\e900";
+.icon-arrow-left::before {
+  content: '\e900';
 }
-.icon-arrow-right:before {
-  content: "\e901";
+.icon-arrow-right::before {
+  content: '\e901';
 }
-.icon-arrow-up:before {
-  content: "\e902";
+.icon-arrow-up::before {
+  content: '\e902';
 }
-.icon-chevron-right:before {
-  content: "\e903";
+.icon-chevron-right::before {
+  content: '\e903';
 }
-.icon-corner-up-right:before {
-  content: "\e904";
+.icon-corner-up-right::before {
+  content: '\e904';
 }
-.icon-download:before {
-  content: "\e905";
+.icon-download::before {
+  content: '\e905';
 }
-.icon-eye:before {
-  content: "\e906";
+.icon-eye::before {
+  content: '\e906';
 }
-.icon-eye-off:before {
-  content: "\e907";
+.icon-eye-off::before {
+  content: '\e907';
 }
-.icon-file:before {
-  content: "\e908";
+.icon-file::before {
+  content: '\e908';
 }
-.icon-film:before {
-  content: "\e909";
+.icon-film::before {
+  content: '\e909';
 }
-.icon-folder:before {
-  content: "\e90a";
+.icon-folder::before {
+  content: '\e90a';
 }
-.icon-hard-drive:before {
-  content: "\e90b";
+.icon-hard-drive::before {
+  content: '\e90b';
 }
-.icon-home:before {
-  content: "\e90c";
+.icon-home::before {
+  content: '\e90c';
 }
-.icon-image:before {
-  content: "\e90d";
+.icon-image::before {
+  content: '\e90d';
 }
-.icon-maximize-2:before {
-  content: "\e90e";
+.icon-maximize-2::before {
+  content: '\e90e';
 }
-.icon-minimize-2:before {
-  content: "\e90f";
+.icon-minimize-2::before {
+  content: '\e90f';
 }
-.icon-minus:before {
-  content: "\e910";
+.icon-minus::before {
+  content: '\e910';
 }
-.icon-monitor:before {
-  content: "\e911";
+.icon-monitor::before {
+  content: '\e911';
 }
-.icon-music:before {
-  content: "\e912";
+.icon-music::before {
+  content: '\e912';
 }
-.icon-sidebar:before {
-  content: "\e913";
+.icon-sidebar::before {
+  content: '\e913';
 }
-.icon-terminal:before {
-  content: "\e914";
+.icon-terminal::before {
+  content: '\e914';
 }
-.icon-x:before {
-  content: "\e915";
+.icon-x::before {
+  content: '\e915';
 }

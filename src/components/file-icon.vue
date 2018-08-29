@@ -6,10 +6,11 @@
     <g v-if="ext">
       <path d="M50,44V62c0,4,0,4,-4,4H4c-4,0,-4,0,-4,-4V44Z" :fill="color"/>
       <text x="25" y="60" font-size="14" text-anchor="middle"
-        fill="#fff">{{ extname }}</text>
+        fill="white">{{ extname }}</text>
     </g>
-    <text x="51" y="66" font-size="14" text-anchor="end"
-      font-family="icomoon" fill="#353d46" v-if="link">&#xe904;</text>
+    <text x="51" y="66" font-size="14" text-anchor="end" font-family="icomoon"
+      fill="#353d46" v-if="link" stroke="white" stroke-width="3"
+      paint-order="stroke">&#xe904;</text>
   </svg>
 </template>
 
