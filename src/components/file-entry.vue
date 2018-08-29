@@ -3,9 +3,12 @@
     @contextmenu="contextmenu" @dblclick="execute">
     <div class="file-icon-wrapper">
       <img class="folder-icon" src="./assets/images/folder.svg" v-if="isdir">
-      <file-icon :ext="extname" :height="60" v-else></file-icon>
+      <file-icon :ext="extname" height="60" v-else></file-icon>
       <div class="symbolic-link" v-if="link">
         <span class="icon-corner-up-right"></span>
+      </div>
+      <div class="file-icon-watermark" v-if="watermark">
+        <span :class="watermark"></span>
       </div>
     </div>
     <div class="file-name">{{ nickname }}</div>
@@ -42,6 +45,9 @@ export default {
     },
     nickname() {
       return this.$flux.dispatch('file/name', this.path)
+    },
+    watermark() {
+      return this.$flux.dispatch('file/watermark', this.realpath)
     },
     realpath() {
       return this.link ? this.link.path : this.path
@@ -123,6 +129,14 @@ export default {
 .file-entry .file-icon + .symbolic-link {
   right: 18px;
   bottom: 0;
+}
+.file-entry .file-icon-watermark {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.2);
 }
 .file-entry .file-name {
   height: 24px;

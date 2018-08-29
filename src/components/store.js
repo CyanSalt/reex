@@ -81,22 +81,7 @@ export default {
           }
           return
         }
-        Promise.all(files.map(file => {
-          const fullpath = join(path, file)
-          return promises.lstat(fullpath)
-            .then(stats => {
-              const info = {path: fullpath, stats}
-              if (!stats.isSymbolicLink()) {
-                return info
-              }
-              return this['file/follow'](info).then(link => {
-                return Object.assign(info, {link})
-              })
-            })
-        })).then(entries => {
-          this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
-          this['files/selected'] = []
-        })
+        this['explorer/show'](files.map(file => join(path, file)))
       })
     },
     'path/redirect'(path) {
@@ -146,21 +131,23 @@ export default {
     'path/preload'() {
       const electronPaths = [
         {shortname: 'reex'},
-        {shortname: 'home'},
+        {shortname: 'home', watermark: 'icon-home'},
         {shortname: 'appData'},
         {shortname: 'temp'},
-        {shortname: 'desktop', name: 'Desktop#!1'},
-        {shortname: 'documents', name: 'Documents#!2'},
-        {shortname: 'downloads', name: 'Downloads#!3'},
-        {shortname: 'music', name: 'Music#!4'},
-        {shortname: 'pictures', name: 'Pictures#!5'},
-        {shortname: 'videos', name: 'Videos#!6'},
+        {shortname: 'desktop', name: 'Desktop#!1', watermark: 'icon-monitor'},
+        {shortname: 'documents', name: 'Documents#!2', watermark: 'icon-file'},
+        {shortname: 'downloads', name: 'Downloads#!3', watermark: 'icon-download'},
+        {shortname: 'music', name: 'Music#!4', watermark: 'icon-music'},
+        {shortname: 'pictures', name: 'Pictures#!5', watermark: 'icon-image'},
+        {shortname: 'videos', name: 'Videos#!6', watermark: 'icon-film'},
       ]
       for (const data of electronPaths) {
         try {
           if (data.name) data.name = this.i18n(data.name)
-          data.path = data.shortname === 'reex' ? remote.app.getAppPath() :
-            remote.app.getPath(data.shortname)
+          if (!data.path) {
+            data.path = data.shortname === 'reex' ? remote.app.getAppPath() :
+              remote.app.getPath(data.shortname)
+          }
         } catch (e) {}
       }
       this['path/defined'] = electronPaths
@@ -208,6 +195,10 @@ export default {
     'file/name'(path) {
       const target = this['path/defined'].find(data => data.path === path)
       return (target && target.name) || basename(path) || '/'
+    },
+    'file/watermark'(path) {
+      const target = this['path/defined'].find(data => data.path === path)
+      return target && target.watermark
     },
     'file/follow'(info) {
       const {path, stats} = info
@@ -261,6 +252,23 @@ export default {
             .filter(([file, stats]) => stats.isFile())
             .map(([file, stats]) => file)
         })
+      })
+    },
+    'explorer/show'(paths) {
+      Promise.all(paths.map(path => {
+        return promises.lstat(path)
+          .then(stats => {
+            const info = {path, stats}
+            if (!stats.isSymbolicLink()) {
+              return info
+            }
+            return this['file/follow'](info).then(link => {
+              return Object.assign(info, {link})
+            })
+          })
+      })).then(entries => {
+        this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
+        this['files/selected'] = []
       })
     },
     // Context menu actions
