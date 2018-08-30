@@ -24,6 +24,7 @@ export default {
     'files/selected': [],
     'files/recentlog': {},
     'templates/all': [],
+    'explorer/loading': false,
   },
   computed: {
     'path/floors'() {
@@ -255,6 +256,9 @@ export default {
       })
     },
     'explorer/show'(paths) {
+      this['files/info'] = []
+      this['files/selected'] = []
+      this['explorer/loading'] = true
       Promise.all(paths.map(path => {
         return promises.lstat(path)
           .then(stats => {
@@ -267,8 +271,8 @@ export default {
             })
           })
       })).then(entries => {
+        this['explorer/loading'] = false
         this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
-        this['files/selected'] = []
       })
     },
     // Context menu actions

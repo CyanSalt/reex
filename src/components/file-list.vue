@@ -1,7 +1,10 @@
 <template>
   <div class="file-list" @click.self="free" @contextmenu.self="contextmenu">
-    <file-entry v-for="file in files" :path="file.path" :stats="file.stats"
-      :link="file.link" :key="file.path"></file-entry>
+    <div class="loading" v-if="loading">{{ this.i18n('Loading...#!13') }}</div>
+    <template v-else>
+      <file-entry v-for="file in files" :path="file.path" :stats="file.stats"
+        :link="file.link" :key="file.path"></file-entry>
+    </template>
   </div>
 </template>
 
@@ -18,6 +21,7 @@ export default {
   computed: {
     files: state('files/visible'),
     selected: state('files/selected'),
+    loading: state('explorer/loading'),
   },
   methods: {
     free() {
@@ -64,5 +68,11 @@ export default {
   align-content: flex-start;
   padding: 8px;
   overflow: auto;
+}
+.file-list .loading {
+  width: 100%;
+  text-align: center;
+  line-height: 48px;
+  color: #c0c5ce;
 }
 </style>
