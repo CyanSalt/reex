@@ -1,5 +1,5 @@
 <template>
-  <svg class="file-icon" version="1.1" baseProfile="full" viewBox="0 0 50 66"
+  <svg class="single-file-icon" version="1.1" baseProfile="full" viewBox="0 0 50 66"
     xmlns="http://www.w3.org/2000/svg">
     <use xlink:href="./assets/images/file-icons.svg#file"/>
     <g v-if="ext">
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  name: 'file-icon',
+  name: 'single-file-icon',
   props: {
     ext: String,
     link: Boolean,

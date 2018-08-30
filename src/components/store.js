@@ -19,6 +19,7 @@ export default {
     'path/forwards': [],
     'path/defined': [],
     'path/watcher': [],
+    'path/favorites': [],
     'files/info': [],
     'files/vision': false,
     'files/selected': [],
@@ -58,6 +59,11 @@ export default {
         // load other states in store
         const path = data['explorer.startup.path']
         this['path/replace'](this['path/interpret'](path))
+        const favorites = data['quickaccess.favorites']
+          .map(entry => this['path/interpret'](entry))
+        this['file/read'](favorites).then(entries => {
+          this['path/favorites'] = entries
+        })
         // emit loaded event
         this.$emit('settings/loaded', data)
         // filter default values on saving
@@ -143,13 +149,16 @@ export default {
         {shortname: 'videos', name: 'Videos#!6', watermark: '\ue909'},
       ]
       for (const data of electronPaths) {
-        try {
-          if (data.name) data.name = this.i18n(data.name)
-          if (!data.path) {
-            data.path = data.shortname === 'reex' ? remote.app.getAppPath() :
-              remote.app.getPath(data.shortname)
+        if (data.name) {
+          data.name = this.i18n(data.name)
+        }
+        if (!data.path) {
+          if (data.shortname === 'reex') {
+            data.path = remote.app.getAppPath()
+          } else {
+            data.path = remote.app.getPath(data.shortname)
           }
-        } catch (e) {}
+        }
       }
       this['path/defined'] = electronPaths
     },
@@ -222,6 +231,20 @@ export default {
       if (!dirA && dirB) return 1
       return baseA.localeCompare(baseB)
     },
+    'file/read'(paths) {
+      return Promise.all(paths.map(path => {
+        return promises.lstat(path)
+          .then(stats => {
+            const info = {path, stats}
+            if (!stats.isSymbolicLink()) {
+              return info
+            }
+            return this['file/follow'](info).then(link => {
+              return Object.assign(info, {link})
+            })
+          })
+      }))
+    },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
       const watchers = []
@@ -245,13 +268,11 @@ export default {
       const templates = this.$storage.filename('templates')
       readdir(templates, (err, files) => {
         if (err) return
-        Promise.all(files.map(
-          file => promises.lstat(join(templates, file))
-            .then(stats => [file, stats])
-        )).then(entries => {
+        const paths = files.map(file => join(templates, file))
+        this['file/read'](paths).then(entries => {
           this['templates/all'] = entries
-            .filter(([file, stats]) => stats.isFile())
-            .map(([file, stats]) => file)
+            .filter(({stats}) => stats.isFile())
+            .map(({path}) => path)
         })
       })
     },
@@ -259,18 +280,7 @@ export default {
       this['files/info'] = []
       this['files/selected'] = []
       this['explorer/loading'] = true
-      Promise.all(paths.map(path => {
-        return promises.lstat(path)
-          .then(stats => {
-            const info = {path, stats}
-            if (!stats.isSymbolicLink()) {
-              return info
-            }
-            return this['file/follow'](info).then(link => {
-              return Object.assign(info, {link})
-            })
-          })
-      })).then(entries => {
+      this['file/read'](paths).then(entries => {
         this['explorer/loading'] = false
         this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
       })
@@ -288,15 +298,14 @@ export default {
     },
     'contextmenu/create-file'({data}) {
       const path = this['path/full']
-      const name = data || this.i18n('New file#!10')
-      const templates = this.$storage.filename('templates')
+      const name = basename(data) || this.i18n('New file#!10')
       ;(function create(times) {
         const realname = times ? `${name} (${times})` : name
         const callback = err => {
           if (err) create(times + 1)
         }
         if (data) {
-          copyFile(join(templates, name), join(path, realname), callback)
+          copyFile(data, join(path, realname), callback)
         } else {
           writeFile(join(path, realname), '', {flag: 'wx'}, callback)
         }

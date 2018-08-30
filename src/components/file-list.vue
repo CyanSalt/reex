@@ -1,15 +1,16 @@
 <template>
   <div class="file-list" @click.self="free" @contextmenu.self="contextmenu">
-    <div class="loading" v-if="loading">{{ this.i18n('Loading...#!13') }}</div>
+    <div class="loading" v-if="loading">{{ i18n('Loading...#!13') }}</div>
     <template v-else>
-      <file-entry v-for="file in files" :path="file.path" :stats="file.stats"
-        :link="file.link" :key="file.path"></file-entry>
+      <file-entry v-for="file in files" :file="file"
+        :key="file.path"></file-entry>
     </template>
   </div>
 </template>
 
 <script>
 import {ipcRenderer} from 'electron'
+import {basename, extname} from 'fs'
 import ReexFileEntry from './file-entry'
 import {state} from '../plugins/flux'
 
@@ -35,7 +36,7 @@ export default {
       if (templates.length) {
         creation.submenu = templates.map(template => {
           return {
-            label: template,
+            label: basename(template, extname(template)),
             data: template,
             action: 'create-file'
           }

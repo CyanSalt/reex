@@ -1,3 +1,7 @@
 {
-  "explorer.startup.path": "[home]"
+  "explorer.startup.path": "[home]",
+  "quickaccess.favorites": [
+    "[documents]", "[pictures]", "[music]", "[videos]",
+    "[downloads]", "[desktop]", "[home]"
+  ]
 }

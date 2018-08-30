@@ -2,11 +2,9 @@
   <div :class="['file-entry', { selected: focused, hidden }]" @mousedown="select"
     @contextmenu="contextmenu" @dblclick="execute">
     <div class="file-icon-wrapper">
-      <folder-icon :watermark="watermark" :link="!!link"
-        v-if="isFolder"></folder-icon>
-      <img class="image-preview" :src="path" v-else-if="preview && isImage"
+      <img class="image-preview" :src="real.path" v-if="preview && isImage"
         @error="preview = false">
-      <file-icon :ext="extname" :link="!!link" v-else></file-icon>
+      <file-icon :file="file" v-else></file-icon>
     </div>
     <div class="file-name">{{ nickname }}</div>
   </div>
@@ -14,21 +12,16 @@
 
 <script>
 import {shell, ipcRenderer} from 'electron'
-import {extname} from 'path'
 import FileIcon from './file-icon'
-import FolderIcon from './folder-icon'
 import {state} from '../plugins/flux'
 
 export default {
   name: 'file-entry',
   components: {
     'file-icon': FileIcon,
-    'folder-icon': FolderIcon,
   },
   props: {
-    path: String,
-    stats: Object,
-    link: Object,
+    file: Object,
   },
   data() {
     return {
@@ -38,62 +31,51 @@ export default {
   computed: {
     location: state('path/full'),
     selected: state('files/selected'),
-    extname() {
-      return extname(this.path)
-    },
-    isFolder() {
-      return this.realstats.isDirectory()
-    },
     isImage() {
       return [
         '.apng', '.bmp', '.cgm', '.g3', '.gif', '.ief', '.jp2', '.jpg2',
         '.jpeg', '.jpg', '.jpe', '.jpm', '.jpx', '.jpf', '.ktx', '.png',
         '.sgi', '.svg', '.svgz', '.tiff', '.tif', '.webp',
-      ].includes(this.extname)
+      ].find(ext => this.real.path.slice(0 - ext.length) === ext)
     },
     focused() {
-      return this.selected.includes(this.path)
+      return this.selected.includes(this.file.path)
     },
     hidden() {
-      return this.$flux.dispatch('file/hidden', this.path)
+      return this.$flux.dispatch('file/hidden', this.file.path)
     },
     nickname() {
-      return this.$flux.dispatch('file/name', this.path)
+      return this.$flux.dispatch('file/name', this.file.path)
     },
-    watermark() {
-      if (!this.isFolder) return null
-      return this.$flux.dispatch('file/watermark', this.realpath)
-    },
-    realpath() {
-      return this.link ? this.link.path : this.path
-    },
-    realstats() {
-      return this.link ? this.link.stats : this.stats
+    real() {
+      return this.file.link || this.file
     },
   },
   methods: {
     select(e) {
+      const {path} = this.file
       const multiple = process.platform === 'darwin' ?
         e.metaKey : e.ctrlKey
       const rightclick = e.button === 2 || e.button === 3
-      const selected = this.selected.includes(this.path)
+      const selected = this.selected.includes(path)
       if (rightclick) {
         if (!selected) {
-          this.$flux.dispatch('file/specify', this.path)
+          this.$flux.dispatch('file/specify', path)
         }
       } else if (!multiple) {
-        this.$flux.dispatch('file/specify', this.path)
+        this.$flux.dispatch('file/specify', path)
       } else if (selected) {
-        this.$flux.dispatch('file/unselect', this.path)
+        this.$flux.dispatch('file/unselect', path)
       } else {
-        this.$flux.dispatch('file/select', this.path)
+        this.$flux.dispatch('file/select', path)
       }
     },
     execute() {
-      if (this.isFolder) {
-        this.$flux.dispatch('path/redirect', this.realpath)
+      const {stats, path} = this.real
+      if (stats.isDirectory()) {
+        this.$flux.dispatch('path/redirect', path)
       } else {
-        shell.openItem(this.path)
+        shell.openItem(path)
       }
     },
     contextmenu() {
@@ -123,21 +105,22 @@ export default {
   text-align: center;
 }
 .file-entry.selected {
-  background: #eaeef3;
+  background: rgba(234, 238, 243, 0.7);
 }
 .file-entry .file-icon-wrapper {
   height: 72px;
   line-height: 70px;
 }
-.file-entry.hidden {
+.file-entry.hidden .file-icon-wrapper,
+.file-entry.hidden .file-name {
   opacity: 0.5;
 }
-.file-entry .file-icon,
+.file-entry .single-file-icon,
 .file-entry .folder-icon {
   display: inline-block;
   vertical-align: middle;
 }
-.file-entry .file-icon {
+.file-entry .single-file-icon {
   height: 60px;
 }
 .file-entry .folder-icon {
