@@ -75,7 +75,7 @@ export default {
       if (stats.isDirectory()) {
         this.$flux.dispatch('path/redirect', path)
       } else {
-        shell.openItem(path)
+        this.$flux.dispatch('file/execute', path)
       }
     },
     contextmenu() {

@@ -24,6 +24,7 @@ export default {
     'files/vision': false,
     'files/selected': [],
     'files/recentlog': {},
+    'file/executed': null,
     'templates/all': [],
     'explorer/loading': false,
   },
@@ -245,12 +246,22 @@ export default {
           })
       }))
     },
+    'file/execute'(path) {
+      this['file/executed'] = path
+      shell.openItem(path)
+    },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
       const watchers = []
       try {
         watchers[0] = watch(path, (type, file) => {
           if (file === '.DS_Store') return
+          if (this['file/executed'] &&
+            join(path, file) === this['file/executed']
+          ) {
+            this['file/executed'] = null
+            return
+          }
           callback()
         })
         if (parent && parent !== path) {
