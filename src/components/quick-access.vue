@@ -5,9 +5,7 @@
       <div v-for="file in favorites" @click="redirect(file.path)"
         :class="['favorite-entry', { active: active(file) }]">
         <div class="entry-icon">
-          <span :class="watermark(file)" v-if="watermark(file)"></span>
-          <span class="icon-folder" v-else-if="isFolder(file)"></span>
-          <span class="icon-file" v-else></span>
+          <span :class="icon(file)"></span>
         </div>
         <div class="entry-name">{{ name(file.path) }}</div>
       </div>
@@ -32,13 +30,12 @@ export default {
       return file.path === this.path || (
         file.link && file.link.path === this.path)
     },
-    watermark(file) {
+    icon(file) {
       const path = file.link ? file.link.path : file.path
-      return this.$flux.dispatch('file/watermark', path)
-    },
-    isFolder(file) {
       const stats = file.link ? file.link.stats : file.stats
-      return stats.isDirectory()
+      const watermark = this.$flux.dispatch('file/watermark', path)
+      if (watermark) return watermark
+      return stats.isDirectory() ? 'icon-folder' : 'icon-file'
     },
   },
 }
