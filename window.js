@@ -61,9 +61,12 @@ function buildRendererMenu(args) {
     args.submenu = buildRendererMenu(args.submenu)
   }
   if (args.action) {
-    args.click = function () {
-      const contents = webContents.getFocusedWebContents()
-      contents.send('contextmenu', {action: args.action, data: args.data})
+    args.click = function (item, window) {
+      // FIXME: `window` might be null on macOS when that window is not focused
+      // Main process should register the window when IPC received
+      (window || frame).webContents.send('contextmenu', {
+        action: args.action, data: args.data
+      })
     }
   }
   return args
