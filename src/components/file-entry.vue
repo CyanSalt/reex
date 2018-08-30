@@ -1,5 +1,5 @@
 <template>
-  <div :class="['file-entry', { selected: focused }]" @mousedown="select"
+  <div :class="['file-entry', { selected: focused, hidden }]" @mousedown="select"
     @contextmenu="contextmenu" @dblclick="execute">
     <div class="file-icon-wrapper">
       <folder-icon :watermark="watermark" :link="!!link" v-if="isdir"></folder-icon>
@@ -38,6 +38,9 @@ export default {
     },
     focused() {
       return this.selected.includes(this.path)
+    },
+    hidden() {
+      return this.$flux.dispatch('file/hidden', this.path)
     },
     nickname() {
       return this.$flux.dispatch('file/name', this.path)
@@ -103,6 +106,9 @@ export default {
 .file-entry .file-icon-wrapper {
   height: 72px;
   line-height: 70px;
+}
+.file-entry.hidden {
+  opacity: 0.5;
 }
 .file-entry .file-icon,
 .file-entry .folder-icon {
