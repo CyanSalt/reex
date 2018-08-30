@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu, ipcMain, webContents} = require('electron')
+const {app, BrowserWindow, Menu, ipcMain} = require('electron')
 
 let frame = null
 

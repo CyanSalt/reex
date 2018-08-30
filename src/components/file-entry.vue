@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import {shell, ipcRenderer} from 'electron'
+import {ipcRenderer} from 'electron'
 import FileIcon from './file-icon'
 import {state} from '../plugins/flux'
 
@@ -56,7 +56,7 @@ export default {
       const {path} = this.file
       const multiple = process.platform === 'darwin' ?
         e.metaKey : e.ctrlKey
-      const rightclick = e.button === 2 || e.button === 3
+      const rightclick = e.buttons & 2
       const selected = this.selected.includes(path)
       if (rightclick) {
         if (!selected) {
