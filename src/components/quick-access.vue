@@ -54,12 +54,21 @@ export default {
   line-height: 34px;
 }
 .quick-access .favorite-entry {
+  position: relative;
   display: flex;
   padding-left: 24px;
   line-height: 32px;
   cursor: pointer;
 }
-.quick-access .favorite-entry.active,
+.quick-access .favorite-entry.active::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  top: 8px;
+  bottom: 8px;
+  left: 16px;
+  background: currentColor;
+}
 .quick-access .favorite-entry:hover {
   background: rgba(216, 222, 233, 0.5);
 }
