@@ -38,6 +38,7 @@ body {
 .icon-eye,
 .icon-eye-off,
 .icon-file,
+.icon-file-text,
 .icon-film,
 .icon-folder,
 .icon-hard-drive,
@@ -48,7 +49,6 @@ body {
 .icon-minus,
 .icon-monitor,
 .icon-music,
-.icon-sidebar,
 .icon-terminal,
 .icon-x {
   font-family: 'icomoon';
@@ -80,37 +80,37 @@ body {
 .icon-file::before {
   content: '\e908';
 }
-.icon-film::before {
+.icon-file-text::before {
   content: '\e909';
 }
-.icon-folder::before {
+.icon-film::before {
   content: '\e90a';
 }
-.icon-hard-drive::before {
+.icon-folder::before {
   content: '\e90b';
 }
-.icon-home::before {
+.icon-hard-drive::before {
   content: '\e90c';
 }
-.icon-image::before {
+.icon-home::before {
   content: '\e90d';
 }
-.icon-maximize-2::before {
+.icon-image::before {
   content: '\e90e';
 }
-.icon-minimize-2::before {
+.icon-maximize-2::before {
   content: '\e90f';
 }
-.icon-minus::before {
+.icon-minimize-2::before {
   content: '\e910';
 }
-.icon-monitor::before {
+.icon-minus::before {
   content: '\e911';
 }
-.icon-music::before {
+.icon-monitor::before {
   content: '\e912';
 }
-.icon-sidebar::before {
+.icon-music::before {
   content: '\e913';
 }
 .icon-terminal::before {

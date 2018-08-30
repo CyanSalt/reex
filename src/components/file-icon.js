@@ -15,7 +15,7 @@ export default {
     const realpath = file.link ? file.link.path : file.path
     const realstats = file.link ? file.link.stats : file.stats
     if (realstats.isDirectory()) {
-      props.watermark = vm.$flux.dispatch('file/watermark', realpath)
+      props.watermark = vm.$flux.dispatch('file/waterchar', realpath)
       return h(FolderIcon, {props}, context.children)
     }
     props.ext = extname(realpath)

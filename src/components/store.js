@@ -139,19 +139,27 @@ export default {
     'path/preload'() {
       const electronPaths = [
         {shortname: 'reex'},
-        {shortname: 'home', watermark: '\ue90c'},
+        {shortname: 'home', watermark: 'icon-home'},
         {shortname: 'appData'},
         {shortname: 'temp'},
-        {shortname: 'desktop', name: 'Desktop#!1', watermark: '\ue911'},
-        {shortname: 'documents', name: 'Documents#!2', watermark: '\ue908'},
-        {shortname: 'downloads', name: 'Downloads#!3', watermark: '\ue905'},
-        {shortname: 'music', name: 'Music#!4', watermark: '\ue912'},
-        {shortname: 'pictures', name: 'Pictures#!5', watermark: '\ue90d'},
-        {shortname: 'videos', name: 'Videos#!6', watermark: '\ue909'},
+        {shortname: 'desktop', name: 'Desktop#!1', watermark: 'icon-monitor'},
+        {shortname: 'documents', name: 'Documents#!2', watermark: 'icon-file-text'},
+        {shortname: 'downloads', name: 'Downloads#!3', watermark: 'icon-download'},
+        {shortname: 'music', name: 'Music#!4', watermark: 'icon-music'},
+        {shortname: 'pictures', name: 'Pictures#!5', watermark: 'icon-image'},
+        {shortname: 'videos', name: 'Videos#!6', watermark: 'icon-film'},
       ]
+      const span = document.createElement('span')
+      span.style.display = 'none'
+      document.body.appendChild(span)
+      const style = getComputedStyle(span, '::before')
       for (const data of electronPaths) {
         if (data.name) {
           data.name = this.i18n(data.name)
+        }
+        if (!data.waterchar && data.watermark) {
+          span.className = data.watermark
+          data.waterchar = style.getPropertyValue('content')[1]
         }
         if (!data.path) {
           if (data.shortname === 'reex') {
@@ -161,6 +169,7 @@ export default {
           }
         }
       }
+      document.body.removeChild(span)
       this['path/defined'] = electronPaths
     },
     'path/interpret'(path) {
@@ -210,6 +219,10 @@ export default {
     'file/watermark'(path) {
       const target = this['path/defined'].find(data => data.path === path)
       return target && target.watermark
+    },
+    'file/waterchar'(path) {
+      const target = this['path/defined'].find(data => data.path === path)
+      return target && target.waterchar
     },
     'file/follow'(info) {
       const {path, stats} = info
