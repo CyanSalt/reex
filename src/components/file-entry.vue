@@ -2,7 +2,10 @@
   <div :class="['file-entry', { selected: focused, hidden }]" @mousedown="select"
     @contextmenu="contextmenu" @dblclick="execute">
     <div class="file-icon-wrapper">
-      <folder-icon :watermark="watermark" :link="!!link" v-if="isdir"></folder-icon>
+      <folder-icon :watermark="watermark" :link="!!link"
+        v-if="isFolder"></folder-icon>
+      <img class="image-preview" :src="path" v-else-if="preview && isImage"
+        @error="preview = false">
       <file-icon :ext="extname" :link="!!link" v-else></file-icon>
     </div>
     <div class="file-name">{{ nickname }}</div>
@@ -27,14 +30,26 @@ export default {
     stats: Object,
     link: Object,
   },
+  data() {
+    return {
+      preview: false,
+    }
+  },
   computed: {
     location: state('path/full'),
     selected: state('files/selected'),
     extname() {
       return extname(this.path)
     },
-    isdir() {
+    isFolder() {
       return this.realstats.isDirectory()
+    },
+    isImage() {
+      return [
+        '.apng', '.bmp', '.cgm', '.g3', '.gif', '.ief', '.jp2', '.jpg2',
+        '.jpeg', '.jpg', '.jpe', '.jpm', '.jpx', '.jpf', '.ktx', '.png',
+        '.sgi', '.svg', '.svgz', '.tiff', '.tif', '.webp',
+      ].includes(this.extname)
     },
     focused() {
       return this.selected.includes(this.path)
@@ -46,7 +61,7 @@ export default {
       return this.$flux.dispatch('file/name', this.path)
     },
     watermark() {
-      if (!this.isdir) return null
+      if (!this.isFolder) return null
       return this.$flux.dispatch('file/watermark', this.realpath)
     },
     realpath() {
@@ -75,7 +90,7 @@ export default {
       }
     },
     execute() {
-      if (this.isdir) {
+      if (this.isFolder) {
         this.$flux.dispatch('path/redirect', this.realpath)
       } else {
         shell.openItem(this.path)
@@ -89,6 +104,13 @@ export default {
         },
       ])
     },
+  },
+  mounted() {
+    if (this.isImage) {
+      requestIdleCallback(() => {
+        this.preview = true
+      })
+    }
   },
 }
 </script>
@@ -120,6 +142,12 @@ export default {
 }
 .file-entry .folder-icon {
   height: 56px;
+}
+.file-entry .image-preview {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+  max-height: 100%;
 }
 .file-entry .file-name {
   height: 24px;
