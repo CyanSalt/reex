@@ -1,10 +1,10 @@
 <template>
-  <div class="file-list" @click.self="free" @contextmenu.self="contextmenu"
-    @mousedown.left.self="selectstart">
+  <div class="file-list" @contextmenu.self="contextmenu"
+    @mousedown.left.self="selectStart">
     <div class="loading" v-if="loading">{{ i18n('Loading...#!13') }}</div>
     <template v-else>
       <file-entry v-for="file in files" :file="file"
-        :key="file.path"></file-entry>
+        :key="file.path" ref="entries"></file-entry>
     </template>
     <div class="selection" :style="selectionStyle" v-if="dragging"></div>
   </div>
@@ -14,7 +14,7 @@
 import {ipcRenderer} from 'electron'
 import {basename, extname} from 'fs'
 import ReexFileEntry from './file-entry'
-import {state} from '../plugins/flux'
+import {state, action} from '../plugins/flux'
 
 export default {
   name: 'file-list',
@@ -56,10 +56,9 @@ export default {
     },
   },
   methods: {
-    free() {
-      this.$flux.dispatch('file/specify', null)
-    },
+    select: action('file/specify'),
     contextmenu() {
+      this.select([])
       const creation = {
         label: this.i18n('Create new file#!9'),
       }
@@ -88,7 +87,7 @@ export default {
         creation,
       ])
     },
-    selectstart(e) {
+    selectStart(e) {
       const bounding = this.$el.getBoundingClientRect()
       const handler = event => {
         const {scrollTop, scrollLeft} = this.$el
@@ -98,7 +97,7 @@ export default {
         }
       }
       const cancelation = () => {
-        this.selectend()
+        this.selectEnd()
       }
       const {scrollTop, scrollLeft} = this.$el
       const start = {
@@ -109,11 +108,27 @@ export default {
       window.addEventListener('mousemove', handler)
       window.addEventListener('mouseup', cancelation)
     },
-    selectend() {
+    selectEnd() {
       if (!this.dragging) return
       window.removeEventListener('mousemove', this.dragging.handler)
       window.removeEventListener('mouseup', this.dragging.cancelation)
+      this.resolveSelection()
       this.dragging = null
+    },
+    resolveSelection() {
+      const {selection} = this
+      const all = []
+      for (const {$el: el, file} of this.$refs.entries) {
+        const {offsetTop, offsetLeft, scrollWidth, scrollHeight} = el
+        if (offsetTop > selection.bottom) break
+        if (offsetLeft > selection.right) continue
+        const offsetRight = offsetLeft + scrollWidth
+        const offsetBottom = offsetTop + scrollHeight
+        if (offsetBottom < selection.top ||
+          offsetRight < selection.left) continue
+        all.push(file.path)
+      }
+      this.select(all)
     },
   },
 }

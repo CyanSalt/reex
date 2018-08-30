@@ -210,7 +210,8 @@ export default {
       }
     },
     'file/specify'(path) {
-      this['files/selected'] = path ? [path] : []
+      const paths = Array.isArray(path) ? path : [path]
+      this['files/selected'] = paths
     },
     'file/name'(path) {
       const target = this['path/defined'].find(data => data.path === path)
