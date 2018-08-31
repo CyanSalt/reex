@@ -82,13 +82,13 @@ function transferEvents(frame) {
 
 function buildRendererMenu(frame, args) {
   if (Array.isArray(args)) {
-    return args.map(buildRendererMenu)
+    return args.map(item => buildRendererMenu(frame, item))
   }
   if (typeof args !== 'object') {
     return args
   }
   if (args.submenu) {
-    args.submenu = buildRendererMenu(args.submenu)
+    args.submenu = buildRendererMenu(frame, args.submenu)
   }
   if (args.action) {
     args.click = () => {
