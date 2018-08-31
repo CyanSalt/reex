@@ -1,16 +1,25 @@
 <template>
   <div class="quick-access">
-    <div class="favorite-title">{{ i18n('Favorites#!14') }}</div>
-    <div class="favorites">
-      <div v-for="file in favorites" @click="redirect(file.path)"
-        :class="['favorite-entry', { active: active(file) }]">
+    <div class="group-title">{{ i18n('Favorites#!14') }}</div>
+    <div class="group favorites">
+      <div v-for="entry in favorites" @click="open(entry)"
+        :class="['group-entry', { active: active(entry) }]">
         <div class="entry-icon">
-          <span :class="icon(file)"></span>
+          <span :class="icon(entry)"></span>
         </div>
-        <div class="entry-name">{{ name(file.path) }}</div>
+        <div class="entry-name">{{ name(entry.path) }}</div>
       </div>
     </div>
-    <div class="devices"></div>
+    <div class="group-title">{{ i18n('Devices#!15') }}</div>
+    <div class="group devices">
+      <div v-for="entry in devices" @click="open(entry)"
+        :class="['group-entry', { active: active(entry) }]">
+        <div class="entry-icon">
+          <span class="icon-hard-drive"></span>
+        </div>
+        <div class="entry-name">{{ name(entry.path) }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -22,10 +31,11 @@ export default {
   computed: {
     path: state('path/full'),
     favorites: state('path/favorites'),
+    devices: state('path/devices'),
   },
   methods: {
     name: action('file/name'),
-    redirect: action('path/redirect'),
+    open: action('file/open'),
     active(file) {
       return file.path === this.path || (
         file.link && file.link.path === this.path)
@@ -49,18 +59,21 @@ export default {
   background: rgba(255, 255, 255, 0.9);
   color: #4f5b66;
 }
-.quick-access .favorite-title {
+.quick-access .group-title {
   margin-left: 16px;
   line-height: 34px;
 }
-.quick-access .favorite-entry {
+.quick-access .group + .group-title {
+  margin-top: 16px;
+}
+.quick-access .group-entry {
   position: relative;
   display: flex;
   padding-left: 24px;
   line-height: 32px;
   cursor: pointer;
 }
-.quick-access .favorite-entry.active::before {
+.quick-access .group-entry.active::before {
   content: '';
   position: absolute;
   width: 2px;
@@ -69,15 +82,15 @@ export default {
   left: 16px;
   background: currentColor;
 }
-.quick-access .favorite-entry:hover {
+.quick-access .group-entry:hover {
   background: rgba(216, 222, 233, 0.5);
 }
-.quick-access .favorite-entry .entry-icon {
+.quick-access .group-entry .entry-icon {
   flex: none;
   width: 24px;
   text-align: center;
 }
-.quick-access .favorite-entry .entry-name {
+.quick-access .group-entry .entry-name {
   flex: auto;
   padding-left: 6px;
 }

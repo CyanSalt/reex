@@ -29,13 +29,8 @@ export default {
     this.$flux.dispatch('path/preload')
     this.$flux.dispatch('settings/load')
     // load file templates
-    this.$flux.dispatch('templates/load')
-    this.$flux.dispatch('folder/watch', {
-      path: this.$storage.filename('templates'),
-      callback: () => {
-        this.$flux.dispatch('templates/load')
-      }
-    })
+    this.$flux.dispatch('templates/watch')
+    this.$flux.dispatch('devices/watch')
     ipcRenderer.on('contextmenu', (e, args) => {
       if (!args.action) return
       this.$flux.dispatch(`contextmenu/${args.action}`, args)

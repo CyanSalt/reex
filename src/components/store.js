@@ -20,6 +20,7 @@ export default {
     'path/defined': [],
     'path/watcher': [],
     'path/favorites': [],
+    'path/devices': [],
     'files/info': [],
     'files/vision': false,
     'files/selected': [],
@@ -256,6 +257,8 @@ export default {
             }
             return this['file/follow'](info).then(link => {
               return Object.assign(info, {link})
+            }).catch(() => {
+              return Object.assign(info, {link: info})
             })
           })
       }))
@@ -263,6 +266,15 @@ export default {
     'file/execute'(path) {
       this['file/executed'] = path
       shell.openItem(path)
+    },
+    'file/open'(info) {
+      const path = info.link ? info.link.path : info.path
+      const stats = info.link ? info.link.stats : info.stats
+      if (stats.isDirectory()) {
+        this['path/redirect'](path)
+      } else {
+        this['file/execute'](path)
+      }
     },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
@@ -300,6 +312,38 @@ export default {
             .map(({path}) => path)
         })
       })
+    },
+    'templates/watch'() {
+      this['templates/load']()
+      this['folder/watch']({
+        path: this.$storage.filename('templates'),
+        callback: () => {
+          this['templates/load']()
+        }
+      })
+    },
+    'devices/load'() {
+      if (process.platform === 'darwin') {
+        const path = '/Volumes'
+        readdir(path, (err, files) => {
+          if (err) return
+          const paths = files.map(file => join(path, file))
+          this['file/read'](paths).then(entries => {
+            this['path/devices'] = entries
+          })
+        })
+      }
+    },
+    'devices/watch'() {
+      this['devices/load']()
+      if (process.platform === 'darwin') {
+        this['folder/watch']({
+          path: '/Volumes',
+          callback: () => {
+            this['devices/load']()
+          }
+        })
+      }
     },
     'explorer/show'(paths) {
       this['files/info'] = []

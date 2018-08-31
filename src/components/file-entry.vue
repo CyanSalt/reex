@@ -1,6 +1,6 @@
 <template>
   <div :class="['file-entry', { selected: focused, hidden }]" @mousedown="select"
-    @contextmenu="contextmenu" @dblclick="execute">
+    @contextmenu="contextmenu" @dblclick="open(file)">
     <div class="file-icon-wrapper">
       <img class="image-preview" :src="real.path" v-if="preview && isImage"
         @error="preview = false">
@@ -13,7 +13,7 @@
 <script>
 import {ipcRenderer} from 'electron'
 import FileIcon from './file-icon'
-import {state} from '../plugins/flux'
+import {state, action} from '../plugins/flux'
 
 export default {
   name: 'file-entry',
@@ -52,6 +52,7 @@ export default {
     },
   },
   methods: {
+    open: action('file/open'),
     select(e) {
       const {path} = this.file
       const multiple = process.platform === 'darwin' ?
@@ -70,14 +71,6 @@ export default {
         this.$flux.dispatch('file/select', path)
       }
     },
-    execute() {
-      const {stats, path} = this.real
-      if (stats.isDirectory()) {
-        this.$flux.dispatch('path/redirect', path)
-      } else {
-        this.$flux.dispatch('file/execute', path)
-      }
-    },
     contextmenu() {
       ipcRenderer.send('contextmenu', [
         {
@@ -88,10 +81,8 @@ export default {
     },
   },
   mounted() {
-    if (this.isImage) {
-      requestIdleCallback(() => {
-        this.preview = true
-      })
+    if (this.isImage && this.real.stats.size < 10 * (2 ** 20)) {
+      requestIdleCallback(() => {this.preview = true})
     }
   },
 }
