@@ -5,7 +5,7 @@ const frames = []
 
 function createWindow() {
   const frame = new BrowserWindow({
-    title: 'Reex',
+    title: app.getName(),
     width: 952,
     height: 600,
     minWidth: 472,
