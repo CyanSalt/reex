@@ -1,5 +1,6 @@
 <template>
   <div class="quick-access">
+    <div class="application-title">Reex</div>
     <div class="group-title">{{ i18n('Favorites#!14') }}</div>
     <div class="group favorites">
       <div v-for="entry in favorites" @click="open(entry)"
@@ -55,9 +56,14 @@ export default {
 .quick-access {
   flex: none;
   width: 210px;
-  padding-top: 48px;
   background: rgba(255, 255, 255, 0.9);
   color: #4f5b66;
+}
+.quick-access .application-title {
+  height: 48px;
+  margin-left: 32px;
+  font: italic 20px/48px serif;
+  -webkit-app-region: drag;
 }
 .quick-access .group-title {
   margin-left: 16px;
