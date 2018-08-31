@@ -81,6 +81,7 @@ export default {
   bottom: 8px;
   left: 16px;
   background: currentColor;
+  opacity: 0.5;
 }
 .quick-access .group-entry:hover {
   background: rgba(216, 222, 233, 0.5);

@@ -1,5 +1,5 @@
 import {remote, shell} from 'electron'
-import {sep, join, basename, dirname, resolve} from 'path'
+import {sep, join, basename, dirname, resolve, extname} from 'path'
 import {readdir, watch, mkdir, copyFile, writeFile, lstat, readlink, stat} from 'fs'
 import {promisify} from 'util'
 import settings from '../resources/default/settings.json'
@@ -104,6 +104,7 @@ export default {
       this['path/full'] = path
       this['path/load']()
       this['path/watch']()
+      document.title = this['file/name'](path)
     },
     'path/watch'() {
       if (this['path/watcher'].length) {
@@ -275,6 +276,16 @@ export default {
       } else {
         this['file/execute'](path)
       }
+    },
+    'file/type'(path) {
+      const ext = extname(path)
+      const images = [
+        '.apng', '.bmp', '.cgm', '.g3', '.gif', '.ief', '.jp2', '.jpg2',
+        '.jpeg', '.jpg', '.jpe', '.jpm', '.jpx', '.jpf', '.ktx', '.png',
+        '.sgi', '.svg', '.svgz', '.tiff', '.tif', '.webp',
+      ]
+      if (images.includes(ext)) return 'image'
+      return ''
     },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)

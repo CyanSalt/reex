@@ -32,11 +32,7 @@ export default {
     location: state('path/full'),
     selected: state('files/selected'),
     isImage() {
-      return [
-        '.apng', '.bmp', '.cgm', '.g3', '.gif', '.ief', '.jp2', '.jpg2',
-        '.jpeg', '.jpg', '.jpe', '.jpm', '.jpx', '.jpf', '.ktx', '.png',
-        '.sgi', '.svg', '.svgz', '.tiff', '.tif', '.webp',
-      ].find(ext => this.real.path.slice(0 - ext.length) === ext)
+      return this.$flux.dispatch('file/type', this.real.path) === 'image'
     },
     focused() {
       return this.selected.includes(this.file.path)

@@ -16,6 +16,9 @@
       <div class="vision button" @click="blink">
         <span :class="vision ? 'icon-eye-off' : 'icon-eye'"></span>
       </div>
+      <div class="terminal button" @click="terminal">
+        <span class="icon-terminal"></span>
+      </div>
     </div>
     <div class="window-control">
       <div class="minimize button" @click="minimize">
@@ -32,6 +35,7 @@
 </template>
 
 <script>
+import {spawn} from 'child_process'
 import {remote, ipcRenderer} from 'electron'
 import {state, action} from '../plugins/flux'
 
@@ -45,6 +49,7 @@ export default {
     }
   },
   computed: {
+    path: state('path/full'),
     floors: state('path/floors'),
     stack: state('path/stack'),
     forwards: state('path/forwards'),
@@ -55,6 +60,12 @@ export default {
     forward: action('path/forward'),
     upward: action('path/upward'),
     blink: action('vision/toggle'),
+    terminal() {
+      if (process.platform === 'darwin') {
+        // TODO: customize terminal name or path
+        spawn('open', ['-a', 'Terminal', '--args', this.path])
+      }
+    },
     minimize() {
       this.frame.minimize()
     },

@@ -1,9 +1,10 @@
 const {app, BrowserWindow, Menu, ipcMain} = require('electron')
 
-let frame = null
+// let frame = null
+const frames = []
 
-function init() {
-  frame = new BrowserWindow({
+function createWindow() {
+  const frame = new BrowserWindow({
     title: 'Reex',
     width: 952,
     height: 600,
@@ -15,30 +16,59 @@ function init() {
     },
   })
   frame.loadURL(`file://${__dirname}/src/index.html`)
-  frame.on('closed', () => {
-    frame = null
-  })
-  const menu = createMenu()
-  if (process.platform === 'darwin') {
-    Menu.setApplicationMenu(menu)
-  } else {
-    frame.setMenu(menu)
-    frame.setMenuBarVisibility(false)
+  if (process.platform !== 'darwin') {
+    createWindowMenu(frame)
   }
   // these handler must be binded in main process
-  transferEvents()
+  transferEvents(frame)
+  // reference to avoid GC
+  frames.push(frame)
+  frame.on('closed', () => {
+    const index = frames.indexOf(frame)
+    if (index !== -1) {
+      frames.splice(index, 1)
+    }
+  })
 }
 
-function createMenu() {
-  return Menu.buildFromTemplate([
+function createApplicationMenu() {
+  const menu = Menu.buildFromTemplate([
     {
       label: app.getName(),
-      submenu: [{role: 'toggledevtools'}]
-    }
+      submenu: [
+        {role: 'about'},
+        {type: 'separator'},
+        {role: 'services', submenu: []},
+        {type: 'separator'},
+        {role: 'hide'},
+        {role: 'hideothers'},
+        {role: 'unhide'},
+        {type: 'separator'},
+        {role: 'quit'},
+      ],
+    },
+    {role: 'windowMenu'},
+    {
+      role: 'help',
+      submenu: [{role: 'toggledevtools'}],
+    },
   ])
+  Menu.setApplicationMenu(menu)
 }
 
-function transferEvents() {
+function createWindowMenu(frame) {
+  const menu = Menu.buildFromTemplate([
+    {role: 'windowMenu'},
+    {
+      label: 'Help',
+      submenu: [{role: 'toggledevtools'}],
+    },
+  ])
+  frame.setMenu(menu)
+  frame.setMenuBarVisibility(false)
+}
+
+function transferEvents(frame) {
   frame.on('maximize', () => {
     frame.webContents.send('maximize')
   })
@@ -46,11 +76,11 @@ function transferEvents() {
     frame.webContents.send('unmaximize')
   })
   ipcMain.on('contextmenu', (event, args) => {
-    Menu.buildFromTemplate(buildRendererMenu(args)).popup({})
+    Menu.buildFromTemplate(buildRendererMenu(frame, args)).popup({})
   })
 }
 
-function buildRendererMenu(args) {
+function buildRendererMenu(frame, args) {
   if (Array.isArray(args)) {
     return args.map(buildRendererMenu)
   }
@@ -61,10 +91,10 @@ function buildRendererMenu(args) {
     args.submenu = buildRendererMenu(args.submenu)
   }
   if (args.action) {
-    args.click = function (item, window) {
-      // FIXME: `window` might be null on macOS when that window is not focused
+    args.click = () => {
+      // the second argument might be null on macOS when window is not focused
       // Main process should register the window when IPC received
-      (window || frame).webContents.send('contextmenu', {
+      frame.webContents.send('contextmenu', {
         action: args.action, data: args.data
       })
     }
@@ -72,11 +102,16 @@ function buildRendererMenu(args) {
   return args
 }
 
-app.on('ready', init)
+app.on('ready', () => {
+  if (process.platform === 'darwin') {
+    createApplicationMenu()
+  }
+  createWindow()
+})
 
 app.on('activate', () => {
-  if (frame === null) {
-    init()
+  if (!frames.length) {
+    createWindow()
   }
 })
 
