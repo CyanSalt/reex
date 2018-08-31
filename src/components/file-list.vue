@@ -48,10 +48,10 @@ export default {
       const scrollBarWidth = scrollHeight > bounding.height ? 6 : 0
       const scrollBarHeight = scrollWidth > bounding.width ? 6 : 0
       return {
-        top: `${selection.top}px`,
-        right: `${bounding.width - scrollBarWidth - selection.right}px`,
-        bottom: `${bounding.height - scrollBarHeight - selection.bottom}px`,
-        left: `${selection.left}px`,
+        top: selection.top + 'px',
+        right: bounding.width - scrollBarWidth - selection.right + 'px',
+        bottom: bounding.height - scrollBarHeight - selection.bottom + 'px',
+        left: selection.left + 'px',
       }
     },
   },

@@ -19,6 +19,9 @@
           <span class="icon-hard-drive"></span>
         </div>
         <div class="entry-name">{{ name(entry.path) }}</div>
+        <div class="unmount-device" @click="unmount(entry)" v-if="loose(entry)">
+          <span class="icon-upload"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -32,11 +35,13 @@ export default {
   computed: {
     path: state('path/full'),
     favorites: state('path/favorites'),
-    devices: state('path/devices'),
+    devices: state('devices/all'),
+    removable: state('devices/removable'),
   },
   methods: {
     name: action('file/name'),
     open: action('file/open'),
+    unmount: action('devices/unmount'),
     active(file) {
       return file.path === this.path || (
         file.link && file.link.path === this.path)
@@ -48,6 +53,9 @@ export default {
       if (watermark) return watermark
       return stats.isDirectory() ? 'icon-folder' : 'icon-file'
     },
+    loose(device) {
+      return this.removable.includes(device.path)
+    },
   },
 }
 </script>
@@ -56,8 +64,8 @@ export default {
 .quick-access {
   flex: none;
   width: 210px;
-  background: rgba(255, 255, 255, 0.9);
   color: #4f5b66;
+  background: linear-gradient(to left top, #f0f0f0, white);
 }
 .quick-access .application-title {
   height: 48px;
@@ -75,7 +83,9 @@ export default {
 .quick-access .group-entry {
   position: relative;
   display: flex;
+  align-items: center;
   padding-left: 24px;
+  padding-right: 12px;
   line-height: 32px;
   cursor: pointer;
 }
@@ -92,13 +102,23 @@ export default {
 .quick-access .group-entry:hover {
   background: rgba(216, 222, 233, 0.5);
 }
-.quick-access .group-entry .entry-icon {
+.quick-access .group-entry .entry-icon,
+.quick-access .group-entry .unmount-device {
   flex: none;
   width: 24px;
+  height: 24px;
+  line-height: 24px;
+  border-radius: 50%;
   text-align: center;
 }
 .quick-access .group-entry .entry-name {
   flex: auto;
-  padding-left: 6px;
+  padding: 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.quick-access .group-entry .unmount-device:hover {
+  background: white;
 }
 </style>

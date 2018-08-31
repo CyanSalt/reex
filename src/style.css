@@ -50,6 +50,7 @@ body {
 .icon-monitor,
 .icon-music,
 .icon-terminal,
+.icon-upload,
 .icon-x {
   font-family: 'icomoon';
 }
@@ -116,6 +117,9 @@ body {
 .icon-terminal::before {
   content: '\e914';
 }
-.icon-x::before {
+.icon-upload::before {
   content: '\e915';
+}
+.icon-x::before {
+  content: '\e916';
 }

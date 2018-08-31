@@ -274,7 +274,7 @@ module.exports = {
     'prefer-numeric-literals': 'error',
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
-    'prefer-template': 'warn',
+    // 'prefer-template': 'off',
     'require-yield': 'error',
     'rest-spread-spacing': ['error', 'never'],
     // 'sort-imports': 'off',

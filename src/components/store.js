@@ -3,6 +3,7 @@ import {sep, join, basename, dirname, resolve, extname} from 'path'
 import {readdir, watch, mkdir, copyFile, writeFile, lstat, readlink, stat} from 'fs'
 import {promisify} from 'util'
 import settings from '../resources/default/settings.json'
+import {exec} from 'child_process'
 
 const promises = {
   lstat: promisify(lstat),
@@ -20,13 +21,14 @@ export default {
     'path/defined': [],
     'path/watcher': [],
     'path/favorites': [],
-    'path/devices': [],
     'files/info': [],
     'files/vision': false,
     'files/selected': [],
     'files/recentlog': {},
     'file/executed': null,
     'templates/all': [],
+    'devices/all': [],
+    'devices/removable': [],
     'explorer/loading': false,
   },
   computed: {
@@ -340,7 +342,19 @@ export default {
           if (err) return
           const paths = files.map(file => join(path, file))
           this['file/read'](paths).then(entries => {
-            this['path/devices'] = entries
+            this['devices/all'] = entries
+          })
+          files.forEach(file => {
+            const name = file.replace(/\s/g, c => '\\' + c)
+            const command = [
+              `diskutil info ${name}`,
+              'awk \'/Removable Media:/{print $3}\'',
+            ].join(' | ')
+            exec(command, (error, stdout) => {
+              if (!error && stdout.toString().trim() === 'Removable') {
+                this['devices/removable'].push(join(path, file))
+              }
+            })
           })
         })
       }
@@ -354,6 +368,12 @@ export default {
             this['devices/load']()
           }
         })
+      }
+    },
+    'devices/unmount'(info) {
+      if (process.platform === 'darwin') {
+        const name = basename(info.path).replace(/\s/g, c => '\\' + c)
+        exec(`diskutil unmount ${name}`)
       }
     },
     'explorer/show'(paths) {
