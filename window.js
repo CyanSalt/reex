@@ -92,25 +92,27 @@ function transferEvents(frame) {
     frame.webContents.send('unmaximize')
   })
   ipcMain.on('contextmenu', (event, args) => {
-    Menu.buildFromTemplate(buildRendererMenu(frame, args)).popup({})
+    Menu.buildFromTemplate(buildRendererMenu(event.sender, args)).popup({})
+  })
+  ipcMain.on('dragstart', (event, args) => {
+    // event.sender.startDrag({file: args, icon: args})
   })
 }
 
-function buildRendererMenu(frame, args) {
+function buildRendererMenu(contents, args) {
   if (Array.isArray(args)) {
-    return args.map(item => buildRendererMenu(frame, item))
+    return args.map(item => buildRendererMenu(contents, item))
   }
   if (typeof args !== 'object') {
     return args
   }
   if (args.submenu) {
-    args.submenu = buildRendererMenu(frame, args.submenu)
+    args.submenu = buildRendererMenu(contents, args.submenu)
   }
   if (args.action) {
     args.click = () => {
-      // the second argument might be null on macOS when window is not focused
-      // Main process should register the window when IPC received
-      frame.webContents.send('contextmenu', {
+      // Note: the second argument might be null on macOS
+      contents.send('contextmenu', {
         action: args.action, data: args.data
       })
     }

@@ -1,6 +1,7 @@
 <template>
-  <div :class="['file-entry', { selected: focused, hidden }]" @mousedown="select"
-    @contextmenu="contextmenu" @dblclick="open(file)">
+  <div :class="['file-entry', { selected: focused, hidden }]" draggable
+    @dragstart="drag" @mousedown="select" @contextmenu="contextmenu"
+    @dblclick="open(file)">
     <div class="file-icon-wrapper">
       <img class="image-preview" :src="real.path" v-if="preview && isImage"
         @error="preview = false">
@@ -78,6 +79,10 @@ export default {
           action: 'delete',
         },
       ])
+    },
+    drag(e) {
+      // e.preventDefault()
+      // ipcRenderer.send('dragstart', this.file.path)
     },
   },
   mounted() {
