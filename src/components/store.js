@@ -25,6 +25,7 @@ export default {
     'files/info': [],
     'files/vision': false,
     'files/selected': [],
+    'files/selecting': [],
     'files/recentlog': {},
     'file/executed': null,
     'templates/all': [],
@@ -290,6 +291,12 @@ export default {
       if (images.includes(ext)) return 'image'
       return ''
     },
+    'file/avoid'({name, times}) {
+      if (!times) return name
+      const steps = name.split('.')
+      return steps.slice(0, -1).join('.') + ` (${times}).` +
+        steps[steps.length - 1]
+    },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
       const watchers = []
@@ -384,6 +391,10 @@ export default {
       this['file/read'](paths).then(entries => {
         this['explorer/loading'] = false
         this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
+        if (this['files/selecting'].length) {
+          this['files/selected'] = this['files/selecting']
+          this['files/selecting'] = []
+        }
       })
     },
     'clipboard/files'() {
@@ -403,18 +414,19 @@ export default {
     'contextmenu/create-folder'() {
       const path = this['path/full']
       const name = this.i18n('New folder#!8')
-      ;(function create(times) {
-        const realname = times ? `${name} (${times})` : name
+      const create = times => {
+        const realname = this['file/avoid']({name, times})
         mkdir(join(path, realname), err => {
           if (err) create(times + 1)
         })
-      })(0)
+      }
+      create(0)
     },
     'contextmenu/create-file'({data}) {
       const path = this['path/full']
       const name = basename(data) || this.i18n('New file#!10')
-      ;(function create(times) {
-        const realname = times ? `${name} (${times})` : name
+      const create = times => {
+        const realname = this['file/avoid']({name, times})
         const callback = err => {
           if (err) create(times + 1)
         }
@@ -423,7 +435,8 @@ export default {
         } else {
           writeFile(join(path, realname), '', {flag: 'wx'}, callback)
         }
-      })(0)
+      }
+      create(0)
     },
     'contextmenu/refresh'() {
       this['path/load']()
@@ -456,12 +469,18 @@ export default {
     'contextmenu/paste'() {
       const files = this['clipboard/files']()
       const current = this['path/full']
-      // FIXME: duplicate with reloading
       Promise.all(files.map(path => {
         const name = basename(path)
-        const target = join(current, name)
-        return promises.copyFile(path, target).then(() => target)
-      })).then(paths => this['file/specify'](paths))
+        const create = times => {
+          const realname = this['file/avoid']({name, times})
+          const target = join(current, realname)
+          return promises.copyFile(path, target).then(() => target)
+            .catch(() => create(times + 1))
+        }
+        return create(dirname(path) === current ? 1 : 0)
+      })).then(paths => {
+        this['files/selecting'] = paths
+      })
     },
     'contextmenu/selectall'() {
       this['file/specify'](this['files/visible'].map(file => file.path))
