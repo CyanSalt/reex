@@ -47,6 +47,14 @@ function createApplicationMenu() {
         {role: 'quit'},
       ],
     },
+    {
+      label: 'Edit',
+      submenu: [
+        {role: 'copy'},
+        {role: 'paste'},
+        {role: 'selectall'},
+      ],
+    },
     {role: 'windowMenu'},
     {
       role: 'help',
@@ -58,6 +66,14 @@ function createApplicationMenu() {
 
 function createWindowMenu(frame) {
   const menu = Menu.buildFromTemplate([
+    {
+      label: 'Edit',
+      submenu: [
+        {role: 'copy'},
+        {role: 'paste'},
+        {role: 'selectall'},
+      ],
+    },
     {role: 'windowMenu'},
     {
       label: 'Help',

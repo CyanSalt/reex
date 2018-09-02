@@ -16,7 +16,6 @@ import {state, action} from '../plugins/flux'
 export default {
   name: 'path-breadcrumb',
   computed: {
-    floors: state('path/floors'),
     steps: state('path/steps'),
   },
   methods: {

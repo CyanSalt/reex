@@ -70,6 +70,10 @@ export default {
     contextmenu() {
       ipcRenderer.send('contextmenu', [
         {
+          label: this.i18n('Copy#!16'),
+          action: 'copy',
+        },
+        {
           label: this.i18n('Delete#!12'),
           action: 'delete',
         },

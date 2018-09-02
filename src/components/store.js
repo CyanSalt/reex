@@ -1,4 +1,4 @@
-import {remote, shell} from 'electron'
+import {remote, shell, clipboard} from 'electron'
 import {sep, join, basename, dirname, resolve, extname} from 'path'
 import {readdir, watch, mkdir, copyFile, writeFile, lstat, readlink, stat} from 'fs'
 import {promisify} from 'util'
@@ -9,6 +9,7 @@ const promises = {
   lstat: promisify(lstat),
   readlink: promisify(readlink),
   stat: promisify(stat),
+  copyFile: promisify(copyFile),
 }
 
 export default {
@@ -385,6 +386,19 @@ export default {
         this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
       })
     },
+    'clipboard/files'() {
+      const files = []
+      if (process.platform === 'darwin') {
+        const plist = clipboard.read('NSFilenamesPboardType')
+        const regex = /<string>(.+)<\/string>/g
+        while (true) {
+          const matches = regex.exec(plist)
+          if (!matches) break
+          files.push(matches[1])
+        }
+      }
+      return files
+    },
     // Context menu actions
     'contextmenu/create-folder'() {
       const path = this['path/full']
@@ -423,6 +437,34 @@ export default {
         action: 'delete',
         target: files,
       }
+    },
+    'contextmenu/copy'() {
+      const files = this['files/selected']
+      if (process.platform === 'darwin') {
+        clipboard.writeBuffer('NSFilenamesPboardType', Buffer.from(`
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+            <array>
+              ${ files.map(path => `<string>${path}</string>`).join('') }
+            </array>
+          </plist>
+        `))
+      }
+    },
+    'contextmenu/paste'() {
+      const files = this['clipboard/files']()
+      const current = this['path/full']
+      // FIXME: duplicate with reloading
+      Promise.all(files.map(path => {
+        const name = basename(path)
+        const target = join(current, name)
+        return promises.copyFile(path, target).then(() => target)
+      })).then(paths => this['file/specify'](paths))
+    },
+    'contextmenu/selectall'() {
+      this['file/specify'](this['files/visible'].map(file => file.path))
     },
   },
 }

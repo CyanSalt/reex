@@ -74,11 +74,27 @@ export default {
       } else {
         creation.action = 'create-file'
       }
+      let pasting = [
+        {type: 'separator'},
+        {
+          label: this.i18n('Paste#!17'),
+          role: 'paste'
+        }
+      ]
+      const files = this.$flux.dispatch('clipboard/files')
+      if (!files.length) {
+        if (process.platform === 'darwin') {
+          pasting = []
+        } else {
+          pasting[1].enabled = false
+        }
+      }
       ipcRenderer.send('contextmenu', [
         {
           label: this.i18n('Refresh#!11'),
           action: 'refresh',
         },
+        ...pasting,
         {type: 'separator'},
         {
           label: this.i18n('Create new folder#!7'),

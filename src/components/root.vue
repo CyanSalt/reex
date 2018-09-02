@@ -35,6 +35,19 @@ export default {
       if (!args.action) return
       this.$flux.dispatch(`contextmenu/${args.action}`, args)
     })
+    document.addEventListener('copy', e => {
+      e.preventDefault()
+      this.$flux.dispatch('contextmenu/copy', e)
+    })
+    document.addEventListener('paste', e => {
+      e.preventDefault()
+      this.$flux.dispatch('contextmenu/paste', e)
+    })
+    document.addEventListener('selectionchange', e => {
+      e.preventDefault()
+      // FIXME: `selectionchange` might not be triggered
+      this.$flux.dispatch('contextmenu/selectall', e)
+    })
     // custom script
     this.$storage.require('custom.js', init => init(this))
   }
