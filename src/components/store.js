@@ -412,6 +412,8 @@ export default {
     },
     'terminal/open'() {
       const path = this['path/full']
+      const command = this['settings/user']['terminal.command']
+        .replace('%PATH%', path)
       if (process.platform === 'darwin') {
         const name = this['settings/user']['terminal.darwin.name']
         let script
@@ -429,12 +431,12 @@ export default {
                 set context to current session
               end tell
             end try
-            tell context to write text "cd ${path}; clear; pwd"
+            tell context to write text "${command}"
             activate
           end tell`
         } else {
           script = `tell application "Terminal"
-            do script "cd ${path}; clear; pwd"
+            do script "${command}"
             activate
           end tell`
         }

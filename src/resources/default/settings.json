@@ -4,5 +4,6 @@
     "[documents]", "[pictures]", "[music]", "[videos]",
     "[downloads]", "[desktop]", "[home]"
   ],
-  "terminal.darwin.name": "Terminal"
+  "terminal.darwin.name": "Terminal",
+  "terminal.command": "cd %PATH%; clear; pwd"
 }
