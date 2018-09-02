@@ -1,6 +1,6 @@
 <template>
   <div class="file-list" @contextmenu.self="contextmenu"
-    @mousedown.left.self="selectStart">
+    @mousedown.left.self="selectStart" @dragover="dragover" @drop="drop">
     <div class="loading" v-if="loading">{{ i18n('Loading...#!13') }}</div>
     <template v-else>
       <file-entry v-for="file in files" :file="file"
@@ -134,7 +134,8 @@ export default {
     resolveSelection() {
       const {selection} = this
       const all = []
-      for (const {$el: el, file} of this.$refs.entries) {
+      const entries = this.$refs.entries || []
+      for (const {$el: el, file} of entries) {
         const {offsetTop, offsetLeft, scrollWidth, scrollHeight} = el
         if (offsetTop > selection.bottom) break
         if (offsetLeft > selection.right) continue
@@ -145,6 +146,15 @@ export default {
         all.push(file.path)
       }
       this.select(all)
+    },
+    dragover(e) {
+      const copying = process.platform === 'darwin' ? e.altKey : e.ctrlKey
+      e.dataTransfer.dropEffect = copying ? 'copy' : 'move'
+    },
+    drop(e) {
+      const copying = process.platform === 'darwin' ? e.altKey : e.ctrlKey
+      const paths = Array.from(e.dataTransfer.files).map(file => file.path)
+      this.$flux.dispatch(copying ? 'file/copy' : 'file/move', paths)
     },
   },
 }

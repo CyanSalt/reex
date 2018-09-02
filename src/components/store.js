@@ -1,6 +1,9 @@
 import {remote, shell, clipboard} from 'electron'
 import {sep, join, basename, dirname, resolve, extname} from 'path'
-import {readdir, watch, mkdir, copyFile, writeFile, lstat, readlink, stat} from 'fs'
+import {
+  readdir, watch, mkdir, copyFile, writeFile,
+  lstat, readlink, stat, rename,
+} from 'fs'
 import {promisify} from 'util'
 import settings from '../resources/default/settings.json'
 import {exec, spawn} from 'child_process'
@@ -10,6 +13,7 @@ const promises = {
   readlink: promisify(readlink),
   stat: promisify(stat),
   copyFile: promisify(copyFile),
+  rename: promisify(rename),
 }
 
 export default {
@@ -297,6 +301,40 @@ export default {
       return steps.slice(0, -1).join('.') + ` (${times}).` +
         steps[steps.length - 1]
     },
+    'file/copy'(source) {
+      const current = this['path/full']
+      Promise.all(source.map(path => {
+        const name = basename(path)
+        const locally = dirname(path) === current
+        const create = times => {
+          const realname = this['file/avoid']({name, times})
+          const target = join(current, realname)
+          // TODO: show confirm dialog if not locally
+          return promises.copyFile(path, target).then(() => target)
+            .catch(() => create(times + 1))
+        }
+        return create(locally ? 1 : 0)
+      })).then(paths => {
+        this['files/selecting'] = paths
+      })
+    },
+    'file/move'(source) {
+      const current = this['path/full']
+      Promise.all(source.map(path => {
+        const name = basename(path)
+        const create = times => {
+          const realname = this['file/avoid']({name, times})
+          const target = join(current, realname)
+          if (target === path) return path
+          // TODO: show confirm dialog
+          return promises.rename(path, target).then(() => target)
+            .catch(() => create(times + 1))
+        }
+        return create(0)
+      })).then(paths => {
+        this['files/selecting'] = paths
+      })
+    },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
       const watchers = []
@@ -501,19 +539,7 @@ export default {
     },
     'contextmenu/paste'() {
       const files = this['clipboard/files']()
-      const current = this['path/full']
-      Promise.all(files.map(path => {
-        const name = basename(path)
-        const create = times => {
-          const realname = this['file/avoid']({name, times})
-          const target = join(current, realname)
-          return promises.copyFile(path, target).then(() => target)
-            .catch(() => create(times + 1))
-        }
-        return create(dirname(path) === current ? 1 : 0)
-      })).then(paths => {
-        this['files/selecting'] = paths
-      })
+      this['file/copy'](files)
     },
     'contextmenu/selectall'() {
       this['file/specify'](this['files/visible'].map(file => file.path))

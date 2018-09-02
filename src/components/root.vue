@@ -1,5 +1,5 @@
 <template>
-  <div id="main">
+  <div id="main" @dragover.prevent @drop.prevent>
     <quick-access></quick-access>
     <file-explorer></file-explorer>
   </div>
