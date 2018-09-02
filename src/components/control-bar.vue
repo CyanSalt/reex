@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import {spawn} from 'child_process'
 import {remote, ipcRenderer} from 'electron'
 import {state, action} from '../plugins/flux'
 
@@ -60,12 +59,7 @@ export default {
     forward: action('path/forward'),
     upward: action('path/upward'),
     blink: action('vision/toggle'),
-    terminal() {
-      if (process.platform === 'darwin') {
-        // TODO: customize terminal name or path
-        spawn('open', ['-a', 'Terminal', '--args', this.path])
-      }
-    },
+    terminal: action('terminal/open'),
     minimize() {
       this.frame.minimize()
     },

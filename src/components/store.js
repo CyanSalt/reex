@@ -3,7 +3,7 @@ import {sep, join, basename, dirname, resolve, extname} from 'path'
 import {readdir, watch, mkdir, copyFile, writeFile, lstat, readlink, stat} from 'fs'
 import {promisify} from 'util'
 import settings from '../resources/default/settings.json'
-import {exec} from 'child_process'
+import {exec, spawn} from 'child_process'
 
 const promises = {
   lstat: promisify(lstat),
@@ -409,6 +409,37 @@ export default {
         }
       }
       return files
+    },
+    'terminal/open'() {
+      const path = this['path/full']
+      if (process.platform === 'darwin') {
+        const name = this['settings/user']['terminal.darwin.name']
+        let script
+        if (name === 'iTerm2') {
+          script = `tell application "iTerm"
+            try
+              set created to current window
+              tell created
+                create tab with default profile
+                set context to current session
+              end tell
+            on error
+              set created to (create window with default profile)
+              tell created
+                set context to current session
+              end tell
+            end try
+            tell context to write text "cd ${path}; clear; pwd"
+            activate
+          end tell`
+        } else {
+          script = `tell application "Terminal"
+            do script "cd ${path}; clear; pwd"
+            activate
+          end tell`
+        }
+        spawn('osascript', ['-e', script])
+      }
     },
     // Context menu actions
     'contextmenu/create-folder'() {

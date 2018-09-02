@@ -3,5 +3,6 @@
   "quickaccess.favorites": [
     "[documents]", "[pictures]", "[music]", "[videos]",
     "[downloads]", "[desktop]", "[home]"
-  ]
+  ],
+  "terminal.darwin.name": "Terminal"
 }
