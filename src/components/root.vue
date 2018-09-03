@@ -55,6 +55,9 @@ export default {
       selection.removeAllRanges()
       this.$flux.dispatch('contextmenu/selectall', e)
     })
+    ipcRenderer.on('confirm', (event, args) => {
+      this.$flux.dispatch('confirm/receive', args)
+    })
     // custom script
     this.$storage.require('custom.js', init => init(this))
   }

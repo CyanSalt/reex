@@ -1,4 +1,4 @@
-import {remote, shell, clipboard} from 'electron'
+import {remote, shell, clipboard, ipcRenderer} from 'electron'
 import {sep, join, basename, dirname, resolve, extname} from 'path'
 import {
   readdir, watch, mkdir, copyFile, writeFile,
@@ -36,6 +36,7 @@ export default {
     'devices/all': [],
     'devices/removable': [],
     'explorer/loading': false,
+    'confirm/waiting': null,
   },
   computed: {
     'path/floors'() {
@@ -479,6 +480,27 @@ export default {
           end tell`
         }
         spawn('osascript', ['-e', script])
+      }
+    },
+    'confirm/send'(options) {
+      const waiting = this['confirm/waiting']
+      if (waiting) {
+        return waiting.promise.then(() => {
+          return this['confirm/send'](options)
+        })
+      }
+      const current = {}
+      current.promise = new Promise(fulfill => {
+        current.fulfill = fulfill
+        ipcRenderer.send('confirm', options)
+      })
+      this['confirm/waiting'] = current
+      return current.promise
+    },
+    'confirm/receive'(response) {
+      const waiting = this['confirm/waiting']
+      if (waiting) {
+        waiting.fulfill(response)
       }
     },
     // Context menu actions

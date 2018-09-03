@@ -123,7 +123,7 @@ function transferCommonEvents() {
     const {sender} = event
     const window = frames.find(frame => frame.webContents === sender)
     dialog.showMessageBox(window, args, response => {
-      sender.send('confirm', {id: args.id, response})
+      sender.send('confirm', response)
     })
   })
 }
