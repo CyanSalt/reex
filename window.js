@@ -1,4 +1,5 @@
 const {app, BrowserWindow, Menu, ipcMain, dialog} = require('electron')
+const {resolve} = require('path')
 
 // let frame = null
 const frames = []
@@ -106,12 +107,17 @@ function transferWindowEvents(frame) {
   })
 }
 
+const draggingIcon = resolve(__dirname, 'src/assets/images/dragging.png')
+
 function transferCommonEvents() {
   ipcMain.on('contextmenu', (event, args) => {
     Menu.buildFromTemplate(buildRendererMenu(event.sender, args)).popup({})
   })
   ipcMain.on('dragstart', (event, args) => {
-    // event.sender.startDrag({file: args, icon: args})
+    event.sender.startDrag({
+      files: args,
+      icon: draggingIcon,
+    })
   })
   ipcMain.on('confirm', (event, args) => {
     const {sender} = event

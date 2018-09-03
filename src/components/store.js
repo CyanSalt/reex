@@ -21,7 +21,6 @@ export default {
     'settings/default': {},
     'settings/user': {},
     'path/full': '',
-    // TODO: use browser history
     'path/stack': [],
     'path/forwards': [],
     'path/defined': [],

@@ -81,9 +81,8 @@ export default {
       ])
     },
     drag(e) {
-      // TODO: drag icon should be specified
-      // e.preventDefault()
-      // ipcRenderer.send('dragstart', this.file.path)
+      e.preventDefault()
+      ipcRenderer.send('dragstart', [this.file.path])
     },
   },
   mounted() {
