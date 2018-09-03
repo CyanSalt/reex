@@ -205,6 +205,10 @@ export default {
     },
     'vision/toggle'() {
       this['files/vision'] = !this['files/vision']
+      if (!this['files/vision']) {
+        this['files/selected'] = this['files/selected']
+          .filter(path => !this['file/hidden'](path))
+      }
     },
     'file/hidden'(path) {
       return basename(path).charAt(0) === '.'
