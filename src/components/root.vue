@@ -37,15 +37,22 @@ export default {
     })
     document.addEventListener('copy', e => {
       e.preventDefault()
-      this.$flux.dispatch('contextmenu/copy', e)
+      this.$flux.dispatch('contextmenu/copy')
     })
-    document.addEventListener('paste', e => {
-      e.preventDefault()
-      this.$flux.dispatch('contextmenu/paste', e)
+    ipcRenderer.on('paste', (e, args) => {
+      this.$flux.dispatch('contextmenu/paste')
     })
+    // make selection change every time except after `removeAllRanges`
+    let manually = false
     document.addEventListener('selectionchange', e => {
       e.preventDefault()
-      // FIXME: `selectionchange` might not be triggered
+      if (manually) {
+        manually = false
+        return
+      }
+      manually = true
+      const selection = window.getSelection()
+      selection.removeAllRanges()
       this.$flux.dispatch('contextmenu/selectall', e)
     })
     // custom script

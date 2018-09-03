@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu, ipcMain} = require('electron')
+const {app, BrowserWindow, Menu, ipcMain, dialog} = require('electron')
 
 // let frame = null
 const frames = []
@@ -20,7 +20,7 @@ function createWindow() {
     createWindowMenu(frame)
   }
   // these handler must be binded in main process
-  transferEvents(frame)
+  transferWindowEvents(frame)
   // reference to avoid GC
   frames.push(frame)
   frame.on('closed', () => {
@@ -51,7 +51,7 @@ function createApplicationMenu() {
       label: 'Edit',
       submenu: [
         {role: 'copy'},
-        {role: 'paste'},
+        getPasteRoleMenuItem(),
         {role: 'selectall'},
       ],
     },
@@ -70,7 +70,7 @@ function createWindowMenu(frame) {
       label: 'Edit',
       submenu: [
         {role: 'copy'},
-        {role: 'paste'},
+        getPasteRoleMenuItem(),
         {role: 'selectall'},
       ],
     },
@@ -84,18 +84,41 @@ function createWindowMenu(frame) {
   frame.setMenuBarVisibility(false)
 }
 
-function transferEvents(frame) {
+// Note: the role `Paste` will trigger native paste event error
+// when copying inside this app on macOS
+function getPasteRoleMenuItem() {
+  return {
+    label: 'Paste',
+    accelerator: 'CommandOrControl+V',
+    click() {
+      const window = BrowserWindow.getFocusedWindow()
+      if (window) window.webContents.send('paste')
+    },
+  }
+}
+
+function transferWindowEvents(frame) {
   frame.on('maximize', () => {
     frame.webContents.send('maximize')
   })
   frame.on('unmaximize', () => {
     frame.webContents.send('unmaximize')
   })
+}
+
+function transferCommonEvents() {
   ipcMain.on('contextmenu', (event, args) => {
     Menu.buildFromTemplate(buildRendererMenu(event.sender, args)).popup({})
   })
   ipcMain.on('dragstart', (event, args) => {
     // event.sender.startDrag({file: args, icon: args})
+  })
+  ipcMain.on('confirm', (event, args) => {
+    const {sender} = event
+    const window = frames.find(frame => frame.webContents === sender)
+    dialog.showMessageBox(window, args, response => {
+      sender.send('confirm', {id: args.id, response})
+    })
   })
 }
 
@@ -124,6 +147,7 @@ app.on('ready', () => {
   if (process.platform === 'darwin') {
     createApplicationMenu()
   }
+  transferCommonEvents()
   createWindow()
 })
 
