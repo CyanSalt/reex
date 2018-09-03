@@ -16,6 +16,13 @@ export default {
     'quick-access': QuickAccess,
     'file-explorer': FileExplorer,
   },
+  methods: {
+    editing() {
+      const {activeElement} = document
+      return activeElement && activeElement !== document.body ?
+        activeElement : null
+    }
+  },
   beforeCreate() {
     // custom stylesheet
     const stylesheet = this.$storage.rawdataSync('custom.css')
@@ -36,15 +43,21 @@ export default {
       this.$flux.dispatch(`contextmenu/${args.action}`, args)
     })
     document.addEventListener('copy', e => {
+      if (this.editing()) return
       e.preventDefault()
       this.$flux.dispatch('contextmenu/copy')
     })
     ipcRenderer.on('paste', (e, args) => {
-      this.$flux.dispatch('contextmenu/paste')
+      if (this.editing()) {
+        document.execCommand('paste')
+      } else {
+        this.$flux.dispatch('contextmenu/paste')
+      }
     })
     // make selection change every time except after `removeAllRanges`
     let manually = false
     document.addEventListener('selectionchange', e => {
+      if (this.editing()) return
       e.preventDefault()
       if (manually) {
         manually = false
