@@ -19,9 +19,10 @@
   "Duplicate file name#!18": "文件名重复",
   "There has been a file named %NAME%. What to do with %TARGET%?#!19":
     "此处已经有一个名为%NAME%的文件了，要如何处理%TARGET%？",
-  "Rename#!20": "重命名",
-  "Replace#!21": "替换",
-  "Skip#!22": "跳过",
-  "the copying file#!23": "复制中的文件",
-  "the moving file#!24": "移动中的文件"
+  "the copying file#!20": "复制中的文件",
+  "the moving file#!21": "移动中的文件",
+  "Rename#!22": "重命名",
+  "Replace#!23": "替换",
+  "Skip#!24": "跳过",
+  "Cancel#!25": "取消"
 }

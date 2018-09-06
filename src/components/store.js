@@ -306,10 +306,18 @@ export default {
       if (!times) return name
       return `${basename(name)} (${times})${extname(name)}`
     },
+    'file/order'(files, factory, collection = []) {
+      if (!files.length) {
+        return collection
+      }
+      return factory(files[0])
+        .then(result => this['file/order'](
+          files.slice(1), factory, collection.concat([result])
+        )).catch(() => collection)
+    },
     'file/copy'(source) {
       const current = this['path/full']
-      // TODO: support cancelation
-      Promise.all(source.map(path => {
+      this['file/order'](source, path => {
         const name = basename(path)
         const locally = dirname(path) === current
         const create = times => {
@@ -319,7 +327,7 @@ export default {
             .then(() => target)
             .catch(() => {
               if (locally) return create(times + 1)
-              const text = this.i18n('the copying file#!23')
+              const text = this.i18n('the copying file#!20')
               return this['confirm/duplicate'](realname, text)
                 .then(response => {
                   if (response === 0) {
@@ -332,14 +340,13 @@ export default {
             })
         }
         return create(locally ? 1 : 0)
-      })).then(paths => {
+      }).then(paths => {
         this['files/selecting'] = paths.filter(Boolean)
       })
     },
     'file/move'(source) {
       const current = this['path/full']
-      // TODO: support cancelation
-      Promise.all(source.map(path => {
+      this['file/order'](source, path => {
         const name = basename(path)
         const create = times => {
           const realname = this['file/avoid']({name, times})
@@ -347,7 +354,7 @@ export default {
           if (target === path) return path
           return promises.rename(path, target).then(() => target)
             .catch(() => {
-              const text = this.i18n('the moving file#!24')
+              const text = this.i18n('the moving file#!21')
               return this['confirm/duplicate'](realname, text)
                 .then(response => {
                   if (response === 0) {
@@ -362,7 +369,7 @@ export default {
             })
         }
         return create(0)
-      })).then(paths => {
+      }).then(paths => {
         this['files/selecting'] = paths.filter(Boolean)
       })
     },
@@ -540,9 +547,10 @@ export default {
         message: this.i18n('There has been a file named %NAME%. What to do with %TARGET%?#!19')
           .replace('%NAME%', name).replace('%TARGET%', target),
         buttons: [
-          this.i18n('Rename#!20'),
-          this.i18n('Replace#!21'),
-          this.i18n('Skip#!22'),
+          this.i18n('Rename#!22'),
+          this.i18n('Replace#!23'),
+          this.i18n('Skip#!24'),
+          this.i18n('Cancel#!25'),
         ],
         defaultId: 0,
         cancelId: 2,
