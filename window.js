@@ -1,7 +1,6 @@
 const {app, BrowserWindow, Menu, ipcMain, dialog} = require('electron')
 const {resolve} = require('path')
 
-// let frame = null
 const frames = []
 
 function createWindow() {

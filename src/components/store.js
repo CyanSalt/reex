@@ -2,7 +2,8 @@ import {remote, shell, clipboard, ipcRenderer} from 'electron'
 import {sep, join, basename, dirname, resolve, extname} from 'path'
 import {
   readdir, watch, mkdir, copyFile, writeFile,
-  lstat, readlink, stat, rename,
+  lstat, readlink, stat, rename, unlink,
+  constants as fsconst,
 } from 'fs'
 import {promisify} from 'util'
 import settings from '../resources/default/settings.json'
@@ -14,6 +15,7 @@ const promises = {
   stat: promisify(stat),
   copyFile: promisify(copyFile),
   rename: promisify(rename),
+  unlink: promisify(unlink),
 }
 
 export default {
@@ -302,42 +304,66 @@ export default {
     },
     'file/avoid'({name, times}) {
       if (!times) return name
-      const steps = name.split('.')
-      return steps.slice(0, -1).join('.') + ` (${times}).` +
-        steps[steps.length - 1]
+      return `${basename(name)} (${times})${extname(name)}`
     },
     'file/copy'(source) {
       const current = this['path/full']
+      // TODO: support cancelation
       Promise.all(source.map(path => {
         const name = basename(path)
         const locally = dirname(path) === current
         const create = times => {
           const realname = this['file/avoid']({name, times})
           const target = join(current, realname)
-          // TODO: show confirm dialog if not locally
-          return promises.copyFile(path, target).then(() => target)
-            .catch(() => create(times + 1))
+          return promises.copyFile(path, target, fsconst.COPYFILE_EXCL)
+            .then(() => target)
+            .catch(() => {
+              if (locally) return create(times + 1)
+              const text = this.i18n('the copying file#!23')
+              return this['confirm/duplicate'](realname, text)
+                .then(response => {
+                  if (response === 0) {
+                    return create(times + 1)
+                  } else if (response === 1) {
+                    return promises.rename(path, target).then(() => target)
+                  }
+                  return null
+                })
+            })
         }
         return create(locally ? 1 : 0)
       })).then(paths => {
-        this['files/selecting'] = paths
+        this['files/selecting'] = paths.filter(Boolean)
       })
     },
     'file/move'(source) {
       const current = this['path/full']
+      // TODO: support cancelation
       Promise.all(source.map(path => {
         const name = basename(path)
         const create = times => {
           const realname = this['file/avoid']({name, times})
           const target = join(current, realname)
           if (target === path) return path
-          // TODO: show confirm dialog
           return promises.rename(path, target).then(() => target)
-            .catch(() => create(times + 1))
+            .catch(() => {
+              const text = this.i18n('the moving file#!24')
+              return this['confirm/duplicate'](realname, text)
+                .then(response => {
+                  if (response === 0) {
+                    return create(times + 1)
+                  } else if (response === 1) {
+                    return promises.unlink(target)
+                      .then(() => promises.rename(path, target))
+                      .then(() => target)
+                  }
+                  return null
+                })
+            })
         }
         return create(0)
       })).then(paths => {
-        this['files/selecting'] = paths
+        this['files/selecting'] = paths.filter(Boolean)
       })
     },
     'folder/watch'({path, callback}) {
@@ -507,6 +533,21 @@ export default {
         waiting.fulfill(response)
       }
     },
+    'confirm/duplicate'(name, target) {
+      return this['confirm/send']({
+        type: 'question',
+        title: this.i18n('Duplicate file name#!18'),
+        message: this.i18n('There has been a file named %NAME%. What to do with %TARGET%?#!19')
+          .replace('%NAME%', name).replace('%TARGET%', target),
+        buttons: [
+          this.i18n('Rename#!20'),
+          this.i18n('Replace#!21'),
+          this.i18n('Skip#!22'),
+        ],
+        defaultId: 0,
+        cancelId: 2,
+      })
+    },
     // Context menu actions
     'contextmenu/create-folder'() {
       const path = this['path/full']
@@ -528,7 +569,7 @@ export default {
           if (err) create(times + 1)
         }
         if (data) {
-          copyFile(data, join(path, realname), callback)
+          copyFile(data, join(path, realname), fsconst.COPYFILE_EXCL, callback)
         } else {
           writeFile(join(path, realname), '', {flag: 'wx'}, callback)
         }
