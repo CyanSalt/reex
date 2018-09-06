@@ -50,6 +50,8 @@ const types = {
     // application/pdf
     '.pdf',
   ]
+  // TODO: support disks and zips
+  // TODO: support custom registry
 }
 
 export default types

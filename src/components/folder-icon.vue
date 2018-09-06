@@ -7,7 +7,7 @@
       >{{ watermark }}</text>
     <text x="65" y="60" font-size="14" text-anchor="end" font-family="icomoon"
       fill="#353d46" v-if="link" stroke="white" stroke-width="3"
-      paint-order="stroke">&#xe904;</text>
+      paint-order="stroke">{{ linkIcon }}</text>
   </svg>
 </template>
 
@@ -17,6 +17,11 @@ export default {
   props: {
     watermark: String,
     link: Boolean,
+  },
+  computed: {
+    linkIcon() {
+      return this.$flux.dispatch('icon/character', 'icon-corner-up-right')
+    },
   },
 }
 </script>
