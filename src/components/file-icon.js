@@ -12,13 +12,19 @@ export default {
     const {file} = context.props
     const props = {link: Boolean(file.link)}
     const vm = context.parent
-    const realpath = file.link ? file.link.path : file.path
-    const realstats = file.link ? file.link.stats : file.stats
-    if (realstats.isDirectory()) {
-      props.watermark = vm.$flux.dispatch('file/waterchar', realpath)
+    const real = file.link || file
+    const isFolder = real.stats.isDirectory()
+    let watermark = vm.$flux.dispatch('icon/defined', real.path)
+    if (!watermark && !isFolder) {
+      watermark = vm.$flux.dispatch('icon/type', real.path)
+    }
+    if (watermark) {
+      props.watermark = vm.$flux.dispatch('icon/character', watermark)
+    }
+    if (isFolder) {
       return h(FolderIcon, {props}, context.children)
     }
-    props.ext = extname(realpath)
+    props.ext = extname(real.path)
     return h(SingleFileIcon, {props}, context.children)
   },
 }

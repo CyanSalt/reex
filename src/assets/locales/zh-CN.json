@@ -17,8 +17,8 @@
   "Copy#!16": "复制",
   "Paste#!17": "粘贴",
   "Duplicate file name#!18": "文件名重复",
-  "There has been a file named %NAME%. What to do with %TARGET%?#!19":
-    "此处已经有一个名为%NAME%的文件了，要如何处理%TARGET%？",
+  "There has been a file named \"%NAME%\". What to do with %TARGET%?#!19":
+    "此处已经有一个名为“%NAME%”的文件了，要如何处理%TARGET%？",
   "the copying file#!20": "复制中的文件",
   "the moving file#!21": "移动中的文件",
   "Rename#!22": "重命名",

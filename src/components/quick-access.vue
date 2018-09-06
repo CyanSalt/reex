@@ -49,7 +49,7 @@ export default {
     icon(file) {
       const path = file.link ? file.link.path : file.path
       const stats = file.link ? file.link.stats : file.stats
-      const watermark = this.$flux.dispatch('file/watermark', path)
+      const watermark = this.$flux.dispatch('icon/defined', path)
       if (watermark) return watermark
       return stats.isDirectory() ? 'icon-folder' : 'icon-file'
     },

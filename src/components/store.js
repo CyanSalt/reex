@@ -39,6 +39,7 @@ export default {
     'devices/removable': [],
     'explorer/loading': false,
     'confirm/waiting': null,
+    'icons/cache': {},
   },
   computed: {
     'path/floors'() {
@@ -162,17 +163,9 @@ export default {
         {shortname: 'pictures', name: 'Pictures#!5', watermark: 'icon-image'},
         {shortname: 'videos', name: 'Videos#!6', watermark: 'icon-film'},
       ]
-      const span = document.createElement('span')
-      span.style.display = 'none'
-      document.body.appendChild(span)
-      const style = getComputedStyle(span, '::before')
       for (const data of electronPaths) {
         if (data.name) {
           data.name = this.i18n(data.name)
-        }
-        if (!data.waterchar && data.watermark) {
-          span.className = data.watermark
-          data.waterchar = style.getPropertyValue('content')[1]
         }
         if (!data.path) {
           if (data.shortname === 'reex') {
@@ -182,7 +175,6 @@ export default {
           }
         }
       }
-      document.body.removeChild(span)
       this['path/defined'] = electronPaths
     },
     'path/interpret'(path) {
@@ -233,14 +225,6 @@ export default {
     'file/name'(path) {
       const target = this['path/defined'].find(data => data.path === path)
       return (target && target.name) || basename(path) || '/'
-    },
-    'file/watermark'(path) {
-      const target = this['path/defined'].find(data => data.path === path)
-      return target && target.watermark
-    },
-    'file/waterchar'(path) {
-      const target = this['path/defined'].find(data => data.path === path)
-      return target && target.waterchar
     },
     'file/follow'(info) {
       const {path, stats} = info
@@ -299,7 +283,19 @@ export default {
         '.jpeg', '.jpg', '.jpe', '.jpm', '.jpx', '.jpf', '.ktx', '.png',
         '.sgi', '.svg', '.svgz', '.tiff', '.tif', '.webp',
       ]
+      const videos = [
+        '.3gp', '.3gpp', '.3g2', '.h261', '.h263', '.h264', '.jpgv', '.jpgm',
+        '.mj2', '.mjp2', '.ts', '.mp4', '.mp4v', '.mpg4', '.mpeg', '.mpg',
+        '.mpe', '.m1v', '.m2v', '.ogv', '.qt', '.mov', '.webm',
+      ]
+      const audios = [
+        '.adp', '.au', '.snd', '.mid', '.midi', '.kar', '.rmi', '.m4a',
+        '.mp4a', '.mpga', '.mp2', '.mp2a', '.mp3', '.m2a', '.m3a', '.oga',
+        '.ogg', '.spx', '.s3m', '.sil', '.wav', '.weba', '.xm',
+      ]
       if (images.includes(ext)) return 'image'
+      if (videos.includes(ext)) return 'video'
+      if (audios.includes(ext)) return 'audio'
       return ''
     },
     'file/avoid'({name, times}) {
@@ -372,6 +368,31 @@ export default {
       }).then(paths => {
         this['files/selecting'] = paths.filter(Boolean)
       })
+    },
+    'icon/defined'(path) {
+      const target = this['path/defined'].find(data => data.path === path)
+      return target && target.watermark
+    },
+    'icon/type'(path) {
+      const type = this['file/type'](path)
+      if (type === 'image') return 'icon-image'
+      if (type === 'video') return 'icon-film'
+      if (type === 'audio') return 'icon-music'
+      return null
+    },
+    'icon/character'(icon) {
+      if (this['icons/cache'][icon]) {
+        return this['icons/cache'][icon]
+      }
+      const span = document.createElement('span')
+      span.style.display = 'none'
+      document.body.appendChild(span)
+      const style = getComputedStyle(span, '::before')
+      span.className = icon
+      const char = style.getPropertyValue('content')[1]
+      document.body.removeChild(span)
+      this['icons/cache'][icon] = char
+      return char
     },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
@@ -544,7 +565,7 @@ export default {
       return this['confirm/send']({
         type: 'question',
         title: this.i18n('Duplicate file name#!18'),
-        message: this.i18n('There has been a file named %NAME%. What to do with %TARGET%?#!19')
+        message: this.i18n('There has been a file named "%NAME%". What to do with %TARGET%?#!19')
           .replace('%NAME%', name).replace('%TARGET%', target),
         buttons: [
           this.i18n('Rename#!22'),

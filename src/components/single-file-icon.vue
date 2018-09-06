@@ -7,6 +7,9 @@
       <text x="25" y="60" font-size="14" text-anchor="middle"
         fill="white">{{ extname }}</text>
     </g>
+    <text x="25" y="36" font-size="24" text-anchor="middle"
+      font-family="icomoon" fill="black" opacity="0.1" v-if="watermark"
+      >{{ watermark }}</text>
     <text x="51" y="66" font-size="14" text-anchor="end" font-family="icomoon"
       fill="#353d46" v-if="link" stroke="white" stroke-width="3"
       paint-order="stroke">&#xe904;</text>
@@ -18,6 +21,7 @@ export default {
   name: 'single-file-icon',
   props: {
     ext: String,
+    watermark: String,
     link: Boolean,
   },
   computed: {
