@@ -7,6 +7,7 @@ import {
 } from 'fs'
 import {promisify} from 'util'
 import settings from '../resources/default/settings.json'
+import types from '../utilities/file-types'
 import {exec, spawn} from 'child_process'
 
 const promises = {
@@ -278,24 +279,12 @@ export default {
     },
     'file/type'(path) {
       const ext = extname(path)
-      const images = [
-        '.apng', '.bmp', '.cgm', '.g3', '.gif', '.ief', '.jp2', '.jpg2',
-        '.jpeg', '.jpg', '.jpe', '.jpm', '.jpx', '.jpf', '.ktx', '.png',
-        '.sgi', '.svg', '.svgz', '.tiff', '.tif', '.webp',
-      ]
-      const videos = [
-        '.3gp', '.3gpp', '.3g2', '.h261', '.h263', '.h264', '.jpgv', '.jpgm',
-        '.mj2', '.mjp2', '.ts', '.mp4', '.mp4v', '.mpg4', '.mpeg', '.mpg',
-        '.mpe', '.m1v', '.m2v', '.ogv', '.qt', '.mov', '.webm',
-      ]
-      const audios = [
-        '.adp', '.au', '.snd', '.mid', '.midi', '.kar', '.rmi', '.m4a',
-        '.mp4a', '.mpga', '.mp2', '.mp2a', '.mp3', '.m2a', '.m3a', '.oga',
-        '.ogg', '.spx', '.s3m', '.sil', '.wav', '.weba', '.xm',
-      ]
-      if (images.includes(ext)) return 'image'
-      if (videos.includes(ext)) return 'video'
-      if (audios.includes(ext)) return 'audio'
+      if (types.images.includes(ext)) return 'image'
+      if (types.videos.includes(ext)) return 'video'
+      if (types.audios.includes(ext)) return 'audio'
+      if (types.fonts.includes(ext)) return 'font'
+      if (types.codes.includes(ext)) return 'code'
+      if (types.texts.includes(ext)) return 'text'
       return ''
     },
     'file/avoid'({name, times}) {
@@ -378,6 +367,9 @@ export default {
       if (type === 'image') return 'icon-image'
       if (type === 'video') return 'icon-film'
       if (type === 'audio') return 'icon-music'
+      if (type === 'font') return 'icon-type'
+      if (type === 'code') return 'icon-code'
+      if (type === 'text') return 'icon-align-left'
       return null
     },
     'icon/character'(icon) {

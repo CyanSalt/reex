@@ -29,97 +29,84 @@ body {
   font-style: normal;
   src: url('./assets/fonts/icomoon.woff') format('woff');
 }
-.icon-arrow-left,
-.icon-arrow-right,
-.icon-arrow-up,
-.icon-chevron-right,
-.icon-corner-up-right,
-.icon-download,
-.icon-eye,
-.icon-eye-off,
-.icon-file,
-.icon-file-text,
-.icon-film,
-.icon-folder,
-.icon-hard-drive,
-.icon-home,
-.icon-image,
-.icon-maximize-2,
-.icon-minimize-2,
-.icon-minus,
-.icon-monitor,
-.icon-music,
-.icon-terminal,
-.icon-upload,
-.icon-x {
+[class^='icon-'] {
   font-family: 'icomoon';
 }
-.icon-arrow-left::before {
+.icon-align-left::before {
   content: '\e900';
 }
-.icon-arrow-right::before {
+.icon-arrow-left::before {
   content: '\e901';
 }
-.icon-arrow-up::before {
+.icon-arrow-right::before {
   content: '\e902';
 }
-.icon-chevron-right::before {
+.icon-arrow-up::before {
   content: '\e903';
 }
-.icon-corner-up-right::before {
+.icon-chevron-right::before {
   content: '\e904';
 }
-.icon-download::before {
+.icon-code::before {
   content: '\e905';
 }
-.icon-eye::before {
+.icon-corner-up-right::before {
   content: '\e906';
 }
-.icon-eye-off::before {
+.icon-download::before {
   content: '\e907';
 }
-.icon-file::before {
+.icon-eye::before {
   content: '\e908';
 }
-.icon-file-text::before {
+.icon-eye-off::before {
   content: '\e909';
 }
-.icon-film::before {
+.icon-file::before {
   content: '\e90a';
 }
-.icon-folder::before {
+.icon-file-text::before {
   content: '\e90b';
 }
-.icon-hard-drive::before {
+.icon-film::before {
   content: '\e90c';
 }
-.icon-home::before {
+.icon-folder::before {
   content: '\e90d';
 }
-.icon-image::before {
+.icon-hard-drive::before {
   content: '\e90e';
 }
-.icon-maximize-2::before {
+.icon-home::before {
   content: '\e90f';
 }
-.icon-minimize-2::before {
+.icon-image::before {
   content: '\e910';
 }
-.icon-minus::before {
+.icon-maximize-2::before {
   content: '\e911';
 }
-.icon-monitor::before {
+.icon-minimize-2::before {
   content: '\e912';
 }
-.icon-music::before {
+.icon-minus::before {
   content: '\e913';
 }
-.icon-terminal::before {
+.icon-monitor::before {
   content: '\e914';
 }
-.icon-upload::before {
+.icon-music::before {
   content: '\e915';
 }
-.icon-x::before {
+.icon-terminal::before {
   content: '\e916';
+}
+.icon-type::before {
+  content: '\e917';
+}
+.icon-upload::before {
+  content: '\e918';
+}
+.icon-x::before {
+  content: '\e919';
 }
