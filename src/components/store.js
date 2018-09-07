@@ -19,6 +19,8 @@ const promises = {
   unlink: promisify(unlink),
 }
 
+const {additionalArguments} = remote.getCurrentWindow()
+
 export default {
   data: {
     'settings/default': {},
@@ -74,8 +76,9 @@ export default {
         data = err ? copied : {...copied, ...data}
         this['settings/user'] = data
         // load other states in store
-        const path = data['explorer.startup.path']
-        this['path/replace'](this['path/interpret'](path))
+        const path = additionalArguments.path ||
+          this['path/interpret'](data['explorer.startup.path'])
+        this['path/replace'](path)
         const favorites = data['quickaccess.favorites']
           .map(entry => this['path/interpret'](entry))
         this['file/read'](favorites).then(entries => {

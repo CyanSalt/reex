@@ -3,7 +3,7 @@ const {resolve} = require('path')
 
 const frames = []
 
-function createWindow() {
+function createWindow(args) {
   const frame = new BrowserWindow({
     title: app.getName(),
     width: 952,
@@ -29,6 +29,7 @@ function createWindow() {
       frames.splice(index, 1)
     }
   })
+  frame.additionalArguments = args || {}
 }
 
 function createApplicationMenu() {
@@ -153,7 +154,11 @@ app.on('ready', () => {
     createApplicationMenu()
   }
   transferCommonEvents()
-  createWindow()
+  const args = {}
+  if (process.argv[1]) {
+    args.path = resolve(process.cwd(), process.argv[1])
+  }
+  createWindow(args)
 })
 
 app.on('activate', () => {
