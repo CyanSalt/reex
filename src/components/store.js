@@ -287,7 +287,7 @@ export default {
       }
     },
     'file/type'(path) {
-      const ext = extname(path)
+      const ext = extname(path).toLowerCase()
       for (const {type, extension} of this['types/all']) {
         if (extension.includes(ext)) return type
       }
