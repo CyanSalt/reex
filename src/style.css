@@ -53,60 +53,66 @@ body {
 .icon-corner-up-right::before {
   content: '\e906';
 }
-.icon-download::before {
+.icon-disc::before {
   content: '\e907';
 }
-.icon-eye::before {
+.icon-download::before {
   content: '\e908';
 }
-.icon-eye-off::before {
+.icon-eye::before {
   content: '\e909';
 }
-.icon-file::before {
+.icon-eye-off::before {
   content: '\e90a';
 }
-.icon-file-text::before {
+.icon-file::before {
   content: '\e90b';
 }
-.icon-film::before {
+.icon-file-text::before {
   content: '\e90c';
 }
-.icon-folder::before {
+.icon-film::before {
   content: '\e90d';
 }
-.icon-hard-drive::before {
+.icon-folder::before {
   content: '\e90e';
 }
-.icon-home::before {
+.icon-hard-drive::before {
   content: '\e90f';
 }
-.icon-image::before {
+.icon-home::before {
   content: '\e910';
 }
-.icon-maximize-2::before {
+.icon-image::before {
   content: '\e911';
 }
-.icon-minimize-2::before {
+.icon-maximize-2::before {
   content: '\e912';
 }
-.icon-minus::before {
+.icon-minimize-2::before {
   content: '\e913';
 }
-.icon-monitor::before {
+.icon-minus::before {
   content: '\e914';
 }
-.icon-music::before {
+.icon-monitor::before {
   content: '\e915';
 }
-.icon-terminal::before {
+.icon-music::before {
   content: '\e916';
 }
-.icon-type::before {
+.icon-package::before {
   content: '\e917';
 }
-.icon-upload::before {
+.icon-terminal::before {
   content: '\e918';
 }
-.icon-x::before {
+.icon-type::before {
   content: '\e919';
+}
+.icon-upload::before {
+  content: '\e91a';
+}
+.icon-x::before {
+  content: '\e91b';
 }

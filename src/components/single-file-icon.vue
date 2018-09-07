@@ -33,7 +33,6 @@ export default {
     linkIcon() {
       return this.$flux.dispatch('icon/character', 'icon-corner-up-right')
     },
-    // TODO: support specific color
     color() {
       if (!this.ext) return 'transparent'
       if (this.background) return this.background

@@ -211,7 +211,11 @@ export default {
       }
     },
     'file/hidden'(path) {
-      return basename(path).charAt(0) === '.'
+      if (process.platform !== 'win32') {
+        return basename(path).charAt(0) === '.'
+      }
+      // TODO: support winattr
+      return false
     },
     'file/select'(path) {
       if (!this['files/selected'].includes(path)) {
@@ -434,8 +438,10 @@ export default {
         {type: 'image', extension: types.images, icon: 'icon-image'},
         {type: 'video', extension: types.videos, icon: 'icon-film'},
         {type: 'audio', extension: types.audios, icon: 'icon-music'},
-        {type: 'code', extension: types.codes, icon: 'icon-code'},
         {type: 'font', extension: types.fonts, icon: 'icon-type'},
+        {type: 'package', extension: types.packages, icon: 'icon-package'},
+        {type: 'disc', extension: types.discs, icon: 'icon-disc'},
+        {type: 'code', extension: types.codes, icon: 'icon-code'},
         {type: 'text', extension: types.texts, icon: 'icon-align-left'},
       ])
     },
@@ -468,6 +474,7 @@ export default {
       })
     },
     'devices/load'() {
+      // TODO: cross platform
       if (process.platform === 'darwin') {
         const path = '/Volumes'
         readdir(path, (err, files) => {
@@ -493,6 +500,7 @@ export default {
     },
     'devices/watch'() {
       this['devices/load']()
+      // TODO: cross platform
       if (process.platform === 'darwin') {
         this['folder/watch']({
           path: '/Volumes',
@@ -503,6 +511,7 @@ export default {
       }
     },
     'devices/unmount'(info) {
+      // TODO: cross platform
       if (process.platform === 'darwin') {
         const name = basename(info.path).replace(/\s/g, c => '\\' + c)
         exec(`diskutil unmount ${name}`)
@@ -523,6 +532,7 @@ export default {
     },
     'clipboard/files'() {
       const files = []
+      // TODO: cross platform
       if (process.platform === 'darwin') {
         const plist = clipboard.read('NSFilenamesPboardType')
         const regex = /<string>(.+)<\/string>/g
@@ -538,6 +548,7 @@ export default {
       const path = this['path/full']
       const command = this['settings/user']['terminal.command']
         .replace('%PATH%', path)
+      // TODO: cross platform
       if (process.platform === 'darwin') {
         const name = this['settings/user']['terminal.darwin.name']
         let script
@@ -647,6 +658,7 @@ export default {
     },
     'contextmenu/copy'() {
       const files = this['files/selected']
+      // TODO: cross platform
       if (process.platform === 'darwin') {
         clipboard.writeBuffer('NSFilenamesPboardType', Buffer.from(`
           <?xml version="1.0" encoding="UTF-8"?>

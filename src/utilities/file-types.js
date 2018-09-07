@@ -20,38 +20,30 @@ const types = {
     '.ogx',
   ],
   fonts: ['.ttc', '.otf', '.ttf', '.woff', '.woff2', '.eot'],
+  packages: [
+    '.tar', '.bz2', '.gz', '.lz', '.lzma', '.rz', '.sz', '.xz',
+    '.z', '.7z', '.apk', '.cab', '.jar', '.pak', '.rar', '.tbz2',
+    '.wim', '.xar', '.yz1', '.zip', '.zz',
+    // application/octet-stream
+    '.bin', '.pkg', '.deb', '.msi',
+    // application/*zip
+    '.air',
+  ],
+  discs: ['.dmg', '.iso', '.img'],
   codes: [
-    '.appcache', '.manifest', '.coffee', '.litcoffee', '.css', '.csv',
-    '.html', '.htm', '.shtml', '.jade', '.jsx', '.less',
-    '.mml', '.conf', '.def', '.in', '.ini', '.sgml', '.sgm', '.shex',
-    '.slim', '.slm', '.stylus', '.styl', '.tsv', '.ttl', '.vcard', '.vtt',
-    '.xml', '.yaml', '.yml',
-    // application/*ml, application/*json, application/*script
-    '.atom', '.atomcat', '.atomsvc', '.ccxml', '.mpd', '.davmount',
-    '.dbk', '.xdssc', '.ecma', '.emma', '.geojson', '.gml', '.gpx', '.hjson',
-    '.ink', '.inkml', '.js', '.mjs', '.json', '.map', '.json5', '.jsonml',
-    '.jsonld', '.lostxml', '.mads', '.mrcx', '.mathml', '.mscml',
-    '.metalink', '.meta4', '.mets', '.mods', '.omdoc', '.xer',
-    '.pls', '.ai', '.eps', '.ps', '.pskcxml', '.raml', '.rdf', '.rif',
-    '.rl', '.rld', '.rs', '.rsd', '.rss', '.sbml', '.shf', '.smi',
-    '.smil', '.srx', '.grxml', '.sru', '.ssdl', '.ssml', '.tei', '.teicorpus',
-    '.tfi', '.vxml', '.wsdl', '.wspolicy', '.xaml', '.xdf', '.xenc', '.xhtml',
-    '.xht', '.xsl', '.xsd', '.rng', '.dtd', '.xop', '.xpl', '.xslt',
-    '.xspf', '.mxml', '.xhvml', '.xvml', '.xvm', '.yin',
+    '.manifest', '.coffee', '.css', '.csv', '.html', '.htm', '.shtml', '.jade',
+    '.pug', '.jsx', '.less', '.conf', '.ini', '.sgml', '.sgm', '.stylus',
+    '.styl', '.tsv', '.vcard', '.vtt', '.xml', '.yaml', '.yml',
+    // application/*ml/json/script
+    '.js', '.mjs', '.json', '.map', '.rss', '.xhtml', '.xht', '.dtd',
+    // for others applications
+    '.vue',
   ],
   texts: [
-    '.ics', '.ifb', '.markdown', '.md', '.n3', '.txt', '.text', '.list',
-    '.log', '.rtx', '.rtf', '.t', '.tr', '.roff', '.man', '.me',
-    '.ms', '.uri', '.uris', '.urls',
-    // application/msword
-    '.doc', '.dot',
-    // application/onenote
-    '.onetoc', '.onetoc2', '.onetmp', '.onepkg',
-    // application/pdf
-    '.pdf',
-  ]
-  // TODO: support disks and zips
-  // TODO: support custom registry
+    '.markdown', '.md', '.txt', '.text', '.log', '.rtx', '.rtf', '.man',
+    // for others applications
+    '.doc', '.docx', '.pdf',
+  ],
 }
 
 export default types
