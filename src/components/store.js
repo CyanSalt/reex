@@ -266,8 +266,8 @@ export default {
             }).catch(() => {
               return Object.assign(info, {link: info})
             })
-          })
-      }))
+          }).catch(() => null)
+      })).then(all => all.filter(Boolean))
     },
     'file/execute'(path) {
       this['file/executed'] = path
