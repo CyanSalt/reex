@@ -5,7 +5,7 @@
     <g v-if="ext">
       <path d="M50,44V62c0,4,0,4,-4,4H4c-4,0,-4,0,-4,-4V44Z" :fill="color"/>
       <text x="25" y="60" font-size="14" text-anchor="middle"
-        fill="white">{{ extname }}</text>
+        :fill="foreground">{{ extname }}</text>
     </g>
     <text x="25" y="36" font-size="24" text-anchor="middle"
       font-family="icomoon" fill="black" opacity="0.1" v-if="watermark"
@@ -23,6 +23,11 @@ export default {
     ext: String,
     watermark: String,
     link: Boolean,
+    background: String,
+    foreground: {
+      type: String,
+      default: 'white',
+    },
   },
   computed: {
     linkIcon() {
@@ -31,6 +36,7 @@ export default {
     // TODO: support specific color
     color() {
       if (!this.ext) return 'transparent'
+      if (this.background) return this.background
       const digit = Array.from(this.ext).reduce((total, char) =>
         total + char.charCodeAt(0), 0)
       const colors = [

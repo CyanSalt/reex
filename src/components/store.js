@@ -41,7 +41,8 @@ export default {
     'explorer/loading': false,
     'confirm/waiting': null,
     'icons/cache': {},
-    'file/types': [],
+    'types/all': [],
+    'colors/all': {},
   },
   computed: {
     'path/floors'() {
@@ -280,7 +281,7 @@ export default {
     },
     'file/type'(path) {
       const ext = extname(path)
-      for (const {type, extension} of this['file/types']) {
+      for (const {type, extension} of this['types/all']) {
         if (extension.includes(ext)) return type
       }
       return ''
@@ -362,7 +363,7 @@ export default {
     },
     'icon/type'(path) {
       const type = this['file/type'](path)
-      const group = this['file/types'].find(item => item.type === type)
+      const group = this['types/all'].find(item => item.type === type)
       return (group && group.icon) || null
     },
     'icon/character'(icon) {
@@ -413,7 +414,7 @@ export default {
       if (!Array.isArray(extension)) {
         extension = [extension]
       }
-      const allTypes = this['file/types']
+      const allTypes = this['types/all']
       const group = allTypes.find(item => item.type === type)
       if (!group) {
         allTypes.push({type, extension, icon})
@@ -434,6 +435,13 @@ export default {
         {type: 'font', extension: types.fonts, icon: 'icon-type'},
         {type: 'text', extension: types.texts, icon: 'icon-align-left'},
       ])
+    },
+    'colors/define'({extension, color}) {
+      if (!Array.isArray(color)) color = [color]
+      this['colors/all'][extension] = color
+    },
+    'colors/match'(extension) {
+      return this['colors/all'][extension] || null
     },
     'templates/load'() {
       const templates = this.$storage.filename('templates')

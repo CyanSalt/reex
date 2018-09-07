@@ -25,6 +25,11 @@ export default {
       return h(FolderIcon, {props}, context.children)
     }
     props.ext = extname(real.path)
+    const colors = vm.$flux.dispatch('colors/match', props.ext)
+    if (colors) {
+      if (colors[0]) props.background = colors[0]
+      if (colors[1]) props.foreground = colors[1]
+    }
     return h(SingleFileIcon, {props}, context.children)
   },
 }
