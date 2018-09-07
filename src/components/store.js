@@ -41,6 +41,7 @@ export default {
     'explorer/loading': false,
     'confirm/waiting': null,
     'icons/cache': {},
+    'file/types': [],
   },
   computed: {
     'path/floors'() {
@@ -279,12 +280,9 @@ export default {
     },
     'file/type'(path) {
       const ext = extname(path)
-      if (types.images.includes(ext)) return 'image'
-      if (types.videos.includes(ext)) return 'video'
-      if (types.audios.includes(ext)) return 'audio'
-      if (types.fonts.includes(ext)) return 'font'
-      if (types.codes.includes(ext)) return 'code'
-      if (types.texts.includes(ext)) return 'text'
+      for (const {type, extension} of this['file/types']) {
+        if (extension.includes(ext)) return type
+      }
       return ''
     },
     'file/avoid'({name, times}) {
@@ -364,13 +362,8 @@ export default {
     },
     'icon/type'(path) {
       const type = this['file/type'](path)
-      if (type === 'image') return 'icon-image'
-      if (type === 'video') return 'icon-film'
-      if (type === 'audio') return 'icon-music'
-      if (type === 'font') return 'icon-type'
-      if (type === 'code') return 'icon-code'
-      if (type === 'text') return 'icon-align-left'
-      return null
+      const group = this['file/types'].find(item => item.type === type)
+      return (group && group.icon) || null
     },
     'icon/character'(icon) {
       if (this['icons/cache'][icon]) {
@@ -410,6 +403,37 @@ export default {
         }
       } catch (e) {}
       return watchers
+    },
+    'types/define'(definition) {
+      if (Array.isArray(definition)) {
+        definition.forEach(item => this['types/define'](item))
+        return
+      }
+      let {type, extension, icon} = definition
+      if (!Array.isArray(extension)) {
+        extension = [extension]
+      }
+      const allTypes = this['file/types']
+      const group = allTypes.find(item => item.type === type)
+      if (!group) {
+        allTypes.push({type, extension, icon})
+      } else {
+        group.icon = icon
+        const list = group.extension
+        extension.forEach(ext => {
+          if (!list.includes(ext)) list.push(ext)
+        })
+      }
+    },
+    'types/load'() {
+      this['types/define']([
+        {type: 'image', extension: types.images, icon: 'icon-image'},
+        {type: 'video', extension: types.videos, icon: 'icon-film'},
+        {type: 'audio', extension: types.audios, icon: 'icon-music'},
+        {type: 'code', extension: types.codes, icon: 'icon-code'},
+        {type: 'font', extension: types.fonts, icon: 'icon-type'},
+        {type: 'text', extension: types.texts, icon: 'icon-align-left'},
+      ])
     },
     'templates/load'() {
       const templates = this.$storage.filename('templates')
