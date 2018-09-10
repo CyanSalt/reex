@@ -292,6 +292,7 @@ export default {
       }
     },
     'file/type'(path) {
+      // TODO: consider using `mdls`
       const ext = extname(path).toLowerCase()
       for (const {type, extension} of this['types/all']) {
         if (extension.includes(ext)) return type
@@ -634,7 +635,7 @@ export default {
     },
     'contextmenu/create-file'({data}) {
       const path = this['path/full']
-      const name = basename(data) || this.i18n('New file#!10')
+      const name = (data && basename(data)) || this.i18n('New file#!10')
       const create = times => {
         const realname = this['file/avoid']({name, times})
         const callback = err => {
