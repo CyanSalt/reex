@@ -58,8 +58,10 @@ packager(options).then(appPaths => {
   appPaths.forEach(dir => {
     copy('src/resources', dir)
     if (dir.includes('win32')) {
-      const manifest = `${app.name}.VisualElementsManifest.xml`
-      fs.renameSync(`${dir}/resources/visual/${manifest}`, `${dir}/${manifest}`)
+      // TODO: support visual elements manifest
+      // const manifest = `${app.name}.VisualElementsManifest.xml`
+      // fs.renameSync(`${dir}/resources/visual/${manifest}`,
+      //  `${dir}/${manifest}`)
     }
   })
   console.log('Build finished.')

@@ -1,5 +1,6 @@
 {
   "explorer.startup.path": "[home]",
+  "explorer.win32.hidedotfiles": true,
   "quickaccess.favorites": [
     "[documents]", "[pictures]", "[music]", "[videos]",
     "[downloads]", "[desktop]", "[home]"

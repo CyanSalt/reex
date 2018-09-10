@@ -214,6 +214,11 @@ export default {
       if (process.platform !== 'win32') {
         return basename(path).charAt(0) === '.'
       }
+      const hideDotFiles = this['settings/user']['explorer.win32.hidedotfiles']
+      if (hideDotFiles) {
+        const isDotFile = basename(path).charAt(0) === '.'
+        if (isDotFile) return true
+      }
       // TODO: support winattr
       return false
     },
