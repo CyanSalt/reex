@@ -15,7 +15,7 @@ function createWindow(args) {
       experimentalFeatures: true,
     },
   }
-  if (args.position) {
+  if (args && args.position) {
     options.x = args.position.x
     options.y = args.position.y
   }
