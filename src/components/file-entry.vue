@@ -69,7 +69,30 @@ export default {
       }
     },
     contextmenu() {
+      let open = []
+      if (this.selected.length === 1 && this.focused) {
+        const isDirectory = this.real.stats.isDirectory()
+        open = [
+          {
+            label: this.i18n('Open#!26'),
+            action: 'open',
+            data: {
+              path: this.real.path,
+              isDirectory,
+            },
+          },
+          {type: 'separator'},
+        ]
+        if (isDirectory) {
+          open.splice(1, 0, {
+            label: this.i18n('Open in new window#!27'),
+            action: 'open-window',
+            data: this.real.path,
+          })
+        }
+      }
       ipcRenderer.send('contextmenu', [
+        ...open,
         {
           label: this.i18n('Copy#!16'),
           action: 'copy',

@@ -119,6 +119,9 @@ function transferCommonEvents() {
       icon: draggingIcon,
     })
   })
+  ipcMain.on('open-window', (event, args) => {
+    createWindow(args)
+  })
   ipcMain.on('confirm', (event, args) => {
     const {sender} = event
     const window = frames.find(frame => frame.webContents === sender)
@@ -162,7 +165,7 @@ app.on('ready', () => {
 })
 
 app.on('activate', () => {
-  if (!frames.length) {
+  if (!frames.length && app.isReady()) {
     createWindow()
   }
 })

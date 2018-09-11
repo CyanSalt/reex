@@ -285,11 +285,9 @@ export default {
     'file/open'(info) {
       const path = info.link ? info.link.path : info.path
       const stats = info.link ? info.link.stats : info.stats
-      if (stats.isDirectory()) {
-        this['path/redirect'](path)
-      } else {
-        this['file/execute'](path)
-      }
+      return this['contextmenu/open']({
+        data: {path, isDirectory: stats.isDirectory()}
+      })
     },
     'file/type'(path) {
       // TODO: consider using `mdls`
@@ -305,7 +303,7 @@ export default {
     },
     'file/order'(files, factory, collection = []) {
       if (!files.length) {
-        return collection
+        return Promise.resolve(collection)
       }
       return factory(files[0])
         .then(result => this['file/order'](
@@ -684,6 +682,17 @@ export default {
     },
     'contextmenu/selectall'() {
       this['file/specify'](this['files/visible'].map(file => file.path))
+    },
+    'contextmenu/open'({data}) {
+      const {path, isDirectory} = data
+      if (isDirectory) {
+        this['path/redirect'](path)
+      } else {
+        this['file/execute'](path)
+      }
+    },
+    'contextmenu/open-window'({data}) {
+      ipcRenderer.send('open-window', {path: data})
     },
   },
 }
