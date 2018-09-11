@@ -21,6 +21,7 @@ const promises = {
 
 const {additionalArguments} = remote.getCurrentWindow()
 
+// TODO: support permission like jorangreef/sudo-prompt
 export default {
   data: {
     'settings/default': {},
@@ -337,6 +338,10 @@ export default {
         return create(locally ? 1 : 0)
       }).then(paths => {
         this['files/selecting'] = paths.filter(Boolean)
+        this['files/recentlog'] = {
+          action: 'copy',
+          target: paths,
+        }
       })
     },
     'file/move'(source) {
@@ -366,6 +371,11 @@ export default {
         return create(0)
       }).then(paths => {
         this['files/selecting'] = paths.filter(Boolean)
+        this['files/recentlog'] = {
+          action: 'move',
+          target: paths,
+          source,
+        }
       })
     },
     'icon/defined'(path) {
