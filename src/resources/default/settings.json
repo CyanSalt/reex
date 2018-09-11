@@ -1,5 +1,11 @@
 {
   "explorer.startup.path": "[home]",
+  "explorer.icon.colorful": false,
+  "explorer.icon.black": "#61737f",
+  "explorer.icon.colors": [
+    "#ec5f67", "#f99157", "#fac863", "#99c794",
+    "#5fb3b3", "#6699cc", "#c594c5", "#ab7967"
+  ],
   "explorer.win32.hidedotfiles": true,
   "quickaccess.favorites": [
     "[documents]", "[pictures]", "[music]", "[videos]",

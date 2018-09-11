@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import {state} from '../plugins/flux'
+
 export default {
   name: 'single-file-icon',
   props: {
@@ -30,18 +32,19 @@ export default {
     },
   },
   computed: {
+    settings: state('settings/user'),
     linkIcon() {
       return this.$flux.dispatch('icon/character', 'icon-corner-up-right')
     },
     color() {
       if (!this.ext) return 'transparent'
       if (this.background) return this.background
+      if (!this.settings['explorer.icon.colorful']) {
+        return this.settings['explorer.icon.black']
+      }
       const digit = Array.from(this.ext).reduce((total, char) =>
         total + char.charCodeAt(0), 0)
-      const colors = [
-        '#ec5f67', '#f99157', '#fac863', '#99c794',
-        '#5fb3b3', '#6699cc', '#c594c5', '#ab7967',
-      ]
+      const colors = this.settings['explorer.icon.colors']
       return colors[digit % colors.length]
     },
     extname() {
