@@ -4,7 +4,7 @@ const {resolve} = require('path')
 const frames = []
 
 function createWindow(args) {
-  const frame = new BrowserWindow({
+  const options = {
     title: app.getName(),
     width: 952,
     height: 600,
@@ -14,7 +14,12 @@ function createWindow(args) {
     webPreferences: {
       experimentalFeatures: true,
     },
-  })
+  }
+  if (args.position) {
+    options.x = args.position.x
+    options.y = args.position.y
+  }
+  const frame = new BrowserWindow(options)
   frame.loadURL(`file://${__dirname}/src/index.html`)
   if (process.platform !== 'darwin') {
     createWindowMenu(frame)
@@ -120,6 +125,10 @@ function transferCommonEvents() {
     })
   })
   ipcMain.on('open-window', (event, args) => {
+    const {sender} = event
+    const parent = frames.find(frame => frame.webContents === sender)
+    const rect = parent.getBounds()
+    args.position = {x: rect.x + 30, y: rect.y + 30}
     createWindow(args)
   })
   ipcMain.on('confirm', (event, args) => {
