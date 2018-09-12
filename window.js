@@ -3,19 +3,20 @@ const {resolve} = require('path')
 
 const frames = []
 
-function createWindow(args) {
+function createWindow(args = {}) {
   const options = {
     title: app.getName(),
     width: 952,
     height: 600,
     minWidth: 472,
     frame: false,
-    transparent: true,
+    acceptFirstMouse: true,
+    backgroundColor: '#fff',
     webPreferences: {
       experimentalFeatures: true,
     },
   }
-  if (args && args.position) {
+  if (args.position) {
     options.x = args.position.x
     options.y = args.position.y
   }
@@ -34,7 +35,38 @@ function createWindow(args) {
       frames.splice(index, 1)
     }
   })
-  frame.additionalArguments = args || {}
+  frame.additionalArguments = args
+}
+
+function createPropertyWindow(parent, args = {}) {
+  const options = {
+    parent,
+    title: app.getName(),
+    width: 360,
+    height: 480,
+    resizable: false,
+    frame: false,
+    acceptFirstMouse: true,
+    backgroundColor: '#fff',
+    webPreferences: {
+      experimentalFeatures: true,
+    },
+  }
+  const frame = new BrowserWindow(options)
+  frame.loadURL(`file://${__dirname}/src/index.html`)
+  if (process.platform !== 'darwin') {
+    createPropertyWindowMenu(frame)
+  }
+  // reference to avoid GC
+  frames.push(frame)
+  frame.on('closed', () => {
+    const index = frames.indexOf(frame)
+    if (index !== -1) {
+      frames.splice(index, 1)
+    }
+  })
+  args.type = 'property'
+  frame.additionalArguments = args
 }
 
 function createApplicationMenu() {
@@ -90,6 +122,17 @@ function createWindowMenu(frame) {
   frame.setMenuBarVisibility(false)
 }
 
+function createPropertyWindowMenu(frame) {
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Help',
+      submenu: [{role: 'toggledevtools'}],
+    },
+  ])
+  frame.setMenu(menu)
+  frame.setMenuBarVisibility(false)
+}
+
 // Note: the role `Paste` will trigger native paste event error
 // when copying inside this app on macOS
 function getPasteRoleMenuItem() {
@@ -130,6 +173,11 @@ function transferCommonEvents() {
     const rect = parent.getBounds()
     args.position = {x: rect.x + 30, y: rect.y + 30}
     createWindow(args)
+  })
+  ipcMain.on('property', (event, args) => {
+    const {sender} = event
+    const parent = frames.find(frame => frame.webContents === sender)
+    createPropertyWindow(parent, args)
   })
   ipcMain.on('confirm', (event, args) => {
     const {sender} = event

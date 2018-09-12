@@ -82,5 +82,6 @@ export default {
 #main {
   display: flex;
   height: 100vh;
+  background: white;
 }
 </style>

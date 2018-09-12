@@ -70,6 +70,7 @@ export default {
     },
     contextmenu() {
       let open = []
+      let property = []
       if (this.selected.length === 1 && this.focused) {
         const isDirectory = this.real.stats.isDirectory()
         open = [
@@ -82,6 +83,14 @@ export default {
             },
           },
           {type: 'separator'},
+        ]
+        property = [
+          {type: 'separator'},
+          {
+            label: this.i18n('Properties#!28'),
+            action: 'property',
+            data: this.file.path,
+          },
         ]
         if (isDirectory) {
           open.splice(1, 0, {
@@ -101,6 +110,7 @@ export default {
           label: this.i18n('Delete#!12'),
           action: 'delete',
         },
+        ...property,
       ])
     },
     drag(e) {

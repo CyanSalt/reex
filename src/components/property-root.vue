@@ -1,0 +1,34 @@
+<template>
+  <div id="main" @dragover.prevent @drop.prevent>
+    <property-title></property-title>
+    <property-content></property-content>
+  </div>
+</template>
+
+<script>
+import PropertyTitle from './property-title'
+import PropertyContent from './property-content'
+
+export default {
+  el: '#main',
+  components: {
+    'property-title': PropertyTitle,
+    'property-content': PropertyContent,
+  },
+  beforeCreate() {
+    // custom stylesheet
+    const stylesheet = this.$storage.rawdataSync('custom.css')
+    if (stylesheet) {
+      const element = document.createElement('style')
+      element.appendChild(document.createTextNode(stylesheet))
+      document.head.appendChild(element)
+    }
+  },
+  created() {
+    this.$flux.dispatch('path/preload')
+    this.$flux.dispatch('settings/load')
+    // custom script
+    this.$storage.require('custom.js', init => init(this))
+  }
+}
+</script>

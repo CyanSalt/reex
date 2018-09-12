@@ -704,5 +704,8 @@ export default {
     'contextmenu/open-window'({data}) {
       ipcRenderer.send('open-window', {path: data})
     },
+    'contextmenu/property'({data}) {
+      ipcRenderer.send('property', {path: data})
+    },
   },
 }
