@@ -27,6 +27,7 @@ export default {
     }
   },
   computed: {
+    path: state('path/full'),
     files: state('files/visible'),
     selected: state('files/selected'),
     loading: state('explorer/loading'),
@@ -57,6 +58,7 @@ export default {
   },
   methods: {
     select: action('file/specify'),
+    // eslint-disable-next-line max-lines-per-function
     contextmenu() {
       this.select([])
       const creation = {
@@ -101,6 +103,12 @@ export default {
           action: 'create-folder',
         },
         creation,
+        {type: 'separator'},
+        {
+          label: this.i18n('Properties#!28'),
+          action: 'property',
+          data: this.path,
+        },
       ])
     },
     selectStart(e) {
