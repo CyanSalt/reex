@@ -1,6 +1,6 @@
 <template>
   <div class="control-bar">
-    <div class="directory-control">
+    <div class="directory-control button-group">
       <div :class="['back', 'button', { disabled: !stack.length }]"
         @click="back">
         <span class="icon-arrow-left"></span>
@@ -20,7 +20,7 @@
         <span class="icon-terminal"></span>
       </div>
     </div>
-    <div class="window-control">
+    <div class="window-control button-group">
       <div class="minimize button" @click="minimize">
         <span class="icon-minus"></span>
       </div>
@@ -94,36 +94,35 @@ export default {
   -webkit-app-region: drag;
   user-select: none;
 }
-.control-bar .directory-control,
-.control-bar .window-control {
+.control-bar .button-group {
   padding: 8px;
   display: flex;
   font-size: 16px;
   -webkit-app-region: no-drag;
 }
-.control-bar .button {
+.button-group .button {
   width: 32px;
   height: 32px;
   line-height: 32px;
   text-align: center;
 }
-.control-bar .button + .button {
+.button-group .button + .button {
   margin-left: 4px;
 }
-.control-bar .button.disabled {
+.button-group .button.disabled {
   color: #eaeef3;
 }
-.control-bar .button:not(.disabled):hover {
+.button-group .button:not(.disabled):hover {
   color: #353d46;
   background: #eaeef3;
 }
-.control-bar .button.minimize:hover {
+.button-group .button.minimize:hover {
   color: #259b24;
 }
-.control-bar .button.maximize:hover {
+.button-group .button.maximize:hover {
   color: #2196f3;
 }
-.control-bar .button.close:hover {
+.button-group .button.close:hover {
   background: #ed5e63;
   color: white;
 }
