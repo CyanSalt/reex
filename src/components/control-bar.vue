@@ -92,7 +92,6 @@ export default {
   justify-content: space-between;
   color: #a7adba;
   -webkit-app-region: drag;
-  user-select: none;
 }
 .control-bar .button-group {
   padding: 8px;

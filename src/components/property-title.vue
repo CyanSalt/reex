@@ -40,7 +40,6 @@ export default {
   justify-content: flex-end;
   color: #a7adba;
   -webkit-app-region: drag;
-  user-select: none;
 }
 .property-title .button-group {
   padding: 8px;

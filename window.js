@@ -12,6 +12,7 @@ function createWindow(args = {}) {
     frame: false,
     acceptFirstMouse: true,
     backgroundColor: '#fff',
+    affinity: 'default',
     webPreferences: {
       experimentalFeatures: true,
     },
@@ -48,6 +49,7 @@ function createPropertyWindow(parent, args = {}) {
     frame: false,
     acceptFirstMouse: true,
     backgroundColor: '#fff',
+    affinity: 'default',
     webPreferences: {
       experimentalFeatures: true,
     },

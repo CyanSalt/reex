@@ -22,6 +22,7 @@ const promises = {
 const {additionalArguments} = remote.getCurrentWindow()
 
 // TODO: support permission like jorangreef/sudo-prompt
+// TODO: use session to share in different window
 export default {
   data: {
     'settings/default': {},
