@@ -6,9 +6,11 @@ import {
   constants as fsconst,
 } from 'fs'
 import {promisify} from 'util'
-import settings from '../resources/default/settings.json'
-import types from '../utilities/file-types'
 import {exec, spawn} from 'child_process'
+
+import defaultSettings from '../resources/default/settings.json'
+import fileTypes from '../utilities/file-types'
+import fileIcons from '../utilities/file-icons'
 
 const promises = {
   lstat: promisify(lstat),
@@ -70,12 +72,12 @@ export default {
   methods: {
     'settings/load'() {
       // load default settings
-      this.$flux.set('settings/default', settings)
+      this.$flux.set('settings/default', defaultSettings)
       // custom script
       this.$storage.require('custom.js', init => init(this))
       // load user settings
       this.$storage.load('settings.json', (err, data) => {
-        const copied = JSON.parse(JSON.stringify(settings))
+        const copied = JSON.parse(JSON.stringify(defaultSettings))
         data = err ? copied : {...copied, ...data}
         this['settings/user'] = data
         // load other states in store
@@ -97,7 +99,7 @@ export default {
           return diff
         }
         this.$flux.on('settings/save', () => {
-          const computed = Object.entries(settings).reduce(reducer, {})
+          const computed = Object.entries(defaultSettings).reduce(reducer, {})
           this.$storage.save('settings.json', computed)
         })
       })
@@ -447,28 +449,10 @@ export default {
       }
     },
     'types/load'() {
-      this['types/define']([
-        {type: 'image', rules: types.images},
-        {type: 'video', rules: types.videos},
-        {type: 'audio', rules: types.audios},
-        {type: 'font', rules: types.fonts},
-        {type: 'package', rules: types.packages},
-        {type: 'disc', rules: types.discs},
-        {type: 'code', rules: types.codes},
-        {type: 'text', rules: types.texts},
-      ])
+      this['types/define'](fileTypes)
     },
     'icons/load'() {
-      this['icons/define']([
-        {icon: '@feather/icon-image', rules: types.images},
-        {icon: '@feather/icon-film', rules: types.videos},
-        {icon: '@feather/icon-music', rules: types.audios},
-        {icon: '@feather/icon-type', rules: types.fonts},
-        {icon: '@feather/icon-package', rules: types.packages},
-        {icon: '@feather/icon-disc', rules: types.discs},
-        {icon: '@feather/icon-code', rules: types.codes},
-        {icon: '@feather/icon-align-left', rules: types.texts},
-      ])
+      this['icons/define'](fileIcons)
     },
     'icons/define'(definition) {
       if (Array.isArray(definition)) {
