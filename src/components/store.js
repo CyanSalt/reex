@@ -485,13 +485,12 @@ export default {
       }
       const matches = icon.match(/^@([^/]+)\/(.+)$/)
       if (!matches) return null
-      let family = ''
-      if (matches[1] === 'reex') family = 'Reex Icon'
       const span = document.createElement('span')
       span.style.display = 'none'
-      span.className = matches[2]
+      span.className = [matches[1] + '-icon', matches[2]].join(' ')
       document.body.appendChild(span)
       const style = getComputedStyle(span, '::before')
+      const family = style.fontFamily
       const char = style.getPropertyValue('content')[1]
       document.body.removeChild(span)
       const detail = {char, family}
