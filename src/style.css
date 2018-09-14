@@ -59,60 +59,69 @@ body {
 .icon-download::before {
   content: '\e908';
 }
-.icon-eye::before {
+.icon-external-link::before {
   content: '\e909';
 }
-.icon-eye-off::before {
+.icon-eye::before {
   content: '\e90a';
 }
-.icon-file::before {
+.icon-eye-off::before {
   content: '\e90b';
 }
-.icon-file-text::before {
+.icon-file::before {
   content: '\e90c';
 }
-.icon-film::before {
+.icon-file-text::before {
   content: '\e90d';
 }
-.icon-folder::before {
+.icon-film::before {
   content: '\e90e';
 }
-.icon-hard-drive::before {
+.icon-folder::before {
   content: '\e90f';
 }
-.icon-home::before {
+.icon-grid::before {
   content: '\e910';
 }
-.icon-image::before {
+.icon-hard-drive::before {
   content: '\e911';
 }
-.icon-maximize-2::before {
+.icon-home::before {
   content: '\e912';
 }
-.icon-minimize-2::before {
+.icon-image::before {
   content: '\e913';
 }
-.icon-minus::before {
+.icon-list::before {
   content: '\e914';
 }
-.icon-monitor::before {
+.icon-maximize-2::before {
   content: '\e915';
 }
-.icon-music::before {
+.icon-minimize-2::before {
   content: '\e916';
 }
-.icon-package::before {
+.icon-minus::before {
   content: '\e917';
 }
-.icon-terminal::before {
+.icon-monitor::before {
   content: '\e918';
 }
-.icon-type::before {
+.icon-music::before {
   content: '\e919';
 }
-.icon-upload::before {
+.icon-package::before {
   content: '\e91a';
 }
-.icon-x::before {
+.icon-terminal::before {
   content: '\e91b';
+}
+.icon-type::before {
+  content: '\e91c';
+}
+.icon-upload::before {
+  content: '\e91d';
+}
+.icon-x::before {
+  content: '\e91e';
 }

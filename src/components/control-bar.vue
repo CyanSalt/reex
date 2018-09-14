@@ -19,6 +19,9 @@
       <div class="terminal button" @click="terminal">
         <span class="icon-terminal"></span>
       </div>
+      <div class="external button" @click="external">
+        <span class="icon-external-link"></span>
+      </div>
     </div>
     <div class="window-control button-group">
       <div class="minimize button" @click="minimize">
@@ -35,7 +38,7 @@
 </template>
 
 <script>
-import {remote, ipcRenderer} from 'electron'
+import {remote, ipcRenderer, shell} from 'electron'
 import {state, action} from '../plugins/flux'
 
 export default {
@@ -60,6 +63,9 @@ export default {
     upward: action('path/upward'),
     blink: action('vision/toggle'),
     terminal: action('terminal/open'),
+    external() {
+      shell.openItem(this.path)
+    },
     minimize() {
       this.frame.minimize()
     },
