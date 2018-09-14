@@ -19,8 +19,9 @@ export default {
       subicon = vm.$flux.dispatch('file/icon', real.path)
     }
     if (subicon) {
-      if (subicon.startsWith('@reex/')) {
-        props.watermark = vm.$flux.dispatch('icons/char', subicon.slice(6))
+      if (subicon.startsWith('@')) {
+        const detail = vm.$flux.dispatch('icons/detail', subicon)
+        props.watermark = detail
       } else if (!isFolder) {
         props.subicon = subicon
       }

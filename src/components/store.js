@@ -479,19 +479,24 @@ export default {
       if (!Array.isArray(rules)) rules = [rules]
       this['icons/all'].unshift({icon, rules})
     },
-    'icons/char'(icon) {
+    'icons/detail'(icon) {
       if (this['icons/cache'][icon]) {
         return this['icons/cache'][icon]
       }
+      const matches = icon.match(/^@([^/]+)\/(.+)$/)
+      if (!matches) return null
+      let family = ''
+      if (matches[1] === 'reex') family = 'Reex Icon'
       const span = document.createElement('span')
       span.style.display = 'none'
+      span.className = matches[2]
       document.body.appendChild(span)
       const style = getComputedStyle(span, '::before')
-      span.className = icon
       const char = style.getPropertyValue('content')[1]
       document.body.removeChild(span)
-      this['icons/cache'][icon] = char
-      return char
+      const detail = {char, family}
+      this['icons/cache'][icon] = detail
+      return detail
     },
     'colors/define'(definition) {
       if (Array.isArray(definition)) {

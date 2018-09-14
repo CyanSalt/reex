@@ -30,6 +30,7 @@ const options = {
     '^/(?!src|package\\.json|window\\.js)',
     '^/src/(components|plugins|resources|storage)($|/)',
     '^/src/assets/.*\\.(ico|icns)$',
+    '^/node_modules/@.*$',
   ],
   appVersion: app.executableVersion,
   win32metadata: {
