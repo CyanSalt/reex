@@ -41,13 +41,11 @@ export default {
     color() {
       if (!this.ext) return 'transparent'
       if (this.background) return this.background
-      if (!this.settings['explorer.icon.colorful']) {
-        return this.settings['explorer.icon.black']
-      }
+      const color = this.settings['explorer.icon.background']
+      if (!Array.isArray(color)) return color
       const digit = Array.from(this.ext).reduce((total, char) =>
         total + char.charCodeAt(0), 0)
-      const colors = this.settings['explorer.icon.colors']
-      return colors[digit % colors.length]
+      return color[digit % color.length]
     },
     extname() {
       let ext = this.ext
