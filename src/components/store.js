@@ -499,7 +499,7 @@ export default {
       return rules.find(rule => {
         if (typeof rule !== 'string') return path.match(rule)
         return rule.startsWith('*.') ? path.endsWith(rule.slice(1)) :
-          path === rule
+          basename(path) === rule
       })
     },
     'templates/load'() {

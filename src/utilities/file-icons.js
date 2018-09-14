@@ -49,6 +49,26 @@ const icons = [
     icon: '@brands/icon-adobeaftereffects',
     rules: ['*.aep', '*.aepx'],
   },
+  {
+    icon: '@brands/icon-adobeacrobatreader',
+    rules: ['*.pdf'],
+  },
+  {
+    icon: '@brands/icon-html5',
+    rules: ['*.html', '*.htm', '*.shtml', '*.xhtml'],
+  },
+  {
+    icon: '@brands/icon-javascript',
+    rules: ['*.js', '*.mjs', '*.jsx'],
+  },
+  {
+    icon: '@brands/icon-json',
+    rules: ['*.json', '*.map'],
+  },
+  {
+    icon: '@brands/icon-nodejs',
+    rules: ['package.json', 'package-lock.json'],
+  },
 ]
 
 export default icons
