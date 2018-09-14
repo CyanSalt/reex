@@ -295,11 +295,13 @@ export default {
       // TODO: consider using `mdls`
       path = path.toLowerCase()
       for (const {type, rules} of this['types/all']) {
-        for (const rule of rules) {
-          if (typeof rule === 'string' && rule.startsWith('.') ?
-            path.endsWith(rule) : path.match(rule)
-          ) return type
-        }
+        const matched = rules.find(rule => {
+          if (typeof rule !== 'string') {
+            return path.match(rule)
+          }
+          return rule.startsWith('.') ? path.endsWith(rule) : path === rule
+        })
+        if (matched) return type
       }
       return ''
     },
