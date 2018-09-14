@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     linkIcon() {
-      return this.$flux.dispatch('icon/character', 'icon-corner-up-right')
+      return this.$flux.dispatch('icons/char', 'icon-corner-up-right')
     },
   },
 }

@@ -49,8 +49,8 @@ export default {
     icon(file) {
       const path = file.link ? file.link.path : file.path
       const stats = file.link ? file.link.stats : file.stats
-      const watermark = this.$flux.dispatch('icon/defined', path)
-      if (watermark) return watermark
+      const icon = this.$flux.dispatch('path/icon', path)
+      if (icon && icon.startsWith('@reex/')) return icon.slice(6)
       return stats.isDirectory() ? 'icon-folder' : 'icon-file'
     },
     loose(device) {

@@ -46,7 +46,8 @@ export default {
     'confirm/waiting': null,
     'icons/cache': {},
     'types/all': [],
-    'colors/all': {},
+    'icons/all': [],
+    'colors/all': [],
   },
   computed: {
     'path/floors'() {
@@ -161,15 +162,15 @@ export default {
     'path/preload'() {
       const electronPaths = [
         {shortname: 'reex'},
-        {shortname: 'home', watermark: 'icon-home'},
+        {shortname: 'home', icon: '@reex/icon-home'},
         {shortname: 'appData'},
         {shortname: 'temp'},
-        {shortname: 'desktop', name: 'Desktop#!1', watermark: 'icon-monitor'},
-        {shortname: 'documents', name: 'Documents#!2', watermark: 'icon-file-text'},
-        {shortname: 'downloads', name: 'Downloads#!3', watermark: 'icon-download'},
-        {shortname: 'music', name: 'Music#!4', watermark: 'icon-music'},
-        {shortname: 'pictures', name: 'Pictures#!5', watermark: 'icon-image'},
-        {shortname: 'videos', name: 'Videos#!6', watermark: 'icon-film'},
+        {shortname: 'desktop', name: 'Desktop#!1', icon: '@reex/icon-monitor'},
+        {shortname: 'documents', name: 'Documents#!2', icon: '@reex/icon-file-text'},
+        {shortname: 'downloads', name: 'Downloads#!3', icon: '@reex/icon-download'},
+        {shortname: 'music', name: 'Music#!4', icon: '@reex/icon-music'},
+        {shortname: 'pictures', name: 'Pictures#!5', icon: '@reex/icon-image'},
+        {shortname: 'videos', name: 'Videos#!6', icon: '@reex/icon-film'},
       ]
       for (const data of electronPaths) {
         if (data.name) {
@@ -204,6 +205,10 @@ export default {
       return path.replace(windowsVariables, systemReplacement)
         .replace(unixVariables, systemReplacement)
         .replace(electronVariables, electronReplacement)
+    },
+    'path/icon'(path) {
+      const target = this['path/defined'].find(data => data.path === path)
+      return target && target.icon
     },
     'vision/toggle'() {
       this['files/vision'] = !this['files/vision']
@@ -295,13 +300,21 @@ export default {
       // TODO: consider using `mdls`
       path = path.toLowerCase()
       for (const {type, rules} of this['types/all']) {
-        const matched = rules.find(rule => {
-          if (typeof rule !== 'string') return path.match(rule)
-          return rule.startsWith('.') ? path.endsWith(rule) : path === rule
-        })
-        if (matched) return type
+        if (this['rules/match']({path, rules})) return type
       }
-      return ''
+      return null
+    },
+    'file/icon'(path) {
+      for (const {icon, rules} of this['icons/all']) {
+        if (this['rules/match']({path, rules})) return icon
+      }
+      return null
+    },
+    'file/color'(path) {
+      for (const {color, rules} of this['colors/all']) {
+        if (this['rules/match']({path, rules})) return color
+      }
+      return null
     },
     'file/avoid'({name, times}) {
       if (!times) return name
@@ -391,29 +404,6 @@ export default {
       }
       return false
     },
-    'icon/defined'(path) {
-      const target = this['path/defined'].find(data => data.path === path)
-      return target && target.watermark
-    },
-    'icon/type'(path) {
-      const type = this['file/type'](path)
-      const group = this['types/all'].find(item => item.type === type)
-      return (group && group.icon) || null
-    },
-    'icon/character'(icon) {
-      if (this['icons/cache'][icon]) {
-        return this['icons/cache'][icon]
-      }
-      const span = document.createElement('span')
-      span.style.display = 'none'
-      document.body.appendChild(span)
-      const style = getComputedStyle(span, '::before')
-      span.className = icon
-      const char = style.getPropertyValue('content')[1]
-      document.body.removeChild(span)
-      this['icons/cache'][icon] = char
-      return char
-    },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
       const watchers = []
@@ -444,37 +434,81 @@ export default {
         definition.forEach(item => this['types/define'](item))
         return
       }
-      let {type, rules, icon} = definition
+      let {type, rules} = definition
       if (!Array.isArray(rules)) {
         rules = [rules]
       }
       const allTypes = this['types/all']
       const group = allTypes.find(item => item.type === type)
       if (!group) {
-        allTypes.push({type, rules, icon})
+        allTypes.unshift({type, rules})
       } else {
-        group.icon = icon
-        group.rules = group.rules.concat(rules)
+        group.rules = rules.concat(group.rules)
       }
     },
     'types/load'() {
       this['types/define']([
-        {type: 'image', rules: types.images, icon: 'icon-image'},
-        {type: 'video', rules: types.videos, icon: 'icon-film'},
-        {type: 'audio', rules: types.audios, icon: 'icon-music'},
-        {type: 'font', rules: types.fonts, icon: 'icon-type'},
-        {type: 'package', rules: types.packages, icon: 'icon-package'},
-        {type: 'disc', rules: types.discs, icon: 'icon-disc'},
-        {type: 'code', rules: types.codes, icon: 'icon-code'},
-        {type: 'text', rules: types.texts, icon: 'icon-align-left'},
+        {type: 'image', rules: types.images},
+        {type: 'video', rules: types.videos},
+        {type: 'audio', rules: types.audios},
+        {type: 'font', rules: types.fonts},
+        {type: 'package', rules: types.packages},
+        {type: 'disc', rules: types.discs},
+        {type: 'code', rules: types.codes},
+        {type: 'text', rules: types.texts},
       ])
     },
-    'colors/define'({extension, color}) {
-      if (!Array.isArray(color)) color = [color]
-      this['colors/all'][extension] = color
+    'icons/load'() {
+      this['icons/define']([
+        {icon: '@reex/icon-image', rules: types.images},
+        {icon: '@reex/icon-film', rules: types.videos},
+        {icon: '@reex/icon-music', rules: types.audios},
+        {icon: '@reex/icon-type', rules: types.fonts},
+        {icon: '@reex/icon-package', rules: types.packages},
+        {icon: '@reex/icon-disc', rules: types.discs},
+        {icon: '@reex/icon-code', rules: types.codes},
+        {icon: '@reex/icon-align-left', rules: types.texts},
+      ])
     },
-    'colors/match'(extension) {
-      return this['colors/all'][extension] || null
+    'icons/define'(definition) {
+      if (Array.isArray(definition)) {
+        definition.forEach(item => this['icons/define'](item))
+        return
+      }
+      let {icon, rules} = definition
+      if (!Array.isArray(rules)) rules = [rules]
+      this['icons/all'].unshift({icon, rules})
+    },
+    'icons/char'(icon) {
+      if (this['icons/cache'][icon]) {
+        return this['icons/cache'][icon]
+      }
+      const span = document.createElement('span')
+      span.style.display = 'none'
+      document.body.appendChild(span)
+      const style = getComputedStyle(span, '::before')
+      span.className = icon
+      const char = style.getPropertyValue('content')[1]
+      document.body.removeChild(span)
+      this['icons/cache'][icon] = char
+      return char
+    },
+    'colors/define'(definition) {
+      if (Array.isArray(definition)) {
+        definition.forEach(item => this['colors/define'](item))
+        return
+      }
+      let {color, rules} = definition
+      if (!Array.isArray(color)) color = [color]
+      if (!Array.isArray(rules)) rules = [rules]
+      this['colors/all'].unshift({color, rules})
+    },
+    'rules/match'({path, rules}) {
+      return rules.find(rule => {
+        if (typeof rule !== 'string') return path.match(rule)
+        return rule.startsWith('*.') ? path.endsWith(rule.slice(1)) :
+          path === rule
+      })
     },
     'templates/load'() {
       const templates = this.$storage.filename('templates')

@@ -7,8 +7,9 @@
       <text x="25" y="60" font-size="14" text-anchor="middle"
         :fill="foreground">{{ extname }}</text>
     </g>
+    <image :xlink:href="subicon" v-if="subicon" x="10" y="13" width="30"/>
     <text x="25" y="36" font-size="24" text-anchor="middle"
-      font-family="Reex Icon" fill="black" opacity="0.1" v-if="watermark"
+      font-family="Reex Icon" fill="black" opacity="0.1" v-else-if="watermark"
       >{{ watermark }}</text>
     <text x="51" y="66" font-size="14" text-anchor="end" font-family="Reex Icon"
       fill="#353d46" v-if="link" stroke="white" stroke-width="3"
@@ -23,6 +24,7 @@ export default {
   name: 'single-file-icon',
   props: {
     ext: String,
+    subicon: String,
     watermark: String,
     link: Boolean,
     background: String,
@@ -34,7 +36,7 @@ export default {
   computed: {
     settings: state('settings/user'),
     linkIcon() {
-      return this.$flux.dispatch('icon/character', 'icon-corner-up-right')
+      return this.$flux.dispatch('icons/char', 'icon-corner-up-right')
     },
     color() {
       if (!this.ext) return 'transparent'
