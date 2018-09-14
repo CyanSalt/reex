@@ -149,7 +149,7 @@ module.exports = {
     // 'no-sync': 'off',
 
     /** Stylistic Issues */
-    'array-bracket-newline': ['error', { multiline: true }],
+    'array-bracket-newline': ['error', 'consistent'],
     'array-bracket-spacing': ['error', 'never'],
     // 'array-element-newline': 'off',
     // 'block-spacing': 'off',
