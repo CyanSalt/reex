@@ -36,7 +36,7 @@ export default {
   computed: {
     settings: state('settings/user'),
     linkIcon() {
-      return this.$flux.dispatch('icons/detail', '@reex/icon-corner-up-right')
+      return this.$flux.dispatch('icons/detail', '@feather/icon-corner-up-right')
     },
     color() {
       if (!this.ext) return 'transparent'

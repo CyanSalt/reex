@@ -3,37 +3,37 @@
     <div class="directory-control button-group">
       <div :class="['back', 'button', { disabled: !stack.length }]"
         @click="back">
-        <span class="reex-icon icon-arrow-left"></span>
+        <span class="feather-icon icon-arrow-left"></span>
       </div>
       <div :class="['forward', 'button', { disabled: !forwards.length }]"
         @click="forward">
-        <span class="reex-icon icon-arrow-right"></span>
+        <span class="feather-icon icon-arrow-right"></span>
       </div>
       <div :class="['upward', 'button', { disabled: floors.length <= 1 }]"
         @click="upward">
-        <span class="reex-icon icon-arrow-up"></span>
+        <span class="feather-icon icon-arrow-up"></span>
       </div>
       <div class="vision button" @click="blink">
-        <span :class="['reex-icon', vision ?
+        <span :class="['feather-icon', vision ?
           'icon-eye-off' : 'icon-eye']"></span>
       </div>
       <div class="terminal button" @click="terminal">
-        <span class="reex-icon icon-terminal"></span>
+        <span class="feather-icon icon-terminal"></span>
       </div>
       <div class="external button" @click="external">
-        <span class="reex-icon icon-external-link"></span>
+        <span class="feather-icon icon-external-link"></span>
       </div>
     </div>
     <div class="window-control button-group">
       <div class="minimize button" @click="minimize">
-        <span class="reex-icon icon-minus"></span>
+        <span class="feather-icon icon-minus"></span>
       </div>
       <div class="maximize button" @click="maximize">
-        <span :class="['reex-icon', maximized ?
+        <span :class="['feather-icon', maximized ?
           'icon-minimize-2' : 'icon-maximize-2']"></span>
       </div>
       <div class="close button" @click="close">
-        <span class="reex-icon icon-x"></span>
+        <span class="feather-icon icon-x"></span>
       </div>
     </div>
   </div>

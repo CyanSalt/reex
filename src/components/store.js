@@ -162,15 +162,15 @@ export default {
     'path/preload'() {
       const electronPaths = [
         {shortname: 'reex'},
-        {shortname: 'home', icon: '@reex/icon-home'},
+        {shortname: 'home', icon: '@feather/icon-home'},
         {shortname: 'appData'},
         {shortname: 'temp'},
-        {shortname: 'desktop', name: 'Desktop#!1', icon: '@reex/icon-monitor'},
-        {shortname: 'documents', name: 'Documents#!2', icon: '@reex/icon-file-text'},
-        {shortname: 'downloads', name: 'Downloads#!3', icon: '@reex/icon-download'},
-        {shortname: 'music', name: 'Music#!4', icon: '@reex/icon-music'},
-        {shortname: 'pictures', name: 'Pictures#!5', icon: '@reex/icon-image'},
-        {shortname: 'videos', name: 'Videos#!6', icon: '@reex/icon-film'},
+        {shortname: 'desktop', name: 'Desktop#!1', icon: '@feather/icon-monitor'},
+        {shortname: 'documents', name: 'Documents#!2', icon: '@feather/icon-file-text'},
+        {shortname: 'downloads', name: 'Downloads#!3', icon: '@feather/icon-download'},
+        {shortname: 'music', name: 'Music#!4', icon: '@feather/icon-music'},
+        {shortname: 'pictures', name: 'Pictures#!5', icon: '@feather/icon-image'},
+        {shortname: 'videos', name: 'Videos#!6', icon: '@feather/icon-film'},
       ]
       for (const data of electronPaths) {
         if (data.name) {
@@ -460,14 +460,14 @@ export default {
     },
     'icons/load'() {
       this['icons/define']([
-        {icon: '@reex/icon-image', rules: types.images},
-        {icon: '@reex/icon-film', rules: types.videos},
-        {icon: '@reex/icon-music', rules: types.audios},
-        {icon: '@reex/icon-type', rules: types.fonts},
-        {icon: '@reex/icon-package', rules: types.packages},
-        {icon: '@reex/icon-disc', rules: types.discs},
-        {icon: '@reex/icon-code', rules: types.codes},
-        {icon: '@reex/icon-align-left', rules: types.texts},
+        {icon: '@feather/icon-image', rules: types.images},
+        {icon: '@feather/icon-film', rules: types.videos},
+        {icon: '@feather/icon-music', rules: types.audios},
+        {icon: '@feather/icon-type', rules: types.fonts},
+        {icon: '@feather/icon-package', rules: types.packages},
+        {icon: '@feather/icon-disc', rules: types.discs},
+        {icon: '@feather/icon-code', rules: types.codes},
+        {icon: '@feather/icon-align-left', rules: types.texts},
       ])
     },
     'icons/define'(definition) {

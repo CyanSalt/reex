@@ -2,10 +2,10 @@
   <div class="property-title">
     <div class="window-control button-group">
       <div class="minimize button" @click="minimize">
-        <span class="reex-icon icon-minus"></span>
+        <span class="feather-icon icon-minus"></span>
       </div>
       <div class="close button" @click="close">
-        <span class="reex-icon icon-x"></span>
+        <span class="feather-icon icon-x"></span>
       </div>
     </div>
   </div>

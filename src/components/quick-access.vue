@@ -6,7 +6,7 @@
       <div v-for="entry in favorites" @click="open(entry)"
         :class="['group-entry', { active: active(entry) }]">
         <div class="entry-icon">
-          <span :class="['reex-icon', icon(entry)]"></span>
+          <span :class="['feather-icon', icon(entry)]"></span>
         </div>
         <div class="entry-name">{{ name(entry.path) }}</div>
       </div>
@@ -16,11 +16,11 @@
       <div v-for="entry in devices" @click="open(entry)"
         :class="['group-entry', { active: active(entry) }]">
         <div class="entry-icon">
-          <span class="reex-icon icon-hard-drive"></span>
+          <span class="feather-icon icon-hard-drive"></span>
         </div>
         <div class="entry-name">{{ name(entry.path) }}</div>
         <div class="unmount-device" @click="unmount(entry)" v-if="loose(entry)">
-          <span class="reex-icon icon-upload"></span>
+          <span class="feather-icon icon-upload"></span>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@ export default {
       const path = file.link ? file.link.path : file.path
       const stats = file.link ? file.link.stats : file.stats
       const icon = this.$flux.dispatch('path/icon', path)
-      if (icon && icon.startsWith('@reex/')) return icon.slice(6)
+      if (icon && icon.startsWith('@feather/')) return icon.slice(6)
       return stats.isDirectory() ? 'icon-folder' : 'icon-file'
     },
     loose(device) {
