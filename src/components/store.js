@@ -293,9 +293,13 @@ export default {
     },
     'file/type'(path) {
       // TODO: consider using `mdls`
-      const ext = extname(path).toLowerCase()
-      for (const {type, extension} of this['types/all']) {
-        if (extension.includes(ext)) return type
+      path = path.toLowerCase()
+      for (const {type, rules} of this['types/all']) {
+        for (const rule of rules) {
+          if (typeof rule === 'string' && rule.startsWith('.') ?
+            path.endsWith(rule) : path.match(rule)
+          ) return type
+        }
       }
       return ''
     },
@@ -432,32 +436,29 @@ export default {
         definition.forEach(item => this['types/define'](item))
         return
       }
-      let {type, extension, icon} = definition
-      if (!Array.isArray(extension)) {
-        extension = [extension]
+      let {type, rules, icon} = definition
+      if (!Array.isArray(rules)) {
+        rules = [rules]
       }
       const allTypes = this['types/all']
       const group = allTypes.find(item => item.type === type)
       if (!group) {
-        allTypes.push({type, extension, icon})
+        allTypes.push({type, rules, icon})
       } else {
         group.icon = icon
-        const list = group.extension
-        extension.forEach(ext => {
-          if (!list.includes(ext)) list.push(ext)
-        })
+        group.rules = group.rules.concat(rules)
       }
     },
     'types/load'() {
       this['types/define']([
-        {type: 'image', extension: types.images, icon: 'icon-image'},
-        {type: 'video', extension: types.videos, icon: 'icon-film'},
-        {type: 'audio', extension: types.audios, icon: 'icon-music'},
-        {type: 'font', extension: types.fonts, icon: 'icon-type'},
-        {type: 'package', extension: types.packages, icon: 'icon-package'},
-        {type: 'disc', extension: types.discs, icon: 'icon-disc'},
-        {type: 'code', extension: types.codes, icon: 'icon-code'},
-        {type: 'text', extension: types.texts, icon: 'icon-align-left'},
+        {type: 'image', rules: types.images, icon: 'icon-image'},
+        {type: 'video', rules: types.videos, icon: 'icon-film'},
+        {type: 'audio', rules: types.audios, icon: 'icon-music'},
+        {type: 'font', rules: types.fonts, icon: 'icon-type'},
+        {type: 'package', rules: types.packages, icon: 'icon-package'},
+        {type: 'disc', rules: types.discs, icon: 'icon-disc'},
+        {type: 'code', rules: types.codes, icon: 'icon-code'},
+        {type: 'text', rules: types.texts, icon: 'icon-align-left'},
       ])
     },
     'colors/define'({extension, color}) {
