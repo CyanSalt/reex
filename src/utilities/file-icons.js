@@ -39,15 +39,15 @@ const icons = [
   },
   {
     icon: '@feather/icon-disc',
-    rules: [
-      '*.dmg', '*.iso',
-    ],
+    rules: ['*.dmg', '*.iso'],
   },
   {
     icon: '@feather/icon-align-left',
-    rules: [
-      '*.md', '*.txt', '*.log', '*.rtx', '*.rtf', '*.doc', '*.docx', '*.pdf',
-    ],
+    rules: ['*.md', '*.txt', '*.log'],
+  },
+  {
+    icon: '@brands/icon-adobeaftereffects',
+    rules: ['*.aep', '*.aepx'],
   },
 ]
 

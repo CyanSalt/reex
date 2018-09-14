@@ -11,6 +11,7 @@ import {exec, spawn} from 'child_process'
 import defaultSettings from '../resources/default/settings.json'
 import fileTypes from '../utilities/file-types'
 import fileIcons from '../utilities/file-icons'
+import fileColors from '../utilities/file-colors'
 
 const promises = {
   lstat: promisify(lstat),
@@ -480,6 +481,9 @@ export default {
       const detail = {char, family}
       this['icons/cache'][icon] = detail
       return detail
+    },
+    'colors/load'() {
+      this['colors/define'](fileColors)
     },
     'colors/define'(definition) {
       if (Array.isArray(definition)) {

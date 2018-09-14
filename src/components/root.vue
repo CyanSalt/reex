@@ -37,6 +37,7 @@ export default {
     this.$flux.dispatch('settings/load')
     this.$flux.dispatch('types/load')
     this.$flux.dispatch('icons/load')
+    this.$flux.dispatch('colors/load')
     // load file templates
     this.$flux.dispatch('templates/watch')
     this.$flux.dispatch('devices/watch')
