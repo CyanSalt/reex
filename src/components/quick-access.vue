@@ -6,7 +6,7 @@
       <div v-for="entry in favorites" @click="open(entry)"
         :class="['group-entry', { active: active(entry) }]">
         <div class="entry-icon">
-          <span :class="icon(entry)"></span>
+          <span :class="['reex-icon', icon(entry)]"></span>
         </div>
         <div class="entry-name">{{ name(entry.path) }}</div>
       </div>
@@ -16,11 +16,11 @@
       <div v-for="entry in devices" @click="open(entry)"
         :class="['group-entry', { active: active(entry) }]">
         <div class="entry-icon">
-          <span class="icon-hard-drive"></span>
+          <span class="reex-icon icon-hard-drive"></span>
         </div>
         <div class="entry-name">{{ name(entry.path) }}</div>
         <div class="unmount-device" @click="unmount(entry)" v-if="loose(entry)">
-          <span class="icon-upload"></span>
+          <span class="reex-icon icon-upload"></span>
         </div>
       </div>
     </div>

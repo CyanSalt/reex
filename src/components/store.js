@@ -296,9 +296,7 @@ export default {
       path = path.toLowerCase()
       for (const {type, rules} of this['types/all']) {
         const matched = rules.find(rule => {
-          if (typeof rule !== 'string') {
-            return path.match(rule)
-          }
+          if (typeof rule !== 'string') return path.match(rule)
           return rule.startsWith('.') ? path.endsWith(rule) : path === rule
         })
         if (matched) return type
@@ -384,6 +382,14 @@ export default {
           source,
         }
       })
+    },
+    'file/executable'(info) {
+      const {path, stats} = info
+      // TODO: cross platform
+      if (process.platform === 'darwin') {
+        return stats.isDirectory() && path.endsWith('.app')
+      }
+      return false
     },
     'icon/defined'(path) {
       const target = this['path/defined'].find(data => data.path === path)

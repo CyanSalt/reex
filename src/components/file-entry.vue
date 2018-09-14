@@ -42,7 +42,11 @@ export default {
       return this.$flux.dispatch('file/hidden', this.file.path)
     },
     nickname() {
-      return this.$flux.dispatch('file/name', this.file.path)
+      let name = this.$flux.dispatch('file/name', this.file.path)
+      if (process.platform === 'darwin' &&
+        this.$flux.dispatch('file/executable', this.real)
+      ) name = name.slice(0, -4)
+      return name
     },
     real() {
       return this.file.link || this.file

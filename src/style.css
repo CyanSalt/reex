@@ -24,13 +24,13 @@ body {
 }
 
 @font-face {
-  font-family: 'icomoon';
+  font-family: 'Reex Icon';
   font-weight: normal;
   font-style: normal;
   src: url('./assets/fonts/icomoon.woff') format('woff');
 }
-[class^='icon-'] {
-  font-family: 'icomoon';
+.reex-icon {
+  font-family: 'Reex Icon';
 }
 .icon-align-left::before {
   content: '\e900';

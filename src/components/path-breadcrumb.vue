@@ -6,7 +6,7 @@
       <div :class="['path-floor', { current: index === steps.length - 1 }]"
         @click.stop="redirect(step.path)">{{ step.name }}</div>
       <div class="path-sep" v-if="index < steps.length - 1">
-        <span class="icon-chevron-right"></span>
+        <span class="reex-icon icon-chevron-right"></span>
       </div>
     </template>
   </div>
