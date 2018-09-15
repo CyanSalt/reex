@@ -16,7 +16,11 @@ export default {
     const isFolder = real.stats.isDirectory()
     let subicon = vm.$flux.dispatch('path/icon', real.path)
     if (!subicon) {
-      subicon = vm.$flux.dispatch('file/icon', real.path)
+      if (isFolder) {
+        subicon = vm.$flux.dispatch('folder/icon', real.path)
+      } else {
+        subicon = vm.$flux.dispatch('file/icon', real.path)
+      }
     }
     if (subicon) {
       if (subicon.startsWith('@')) {

@@ -50,6 +50,14 @@ const icons = [
     rules: ['*.aep', '*.aepx'],
   },
   {
+    icon: '@brands/icon-microsoftonenote',
+    rules: ['*.one'],
+  },
+  {
+    icon: '@brands/icon-graphql',
+    rules: ['*.gql', '.graphql'],
+  },
+  {
     icon: '@brands/icon-adobeacrobatreader',
     rules: ['*.pdf'],
   },
@@ -62,12 +70,24 @@ const icons = [
     rules: ['*.js', '*.mjs', '*.jsx'],
   },
   {
+    icon: '@brands/icon-css3',
+    rules: ['*.css'],
+  },
+  {
     icon: '@brands/icon-json',
     rules: ['*.json', '*.map'],
   },
   {
     icon: '@brands/icon-nodejs',
     rules: ['package.json', 'package-lock.json'],
+  },
+  {
+    icon: '@brands/icon-vuejs',
+    rules: ['*.vue'],
+  },
+  {
+    icon: '@brands/icon-apple',
+    rules: ['*.icns'],
   },
 ]
 

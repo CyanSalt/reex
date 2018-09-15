@@ -12,6 +12,7 @@ import defaultSettings from '../resources/default/settings.json'
 import fileTypes from '../utilities/file-types'
 import fileIcons from '../utilities/file-icons'
 import fileColors from '../utilities/file-colors'
+import folderIcons from '../utilities/folder-icons'
 
 const promises = {
   lstat: promisify(lstat),
@@ -50,6 +51,7 @@ export default {
     'icons/cache': {},
     'types/all': [],
     'icons/all': [],
+    'icons/haystack': [],
     'colors/all': [],
   },
   computed: {
@@ -407,6 +409,12 @@ export default {
       }
       return false
     },
+    'folder/icon'(path) {
+      for (const {icon, rules} of this['icons/haystack']) {
+        if (this['rules/match']({path, rules})) return icon
+      }
+      return null
+    },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
       const watchers = []
@@ -454,6 +462,7 @@ export default {
     },
     'icons/load'() {
       this['icons/define'](fileIcons)
+      this['icons/tell'](folderIcons)
     },
     'icons/define'(definition) {
       if (Array.isArray(definition)) {
@@ -463,6 +472,15 @@ export default {
       let {icon, rules} = definition
       if (!Array.isArray(rules)) rules = [rules]
       this['icons/all'].unshift({icon, rules})
+    },
+    'icons/tell'(definition) {
+      if (Array.isArray(definition)) {
+        definition.forEach(item => this['icons/tell'](item))
+        return
+      }
+      let {icon, rules} = definition
+      if (!Array.isArray(rules)) rules = [rules]
+      this['icons/haystack'].unshift({icon, rules})
     },
     'icons/detail'(icon) {
       if (this['icons/cache'][icon]) {

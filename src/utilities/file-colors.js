@@ -4,6 +4,14 @@ const colors = [
     rules: ['*.aep', '*.aepx'],
   },
   {
+    color: '#80397b',
+    rules: ['*.one'],
+  },
+  {
+    color: '#e10098',
+    rules: ['*.gql', '.graphql'],
+  },
+  {
     color: '#ee3f24',
     rules: ['*.pdf'],
   },
@@ -16,8 +24,16 @@ const colors = [
     rules: ['*.js', '*.mjs', '*.jsx'],
   },
   {
+    color: '#1572b6',
+    rules: ['*.css'],
+  },
+  {
     color: '#339933',
     rules: ['package.json', 'package-lock.json'],
+  },
+  {
+    color: '#4fc08d',
+    rules: ['*.vue'],
   },
 ]
 
