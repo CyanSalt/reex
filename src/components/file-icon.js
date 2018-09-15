@@ -1,5 +1,7 @@
 import {extname} from 'path'
 import SingleFileIcon from './single-file-icon'
+import SingleFileIconSketch from './single-file-icon-sketch'
+import SingleFileIconImpress from './single-file-icon-impress'
 import FolderIcon from './folder-icon'
 
 export default {
@@ -39,6 +41,11 @@ export default {
       if (colors[0]) props.background = colors[0]
       if (colors[1]) props.foreground = colors[1]
     }
-    return h(SingleFileIcon, {props}, context.children)
+    const settings = vm.$flux.get('settings/user')
+    const style = settings['explorer.icon.style']
+    let UserFileIcon = SingleFileIcon
+    if (style === 'sketch') UserFileIcon = SingleFileIconSketch
+    if (style === 'impress') UserFileIcon = SingleFileIconImpress
+    return h(UserFileIcon, {props}, context.children)
   },
 }

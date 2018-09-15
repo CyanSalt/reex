@@ -5,11 +5,11 @@
     <g v-if="ext">
       <path d="M50,44V62c0,4,0,4,-4,4H4c-4,0,-4,0,-4,-4V44Z" :fill="color"/>
       <text x="25" y="60" font-size="14" text-anchor="middle"
-        :fill="foreground">{{ extname }}</text>
+        :fill="textColor">{{ extname }}</text>
     </g>
     <image :xlink:href="subicon" v-if="subicon" x="10" y="13" width="30"/>
-    <text x="25" y="36" font-size="24" text-anchor="middle" fill="black"
-      :font-family="watermark.family" opacity="0.1" v-else-if="watermark"
+    <text x="25" y="36" font-size="24" text-anchor="middle" fill="#dfdfdf"
+      :font-family="watermark.family" v-else-if="watermark"
       >{{ watermark.char }}</text>
     <text x="51" y="66" font-size="14" text-anchor="end" fill="#353d46"
       :font-family="linkIcon.family" v-if="link" stroke="white" stroke-width="3"
@@ -28,10 +28,7 @@ export default {
     watermark: Object,
     link: Boolean,
     background: String,
-    foreground: {
-      type: String,
-      default: 'white',
-    },
+    foreground: String,
   },
   computed: {
     settings: state('settings/user'),
@@ -39,13 +36,15 @@ export default {
       return this.$flux.dispatch('icons/detail', '@feather/icon-corner-up-right')
     },
     color() {
-      if (!this.ext) return 'transparent'
       if (this.background) return this.background
       const color = this.settings['explorer.icon.background']
       if (!Array.isArray(color)) return color
       const digit = Array.from(this.ext).reduce((total, char) =>
         total + char.charCodeAt(0), 0)
       return color[digit % color.length]
+    },
+    textColor() {
+      return this.foreground || 'white'
     },
     extname() {
       let ext = this.ext
