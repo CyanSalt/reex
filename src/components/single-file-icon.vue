@@ -37,7 +37,7 @@ export default {
     },
     color() {
       if (this.background) return this.background
-      const color = this.settings['explorer.icon.background']
+      const color = this.settings['theme.icons.background']
       if (!Array.isArray(color)) return color
       const digit = Array.from(this.ext).reduce((total, char) =>
         total + char.charCodeAt(0), 0)

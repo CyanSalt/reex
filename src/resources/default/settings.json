@@ -1,8 +1,8 @@
 {
   "explorer.startup.path": "[home]",
-  "explorer.icon.background": "#61737f",
-  "explorer.icon.style": "impress",
   "explorer.win32.hidedotfiles": true,
+  "theme.icons.background": "#61737f",
+  "theme.icons.style": "impress",
   "quickaccess.favorites": [
     "[documents]", "[pictures]", "[music]", "[videos]",
     "[downloads]", "[desktop]", "[home]"

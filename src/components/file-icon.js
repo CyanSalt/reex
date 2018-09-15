@@ -42,7 +42,7 @@ export default {
       if (colors[1]) props.foreground = colors[1]
     }
     const settings = vm.$flux.get('settings/user')
-    const style = settings['explorer.icon.style']
+    const style = settings['theme.icons.style']
     let UserFileIcon = SingleFileIcon
     if (style === 'sketch') UserFileIcon = SingleFileIconSketch
     if (style === 'impress') UserFileIcon = SingleFileIconImpress
