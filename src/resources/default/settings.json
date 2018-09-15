@@ -2,7 +2,7 @@
   "explorer.startup.path": "[home]",
   "explorer.win32.hidedotfiles": true,
   "theme.icons.background": "#61737f",
-  "theme.icons.style": "impress",
+  "theme.icons.style": "default",
   "quickaccess.favorites": [
     "[documents]", "[pictures]", "[music]", "[videos]",
     "[downloads]", "[desktop]", "[home]"
