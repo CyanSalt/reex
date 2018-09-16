@@ -319,7 +319,6 @@ export default {
       if (!times) return name
       return `${basename(name)} (${times})${extname(name)}`
     },
-    // TODO: optimize with async iterator
     'file/order'(files, factory, collection = []) {
       if (!files.length) {
         return Promise.resolve(collection)
@@ -345,15 +344,17 @@ export default {
             if (locally) return create(times + 1)
             const text = this.i18n('the copying file#!20')
             const response = await this['confirm/duplicate'](realname, text)
-            if (response === 0) {
-              return create(times + 1)
-            } else if (response === 1) {
-              try {
-                await promises.copyFile(path, target)
-              } catch (err) {}
-              return target
+            switch (response) {
+              case 0: return create(times + 1)
+              case 1: {
+                try {
+                  await promises.copyFile(path, target)
+                } catch (err) {}
+                return target
+              }
+              case 2: return null
+              default: throw e
             }
-            return null
           }
         }
         return create(locally ? 1 : 0)
@@ -380,16 +381,18 @@ export default {
             // TODO: may alert the confirm dialog again
             const text = this.i18n('the moving file#!21')
             const response = await this['confirm/duplicate'](realname, text)
-            if (response === 0) {
-              return create(times + 1)
-            } else if (response === 1) {
-              try {
-                await promises.unlink(target)
-                await promises.rename(path, target)
-              } catch (err) {}
-              return target
+            switch (response) {
+              case 0: return create(times + 1)
+              case 1: {
+                try {
+                  await promises.unlink(target)
+                  await promises.rename(path, target)
+                } catch (err) {}
+                return target
+              }
+              case 2: return null
+              default: throw e
             }
-            return null
           }
         }
         return create(0)
