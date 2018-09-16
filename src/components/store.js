@@ -15,6 +15,7 @@ import fileColors from '../utilities/file-colors'
 import folderIcons from '../utilities/folder-icons'
 
 const promises = {
+  readdir: promisify(readdir),
   lstat: promisify(lstat),
   readlink: promisify(readlink),
   stat: promisify(stat),
@@ -107,17 +108,14 @@ export default {
         })
       })
     },
-    'path/load'() {
+    async 'path/load'() {
       const path = this['path/full']
-      readdir(path, (err, files) => {
-        if (err) {
-          if (err.code === 'ENOENT') {
-            this['path/upward']()
-          }
-          return
-        }
+      try {
+        const files = await promises.readdir(path)
         this['explorer/show'](files.map(file => join(path, file)))
-      })
+      } catch (e) {
+        if (e.code === 'ENOENT') this['path/upward']()
+      }
     },
     'path/redirect'(path) {
       if (path === this['path/full']) return
@@ -253,15 +251,13 @@ export default {
       const target = this['path/defined'].find(data => data.path === path)
       return (target && target.name) || basename(path) || '/'
     },
-    'file/follow'(info) {
+    async 'file/follow'(info) {
       const {path, stats} = info
       if (!stats.isSymbolicLink()) return info
-      return promises.readlink(path).then(link => {
-        const targetPath = resolve(dirname(path), link)
-        return promises.stat(targetPath).then(targetStats => {
-          return {path: targetPath, stats: targetStats}
-        })
-      })
+      const link = await promises.readlink(path)
+      const targetPath = resolve(dirname(path), link)
+      const targetStats = await promises.stat(targetPath)
+      return {path: targetPath, stats: targetStats}
     },
     'file/sort'([a, b]) {
       const statsA = a.link ? a.link.stats : a.stats
@@ -275,19 +271,17 @@ export default {
       return baseA.localeCompare(baseB)
     },
     'file/read'(paths) {
-      return Promise.all(paths.map(path => {
-        return promises.lstat(path)
-          .then(stats => {
-            const info = {path, stats}
-            if (!stats.isSymbolicLink()) {
-              return info
-            }
-            return this['file/follow'](info).then(link => {
-              return Object.assign(info, {link})
-            }).catch(() => {
-              return Object.assign(info, {link: info})
-            })
-          }).catch(() => null)
+      return Promise.all(paths.map(async path => {
+        const stats = await promises.lstat(path).catch(() => {})
+        if (!stats) return null
+        const info = {path, stats}
+        if (!stats.isSymbolicLink()) return info
+        try {
+          const link = await this['file/follow'](info)
+          return Object.assign(info, {link})
+        } catch (e) {
+          return Object.assign(info, {link: info})
+        }
       })).then(all => all.filter(Boolean))
     },
     'file/execute'(path) {
@@ -325,6 +319,7 @@ export default {
       if (!times) return name
       return `${basename(name)} (${times})${extname(name)}`
     },
+    // TODO: optimize with async iterator
     'file/order'(files, factory, collection = []) {
       if (!files.length) {
         return Promise.resolve(collection)
@@ -339,24 +334,27 @@ export default {
       this['file/order'](source, path => {
         const name = basename(path)
         const locally = dirname(path) === current
-        const create = times => {
+        const create = async times => {
           const realname = this['file/avoid']({name, times})
           const target = join(current, realname)
-          return promises.copyFile(path, target, fsconst.COPYFILE_EXCL)
-            .then(() => target)
-            .catch(() => {
-              if (locally) return create(times + 1)
-              const text = this.i18n('the copying file#!20')
-              return this['confirm/duplicate'](realname, text)
-                .then(response => {
-                  if (response === 0) {
-                    return create(times + 1)
-                  } else if (response === 1) {
-                    return promises.rename(path, target).then(() => target)
-                  }
-                  return null
-                })
-            })
+          try {
+            await promises.copyFile(path, target, fsconst.COPYFILE_EXCL)
+            return target
+          } catch (e) {
+            // TODO: may alert the confirm dialog again
+            if (locally) return create(times + 1)
+            const text = this.i18n('the copying file#!20')
+            const response = await this['confirm/duplicate'](realname, text)
+            if (response === 0) {
+              return create(times + 1)
+            } else if (response === 1) {
+              try {
+                await promises.copyFile(path, target)
+              } catch (err) {}
+              return target
+            }
+            return null
+          }
         }
         return create(locally ? 1 : 0)
       }).then(paths => {
@@ -371,25 +369,28 @@ export default {
       const current = this['path/full']
       this['file/order'](source, path => {
         const name = basename(path)
-        const create = times => {
+        const create = async times => {
           const realname = this['file/avoid']({name, times})
           const target = join(current, realname)
           if (target === path) return path
-          return promises.rename(path, target).then(() => target)
-            .catch(() => {
-              const text = this.i18n('the moving file#!21')
-              return this['confirm/duplicate'](realname, text)
-                .then(response => {
-                  if (response === 0) {
-                    return create(times + 1)
-                  } else if (response === 1) {
-                    return promises.unlink(target)
-                      .then(() => promises.rename(path, target))
-                      .then(() => target)
-                  }
-                  return null
-                })
-            })
+          try {
+            await promises.rename(path, target)
+            return target
+          } catch (e) {
+            // TODO: may alert the confirm dialog again
+            const text = this.i18n('the moving file#!21')
+            const response = await this['confirm/duplicate'](realname, text)
+            if (response === 0) {
+              return create(times + 1)
+            } else if (response === 1) {
+              try {
+                await promises.unlink(target)
+                await promises.rename(path, target)
+              } catch (err) {}
+              return target
+            }
+            return null
+          }
         }
         return create(0)
       }).then(paths => {
@@ -520,17 +521,15 @@ export default {
           basename(path) === rule
       })
     },
-    'templates/load'() {
+    async 'templates/load'() {
       const templates = this.$storage.filename('templates')
-      readdir(templates, (err, files) => {
-        if (err) return
-        const paths = files.map(file => join(templates, file))
-        this['file/read'](paths).then(entries => {
-          this['templates/all'] = entries
-            .filter(({stats}) => stats.isFile())
-            .map(({path}) => path)
-        })
-      })
+      // Note: display error in console
+      const files = await promises.readdir(templates)
+      const paths = files.map(file => join(templates, file))
+      const entries = await this['file/read'](paths)
+      this['templates/all'] = entries
+        .filter(({stats}) => stats.isFile())
+        .map(({path}) => path)
     },
     'templates/watch'() {
       this['templates/load']()
@@ -541,27 +540,25 @@ export default {
         }
       })
     },
-    'devices/load'() {
+    async 'devices/load'() {
       // TODO: cross platform
       if (process.platform === 'darwin') {
         const path = '/Volumes'
-        readdir(path, (err, files) => {
-          if (err) return
-          const paths = files.map(file => join(path, file))
-          this['file/read'](paths).then(entries => {
-            this['devices/all'] = entries
-          })
-          files.forEach(file => {
-            const name = file.replace(/\s/g, c => '\\' + c)
-            const command = [
-              `diskutil info ${name}`,
-              'awk \'/Removable Media:/{print $3}\'',
-            ].join(' | ')
-            exec(command, (error, stdout) => {
-              if (!error && stdout.toString().trim() === 'Removable') {
-                this['devices/removable'].push(join(path, file))
-              }
-            })
+        // Note: display error in console
+        const files = await promises.readdir(path)
+        const paths = files.map(file => join(path, file))
+        const entries = await this['file/read'](paths)
+        this['devices/all'] = entries
+        files.forEach(file => {
+          const name = file.replace(/\s/g, c => '\\' + c)
+          const command = [
+            `diskutil info ${name}`,
+            'awk \'/Removable Media:/{print $3}\'',
+          ].join(' | ')
+          exec(command, (error, stdout) => {
+            if (!error && stdout.toString().trim() === 'Removable') {
+              this['devices/removable'].push(join(path, file))
+            }
           })
         })
       }
@@ -585,18 +582,17 @@ export default {
         exec(`diskutil unmount ${name}`)
       }
     },
-    'explorer/show'(paths) {
+    async 'explorer/show'(paths) {
       this['files/info'] = []
       this['files/selected'] = []
       this['explorer/loading'] = true
-      this['file/read'](paths).then(entries => {
-        this['explorer/loading'] = false
-        this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
-        if (this['files/selecting'].length) {
-          this['files/selected'] = this['files/selecting']
-          this['files/selecting'] = []
-        }
-      })
+      const entries = await this['file/read'](paths)
+      this['explorer/loading'] = false
+      this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
+      if (this['files/selecting'].length) {
+        this['files/selected'] = this['files/selecting']
+        this['files/selecting'] = []
+      }
     },
     'clipboard/files'() {
       const files = []
