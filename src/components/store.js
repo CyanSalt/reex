@@ -333,29 +333,34 @@ export default {
       this['file/order'](source, path => {
         const name = basename(path)
         const locally = dirname(path) === current
+        let overwrite = false
+        let silence = locally
         const create = async times => {
           const realname = this['file/avoid']({name, times})
           const target = join(current, realname)
+          const flag = overwrite ? [] : [fsconst.COPYFILE_EXCL]
           try {
-            await promises.copyFile(path, target, fsconst.COPYFILE_EXCL)
-            return target
+            await promises.copyFile(path, target, ...flag)
           } catch (e) {
-            // TODO: may alert the confirm dialog again
-            if (locally) return create(times + 1)
+            if (silence) return create(times + 1)
             const text = this.i18n('the copying file#!20')
             const response = await this['confirm/duplicate'](realname, text)
             switch (response) {
-              case 0: return create(times + 1)
+              case 0: {
+                silence = true
+                return create(times + 1)
+              }
               case 1: {
-                try {
-                  await promises.copyFile(path, target)
-                } catch (err) {}
-                return target
+                overwrite = true
+                return create(times)
               }
               case 2: return null
               default: throw e
             }
           }
+          overwrite = false
+          silence = locally
+          return target
         }
         return create(locally ? 1 : 0)
       }).then(paths => {
@@ -374,26 +379,32 @@ export default {
           const realname = this['file/avoid']({name, times})
           const target = join(current, realname)
           if (target === path) return path
+          let silence = false
           try {
             await promises.rename(path, target)
-            return target
           } catch (e) {
-            // TODO: may alert the confirm dialog again
+            if (silence) return create(times + 1)
             const text = this.i18n('the moving file#!21')
             const response = await this['confirm/duplicate'](realname, text)
             switch (response) {
-              case 0: return create(times + 1)
+              case 0: {
+                silence = true
+                return create(times + 1)
+              }
               case 1: {
                 try {
                   await promises.unlink(target)
-                  await promises.rename(path, target)
-                } catch (err) {}
-                return target
+                } catch (err) {
+                  return null
+                }
+                return create(times)
               }
               case 2: return null
               default: throw e
             }
           }
+          silence = false
+          return target
         }
         return create(0)
       }).then(paths => {
