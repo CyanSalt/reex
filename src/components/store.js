@@ -251,9 +251,12 @@ export default {
       const target = this['path/defined'].find(data => data.path === path)
       return (target && target.name) || basename(path) || '/'
     },
-    async 'file/follow'(info) {
-      const {path, stats} = info
-      if (!stats.isSymbolicLink()) return info
+    async 'file/follow'({type, path}) {
+      if (type === 'shortcut') {
+        const {target, args} = shell.readShortcutLink(path)
+        const targetStats = await promises.stat(target)
+        return {path: target, stats: targetStats, args}
+      }
       const link = await promises.readlink(path)
       const targetPath = resolve(dirname(path), link)
       const targetStats = await promises.stat(targetPath)
@@ -270,14 +273,22 @@ export default {
       if (!dirA && dirB) return 1
       return baseA.localeCompare(baseB)
     },
+    'file/link'(info) {
+      const {path, stats} = info
+      if (process.platform === 'win32' &&
+        extname(path) === '.lnk') return 'shortcut'
+      if (stats.isSymbolicLink()) return 'symbolic'
+      return false
+    },
     'file/read'(paths) {
       return Promise.all(paths.map(async path => {
         const stats = await promises.lstat(path).catch(() => {})
         if (!stats) return null
         const info = {path, stats}
-        if (!stats.isSymbolicLink()) return info
+        const type = this['file/link'](info)
+        if (!type) return info
         try {
-          const link = await this['file/follow'](info)
+          const link = await this['file/follow']({type, path})
           return Object.assign(info, {link})
         } catch (e) {
           return Object.assign(info, {link: info})
