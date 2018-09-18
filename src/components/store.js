@@ -8,11 +8,11 @@ import {
 import {promisify} from 'util'
 import {exec, spawn} from 'child_process'
 
+import fileTypes from '../presets/file-types'
+import fileIcons from '../presets/file-icons'
+import fileColors from '../presets/file-colors'
+import folderIcons from '../presets/folder-icons'
 import defaultSettings from '../resources/default/settings.json'
-import fileTypes from '../utilities/file-types'
-import fileIcons from '../utilities/file-icons'
-import fileColors from '../utilities/file-colors'
-import folderIcons from '../utilities/folder-icons'
 
 const promises = {
   readdir: promisify(readdir),
