@@ -34,7 +34,10 @@ export default {
   },
   created() {
     this.$flux.dispatch('path/preload')
-    this.$flux.dispatch('settings/load')
+    this.$flux.dispatch('settings/load').then(data => {
+      // emit loaded event
+      this.$emit('settings/loaded', data)
+    })
     this.$flux.dispatch('types/load')
     this.$flux.dispatch('icons/load')
     this.$flux.dispatch('colors/load')

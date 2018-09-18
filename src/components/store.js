@@ -76,7 +76,7 @@ export default {
   methods: {
     async 'settings/load'() {
       // load default settings
-      this.$flux.set('settings/default', defaultSettings)
+      this['settings/default'] = defaultSettings
       // load user settings
       const copied = JSON.parse(JSON.stringify(defaultSettings))
       const declared = await this.$storage.load('settings.json')
@@ -91,8 +91,7 @@ export default {
       this['file/read'](favorites).then(entries => {
         this['path/favorites'] = entries
       })
-      // emit loaded event
-      this.$emit('settings/loaded', data)
+      return data
     },
     'settings/save'() {
       // filter default values on saving

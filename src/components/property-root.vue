@@ -26,7 +26,10 @@ export default {
   },
   created() {
     this.$flux.dispatch('path/preload')
-    this.$flux.dispatch('settings/load')
+    this.$flux.dispatch('settings/load').then(data => {
+      // emit loaded event
+      this.$emit('settings/loaded', data)
+    })
     // custom script
     const initScript = this.$storage.require('custom.js')
     initScript && initScript(this)
