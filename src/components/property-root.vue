@@ -17,7 +17,7 @@ export default {
   },
   beforeCreate() {
     // custom stylesheet
-    const stylesheet = this.$storage.contentSync('custom.css')
+    const stylesheet = this.$storage.readSync('custom.css')
     if (stylesheet) {
       const element = document.createElement('style')
       element.appendChild(document.createTextNode(stylesheet))

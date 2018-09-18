@@ -15,14 +15,14 @@ const PATH = process.env.NODE_ENV === 'production' ?
 export const FileStorage = {
   async load(basename) {
     try {
-      return JSON.parse(await this.content(basename))
+      return JSON.parse(await this.read(basename))
     } catch (e) {
       return null
     }
   },
   loadSync(basename) {
     try {
-      return JSON.parse(this.contentSync(basename))
+      return JSON.parse(this.readSync(basename))
     } catch (e) {
       return null
     }
@@ -34,14 +34,14 @@ export const FileStorage = {
     } catch (e) {}
     return promises.writeFile(filename, this.stringify(data))
   },
-  async content(basename) {
+  async read(basename) {
     try {
       return await promises.readFile(this.filename(basename))
     } catch (e) {
       return null
     }
   },
-  contentSync(basename) {
+  readSync(basename) {
     try {
       return readFileSync(this.filename(basename))
     } catch (e) {
