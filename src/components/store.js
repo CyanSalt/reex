@@ -546,8 +546,7 @@ export default {
     },
     async 'templates/load'() {
       const templates = this.$storage.filename('templates')
-      // Note: display error in console
-      const files = await promises.readdir(templates)
+      const files = await promises.readdir(templates).catch(() => [])
       const paths = files.map(file => join(templates, file))
       const entries = await this['file/read'](paths)
       this['templates/all'] = entries

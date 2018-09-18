@@ -5,4 +5,4 @@
 /src/assets/images/*.icns
 /src/build
 /src/resources/fonts/*.otf
-/src/storage
+/storage

@@ -9,8 +9,8 @@ const promises = {
   writeFile: promisify(writeFile),
 }
 
-const PATH = process.env.NODE_ENV === 'production' ?
-  dirname(process.execPath) : __dirname
+const PATH = dirname(process.env.NODE_ENV === 'production' ?
+  process.execPath : __dirname)
 
 export const FileStorage = {
   async load(basename) {
