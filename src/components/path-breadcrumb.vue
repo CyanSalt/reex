@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import {state, action} from '../plugins/flux'
+import {state, action} from '../plugins/relax'
 
 export default {
   name: 'path-breadcrumb',
@@ -30,7 +30,7 @@ export default {
     redirect: action('path/redirect'),
     edit() {
       this.editing = true
-      this.$flux.dispatch('file/specify', [])
+      this.$relax.dispatch('file/specify', [])
       this.$nextTick(() => {
         const {editor} = this.$refs
         editor.focus()
@@ -44,7 +44,7 @@ export default {
       this.editing = false
       const {value} = e.target
       if (value === this.path) return
-      const path = this.$flux.dispatch('path/interpret', value)
+      const path = this.$relax.dispatch('path/interpret', value)
       this.redirect(path)
     },
   },

@@ -14,7 +14,7 @@
 import {ipcRenderer} from 'electron'
 import {basename, extname} from 'fs'
 import ReexFileEntry from './file-entry'
-import {state, action} from '../plugins/flux'
+import {state, action} from '../plugins/relax'
 
 export default {
   name: 'file-list',
@@ -64,7 +64,7 @@ export default {
       const creation = {
         label: this.i18n('Create new file#!9'),
       }
-      const templates = this.$flux.get('templates/all')
+      const templates = this.$relax.access('templates/all')
       if (templates.length) {
         creation.submenu = templates.map(template => {
           return {
@@ -83,7 +83,7 @@ export default {
           role: 'paste'
         }
       ]
-      const files = this.$flux.dispatch('clipboard/files')
+      const files = this.$relax.dispatch('clipboard/files')
       if (!files.length) {
         if (process.platform === 'darwin') {
           pasting = []
@@ -162,7 +162,7 @@ export default {
     drop(e) {
       const copying = process.platform === 'darwin' ? e.altKey : e.ctrlKey
       const paths = Array.from(e.dataTransfer.files).map(file => file.path)
-      this.$flux.dispatch(copying ? 'file/copy' : 'file/move', paths)
+      this.$relax.dispatch(copying ? 'file/copy' : 'file/move', paths)
     },
   },
 }

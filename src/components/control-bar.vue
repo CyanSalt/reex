@@ -41,7 +41,7 @@
 
 <script>
 import {remote, ipcRenderer, shell} from 'electron'
-import {state, action} from '../plugins/flux'
+import {state, action} from '../plugins/relax'
 
 export default {
   name: 'control-bar',

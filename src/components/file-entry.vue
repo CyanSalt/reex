@@ -14,7 +14,7 @@
 <script>
 import {ipcRenderer} from 'electron'
 import FileIcon from './file-icon'
-import {state, action} from '../plugins/flux'
+import {state, action} from '../plugins/relax'
 
 export default {
   name: 'file-entry',
@@ -33,18 +33,18 @@ export default {
     location: state('path/full'),
     selected: state('files/selected'),
     isImage() {
-      return this.$flux.dispatch('file/type', this.real.path) === 'image'
+      return this.$relax.dispatch('file/type', this.real.path) === 'image'
     },
     focused() {
       return this.selected.includes(this.file.path)
     },
     hidden() {
-      return this.$flux.dispatch('file/hidden', this.file.path)
+      return this.$relax.dispatch('file/hidden', this.file.path)
     },
     nickname() {
-      let name = this.$flux.dispatch('file/name', this.file.path)
+      let name = this.$relax.dispatch('file/name', this.file.path)
       if (process.platform === 'darwin' &&
-        this.$flux.dispatch('file/executable', this.real)
+        this.$relax.dispatch('file/executable', this.real)
       ) name = name.slice(0, -4)
       return name
     },
@@ -62,14 +62,14 @@ export default {
       const selected = this.selected.includes(path)
       if (rightclick) {
         if (!selected) {
-          this.$flux.dispatch('file/specify', path)
+          this.$relax.dispatch('file/specify', path)
         }
       } else if (!multiple) {
-        this.$flux.dispatch('file/specify', path)
+        this.$relax.dispatch('file/specify', path)
       } else if (selected) {
-        this.$flux.dispatch('file/unselect', path)
+        this.$relax.dispatch('file/unselect', path)
       } else {
-        this.$flux.dispatch('file/select', path)
+        this.$relax.dispatch('file/select', path)
       }
     },
     contextmenu() {

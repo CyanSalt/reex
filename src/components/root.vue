@@ -33,31 +33,31 @@ export default {
     }
   },
   created() {
-    this.$flux.dispatch('path/preload')
-    this.$flux.dispatch('settings/load').then(data => {
+    this.$relax.dispatch('path/preload')
+    this.$relax.dispatch('settings/load').then(data => {
       // emit loaded event
       this.$emit('settings/loaded', data)
     })
-    this.$flux.dispatch('types/load')
-    this.$flux.dispatch('icons/load')
-    this.$flux.dispatch('colors/load')
+    this.$relax.dispatch('types/load')
+    this.$relax.dispatch('icons/load')
+    this.$relax.dispatch('colors/load')
     // load file templates
-    this.$flux.dispatch('templates/watch')
-    this.$flux.dispatch('devices/watch')
+    this.$relax.dispatch('templates/watch')
+    this.$relax.dispatch('devices/watch')
     ipcRenderer.on('contextmenu', (e, args) => {
       if (!args.action) return
-      this.$flux.dispatch(`contextmenu/${args.action}`, args)
+      this.$relax.dispatch(`contextmenu/${args.action}`, args)
     })
     document.addEventListener('copy', e => {
       if (this.editing()) return
       e.preventDefault()
-      this.$flux.dispatch('contextmenu/copy')
+      this.$relax.dispatch('contextmenu/copy')
     })
     ipcRenderer.on('paste', (e, args) => {
       if (this.editing()) {
         document.execCommand('paste')
       } else {
-        this.$flux.dispatch('contextmenu/paste')
+        this.$relax.dispatch('contextmenu/paste')
       }
     })
     // make selection change every time except after `removeAllRanges`
@@ -72,10 +72,10 @@ export default {
       manually = true
       const selection = window.getSelection()
       selection.removeAllRanges()
-      this.$flux.dispatch('contextmenu/selectall', e)
+      this.$relax.dispatch('contextmenu/selectall', e)
     })
     ipcRenderer.on('confirm', (event, args) => {
-      this.$flux.dispatch('confirm/receive', args)
+      this.$relax.dispatch('confirm/receive', args)
     })
     // custom script
     const initScript = this.$storage.require('custom.js')

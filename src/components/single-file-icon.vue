@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import {state} from '../plugins/flux'
+import {state} from '../plugins/relax'
 
 export default {
   name: 'single-file-icon',
@@ -33,7 +33,7 @@ export default {
   computed: {
     settings: state('settings/user'),
     linkIcon() {
-      return this.$flux.dispatch('icons/detail', '@feather/icon-corner-up-right')
+      return this.$relax.dispatch('icons/detail', '@feather/icon-corner-up-right')
     },
     color() {
       if (this.background) return this.background
