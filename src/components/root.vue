@@ -25,7 +25,7 @@ export default {
   },
   beforeCreate() {
     // custom stylesheet
-    const stylesheet = this.$storage.rawdataSync('custom.css')
+    const stylesheet = this.$storage.contentSync('custom.css')
     if (stylesheet) {
       const element = document.createElement('style')
       element.appendChild(document.createTextNode(stylesheet))
@@ -75,7 +75,8 @@ export default {
       this.$flux.dispatch('confirm/receive', args)
     })
     // custom script
-    this.$storage.require('custom.js', init => init(this))
+    const initScript = this.$storage.require('custom.js')
+    initScript && initScript(this)
   }
 }
 </script>

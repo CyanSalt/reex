@@ -74,39 +74,37 @@ export default {
     },
   },
   methods: {
-    'settings/load'() {
+    async 'settings/load'() {
       // load default settings
       this.$flux.set('settings/default', defaultSettings)
-      // custom script
-      this.$storage.require('custom.js', init => init(this))
       // load user settings
-      this.$storage.load('settings.json', (err, data) => {
-        const copied = JSON.parse(JSON.stringify(defaultSettings))
-        data = err ? copied : {...copied, ...data}
-        this['settings/user'] = data
-        // load other states in store
-        const path = additionalArguments.path ||
-          this['path/interpret'](data['explorer.startup.path'])
-        this['path/replace'](path)
-        const favorites = data['quickaccess.favorites']
-          .map(entry => this['path/interpret'](entry))
-        this['file/read'](favorites).then(entries => {
-          this['path/favorites'] = entries
-        })
-        // emit loaded event
-        this.$emit('settings/loaded', data)
-        // filter default values on saving
-        const reducer = (diff, [key, value]) => {
-          if (JSON.stringify(value) !== JSON.stringify(data[key])) {
-            diff[key] = data[key]
-          }
-          return diff
-        }
-        this.$flux.on('settings/save', () => {
-          const computed = Object.entries(defaultSettings).reduce(reducer, {})
-          this.$storage.save('settings.json', computed)
-        })
+      const copied = JSON.parse(JSON.stringify(defaultSettings))
+      const declared = await this.$storage.load('settings.json')
+      const data = declared ? {...copied, ...declared} : copied
+      this['settings/user'] = data
+      // load other states in store
+      const path = additionalArguments.path ||
+        this['path/interpret'](data['explorer.startup.path'])
+      this['path/replace'](path)
+      const favorites = data['quickaccess.favorites']
+        .map(entry => this['path/interpret'](entry))
+      this['file/read'](favorites).then(entries => {
+        this['path/favorites'] = entries
       })
+      // emit loaded event
+      this.$emit('settings/loaded', data)
+    },
+    'settings/save'() {
+      // filter default values on saving
+      const data = this['settings/user']
+      const reducer = (diff, [key, value]) => {
+        if (JSON.stringify(value) !== JSON.stringify(data[key])) {
+          diff[key] = data[key]
+        }
+        return diff
+      }
+      const computed = Object.entries(defaultSettings).reduce(reducer, {})
+      this.$storage.save('settings.json', computed)
     },
     async 'path/load'() {
       const path = this['path/full']
