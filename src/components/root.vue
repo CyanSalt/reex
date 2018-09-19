@@ -50,7 +50,7 @@ export default {
     this.$relax.dispatch('colors/load')
     // load file templates
     this.$relax.dispatch('templates/watch')
-    this.$relax.dispatch('devices/watch')
+    this.$core.devices.watch()
     ipcRenderer.on('contextmenu', (e, args) => {
       if (!args.action) return
       this.$relax.dispatch(`contextmenu/${args.action}`, args)

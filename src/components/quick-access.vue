@@ -35,13 +35,13 @@ export default {
   computed: {
     path: state('location.path'),
     favorites: state('path/favorites'),
-    devices: state('devices/all'),
-    removable: state('devices/removable'),
+    devices: state('devices.list'),
+    removable: state('devices.removable'),
   },
   methods: {
     name: action('file/name'),
     open: action('file/open'),
-    unmount: action('devices/unmount'),
+    unmount: action('devices.unmount'),
     active(file) {
       return file.path === this.path || (
         file.link && file.link.path === this.path)

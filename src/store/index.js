@@ -6,11 +6,12 @@ import {
   constants as fsconst,
 } from 'fs'
 import {promisify} from 'util'
-import {exec, spawn} from 'child_process'
+import {spawn} from 'child_process'
 
 import settings from './modules/settings'
 import location from './modules/location'
 import history from './modules/history'
+import devices from './modules/devices'
 import fileTypes from '../presets/file-types'
 import fileIcons from '../presets/file-icons'
 import fileColors from '../presets/file-colors'
@@ -33,6 +34,7 @@ export default {
     settings,
     location,
     history,
+    devices,
   },
   states: {
     'path/defined': [],
@@ -44,8 +46,6 @@ export default {
     'files/recentlog': {},
     'file/executed': null,
     'templates/all': [],
-    'devices/all': [],
-    'devices/removable': [],
     'explorer/loading': false,
     'confirm/waiting': null,
     'icons/cache': {},
@@ -463,48 +463,6 @@ export default {
           this['templates/load']()
         }
       })
-    },
-    async 'devices/load'() {
-      // TODO: cross platform
-      if (process.platform === 'darwin') {
-        const path = '/Volumes'
-        // Note: display error in console
-        const files = await promises.readdir(path)
-        const paths = files.map(file => join(path, file))
-        const entries = await this['file/read'](paths)
-        this['devices/all'] = entries
-        files.forEach(file => {
-          const name = file.replace(/\s/g, c => '\\' + c)
-          const command = [
-            `diskutil info ${name}`,
-            'awk \'/Removable Media:/{print $3}\'',
-          ].join(' | ')
-          exec(command, (error, stdout) => {
-            if (!error && stdout.toString().trim() === 'Removable') {
-              this['devices/removable'].push(join(path, file))
-            }
-          })
-        })
-      }
-    },
-    'devices/watch'() {
-      this['devices/load']()
-      // TODO: cross platform
-      if (process.platform === 'darwin') {
-        this['folder/watch']({
-          path: '/Volumes',
-          callback: () => {
-            this['devices/load']()
-          }
-        })
-      }
-    },
-    'devices/unmount'(info) {
-      // TODO: cross platform
-      if (process.platform === 'darwin') {
-        const name = basename(info.path).replace(/\s/g, c => '\\' + c)
-        exec(`diskutil unmount ${name}`)
-      }
     },
     async 'explorer/show'(paths) {
       this['files/info'] = []
