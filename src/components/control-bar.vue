@@ -55,13 +55,13 @@ export default {
   computed: {
     path: state('path/full'),
     floors: state('path/floors'),
-    stack: state('path/stack'),
-    forwards: state('path/forwards'),
+    stack: state('history.stack'),
+    forwards: state('history.forwards'),
     vision: state('files/vision'),
   },
   methods: {
-    back: action('path/back'),
-    forward: action('path/forward'),
+    back: action('history.back'),
+    forward: action('history.forward'),
     upward: action('path/upward'),
     blink: action('vision/toggle'),
     terminal: action('terminal/open'),

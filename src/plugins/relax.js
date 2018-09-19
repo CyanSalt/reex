@@ -1,37 +1,69 @@
 let instance = null
 
 const context = {
-  access(key) {
-    return instance[key]
+  access(name) {
+    const {target, key} = visit(instance, name)
+    return target[key]
   },
-  commit(key, value) {
-    instance[key] = value
+  dispatch(name, payload) {
+    const {target, key} = visit(instance, name)
+    return target[key](payload)
   },
-  dispatch(method, payload) {
-    return instance[method](payload)
-  },
+}
+
+function construct(Vue, store) {
+  const model = {
+    data: store.states || {},
+  }
+  if (store.modules) {
+    for (const [name, value] of Object.entries(store.modules)) {
+      model.data[name] = construct(Vue, value)
+    }
+  }
+  if (store.getters) {
+    model.computed = store.getters
+  }
+  if (store.actions) {
+    model.methods = store.actions
+  }
+  return new Vue(model)
+}
+
+function visit(source, name) {
+  const props = name.split('.')
+  const key = props[props.length - 1]
+  let target = source
+  for (const prop of props.slice(0, -1)) {
+    target = target[prop]
+  }
+  return {target, key}
 }
 
 export function state(name) {
   return {
     get() {
-      return context.access(name)
+      const {target, key} = visit(instance, name)
+      return target[key]
     },
     set(value) {
-      return context.commit(name, value)
+      const {target, key} = visit(instance, name)
+      target[key] = value
     }
   }
 }
 
 export function action(name) {
-  return function (payload) {
-    return context.dispatch(name, payload)
+  return function (...args) {
+    const {target, key} = visit(instance, name)
+    return target[key](...args)
   }
 }
 
 export default {
   install(Vue, store) {
-    instance = new Vue(store)
+    instance = construct(Vue, store)
+    // TODO: deprecated
     Vue.prototype.$relax = context
+    Vue.prototype.$core = instance
   }
 }

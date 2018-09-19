@@ -4,12 +4,12 @@ import Relax from './plugins/relax'
 import I18N from './plugins/i18n'
 import FileStorage from './plugins/storage'
 import Root from './components/root'
-import Store from './components/store'
 import PropertyRoot from './components/property-root'
+import store from './store'
 
 Vue.use(I18N)
 Vue.use(FileStorage)
-Vue.use(Relax, Store)
+Vue.use(Relax, store)
 
 let Main = Root
 const {additionalArguments} = remote.getCurrentWindow()

@@ -8,6 +8,7 @@ import {
 import {promisify} from 'util'
 import {exec, spawn} from 'child_process'
 
+import history from './modules/history'
 import fileTypes from '../presets/file-types'
 import fileIcons from '../presets/file-icons'
 import fileColors from '../presets/file-colors'
@@ -29,12 +30,13 @@ const {additionalArguments} = remote.getCurrentWindow()
 // TODO: support permission like jorangreef/sudo-prompt
 // TODO: use session to share in different window
 export default {
-  data: {
+  modules: {
+    history,
+  },
+  states: {
     'settings/default': {},
     'settings/user': {},
     'path/full': '',
-    'path/stack': [],
-    'path/forwards': [],
     'path/defined': [],
     'path/watcher': [],
     'path/favorites': [],
@@ -55,7 +57,7 @@ export default {
     'icons/haystack': [],
     'colors/all': [],
   },
-  computed: {
+  getters: {
     'path/floors'() {
       const floors = this['path/full'].split(sep)
       return floors[floors.length - 1] ? floors : floors.slice(0, -1)
@@ -73,7 +75,7 @@ export default {
       return this['files/info'].filter(file => !this['file/hidden'](file.path))
     },
   },
-  methods: {
+  actions: {
     async 'settings/load'() {
       // load default settings
       this['settings/default'] = defaultSettings
@@ -116,8 +118,7 @@ export default {
     },
     'path/redirect'(path) {
       if (path === this['path/full']) return
-      this['path/stack'].push(this['path/full'])
-      this['path/forwards'] = []
+      this.$core.history.pushState(path)
       this['path/replace'](path)
     },
     'path/replace'(path) {
@@ -137,20 +138,6 @@ export default {
           this['path/load']()
         }
       })
-    },
-    'path/back'() {
-      if (this['path/stack'].length) {
-        const path = this['path/stack'].pop()
-        this['path/forwards'].push(this['path/full'])
-        this['path/replace'](path)
-      }
-    },
-    'path/forward'() {
-      if (this['path/forwards'].length) {
-        const path = this['path/forwards'].pop()
-        this['path/stack'].push(this['path/full'])
-        this['path/replace'](path)
-      }
     },
     'path/upward'() {
       const {length} = this['path/floors']
