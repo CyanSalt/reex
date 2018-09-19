@@ -188,5 +188,6 @@ export default {
   position: absolute;
   background: rgba(0, 0, 0, 0.05);
   z-index: 10;
+  pointer-events: none;
 }
 </style>

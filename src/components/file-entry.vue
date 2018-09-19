@@ -140,6 +140,9 @@ export default {
 .file-entry.selected {
   background: rgba(234, 238, 243, 0.7);
 }
+.file-entry:not(.selected):hover {
+  background: rgba(234, 238, 243, 0.3);
+}
 .file-entry .file-icon-wrapper {
   height: 72px;
   line-height: 70px;
