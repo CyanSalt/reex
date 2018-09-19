@@ -33,7 +33,7 @@ import {state, action} from '../plugins/relax'
 export default {
   name: 'quick-access',
   computed: {
-    path: state('path/full'),
+    path: state('location.path'),
     favorites: state('path/favorites'),
     devices: state('devices/all'),
     removable: state('devices/removable'),

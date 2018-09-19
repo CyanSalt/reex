@@ -1,5 +1,5 @@
 import {remote, shell, clipboard, ipcRenderer} from 'electron'
-import {sep, join, basename, dirname, resolve, extname} from 'path'
+import {join, basename, dirname, resolve, extname} from 'path'
 import {
   readdir, watch, mkdir, copyFile, writeFile,
   lstat, readlink, stat, rename, unlink,
@@ -8,8 +8,9 @@ import {
 import {promisify} from 'util'
 import {exec, spawn} from 'child_process'
 
-import history from './modules/history'
 import settings from './modules/settings'
+import location from './modules/location'
+import history from './modules/history'
 import fileTypes from '../presets/file-types'
 import fileIcons from '../presets/file-icons'
 import fileColors from '../presets/file-colors'
@@ -30,12 +31,11 @@ const promises = {
 export default {
   modules: {
     settings,
+    location,
     history,
   },
   states: {
-    'path/full': '',
     'path/defined': [],
-    'path/watcher': [],
     'path/favorites': [],
     'files/info': [],
     'files/vision': false,
@@ -55,63 +55,12 @@ export default {
     'colors/all': [],
   },
   getters: {
-    'path/floors'() {
-      const floors = this['path/full'].split(sep)
-      return floors[floors.length - 1] ? floors : floors.slice(0, -1)
-    },
-    'path/steps'() {
-      return this['path/floors'].map((floor, index) => {
-        const path = index === 0 && !floor ? '/' :
-          this['path/floors'].slice(0, index + 1).join(sep)
-        const name = this['file/name'](path)
-        return {name, path}
-      })
-    },
     'files/visible'() {
       if (this['files/vision']) return this['files/info']
       return this['files/info'].filter(file => !this['file/hidden'](file.path))
     },
   },
   actions: {
-    async 'path/load'() {
-      const path = this['path/full']
-      try {
-        const files = await promises.readdir(path)
-        this['explorer/show'](files.map(file => join(path, file)))
-      } catch (e) {
-        if (e.code === 'ENOENT') this['path/upward']()
-      }
-    },
-    'path/redirect'(path) {
-      if (path === this['path/full']) return
-      this.$core.history.pushState(path)
-      this['path/replace'](path)
-    },
-    'path/replace'(path) {
-      if (path === this['path/full']) return
-      this['path/full'] = path
-      this['path/load']()
-      this['path/watch']()
-      document.title = this['file/name'](path)
-    },
-    'path/watch'() {
-      if (this['path/watcher'].length) {
-        this['path/watcher'].forEach(watcher => watcher.close())
-      }
-      this['path/watcher'] = this['folder/watch']({
-        path: this['path/full'],
-        callback: () => {
-          this['path/load']()
-        }
-      })
-    },
-    'path/upward'() {
-      const {length} = this['path/floors']
-      if (length > 1) {
-        const path = this['path/floors'].slice(0, length - 1).join(sep) || '/'
-        this['path/redirect'](path)
-      }
-    },
     'path/preload'() {
       const electronPaths = [
         {shortname: 'reex'},
@@ -171,11 +120,11 @@ export default {
       }
     },
     'file/hidden'(path) {
-      const {settings} = this.$core
+      const settings = this.$core.settings.user
       if (process.platform !== 'win32') {
         return basename(path).charAt(0) === '.'
       }
-      const hideDotFiles = settings.user['explorer.win32.hidedotfiles']
+      const hideDotFiles = settings['explorer.win32.hidedotfiles']
       if (hideDotFiles) {
         const isDotFile = basename(path).charAt(0) === '.'
         if (isDotFile) return true
@@ -291,7 +240,7 @@ export default {
         )).catch(() => collection)
     },
     'file/copy'(source) {
-      const current = this['path/full']
+      const current = this.$core.location.path
       this['file/order'](source, path => {
         const name = basename(path)
         const locally = dirname(path) === current
@@ -334,7 +283,7 @@ export default {
       })
     },
     'file/move'(source) {
-      const current = this['path/full']
+      const current = this.$core.location.path
       this['file/order'](source, path => {
         const name = basename(path)
         const create = async times => {
@@ -584,13 +533,13 @@ export default {
       return files
     },
     'terminal/open'() {
-      const {settings} = this.$core
-      const path = this['path/full']
-      const command = settings.user['terminal.command']
+      const settings = this.$core.settings.user
+      const path = this.$core.location.path
+      const command = settings['terminal.command']
         .replace('%PATH%', path)
       // TODO: cross platform
       if (process.platform === 'darwin') {
-        const name = settings.user['terminal.darwin.name']
+        const name = settings['terminal.darwin.name']
         let script
         if (name === 'iTerm2') {
           script = `tell application "iTerm"
@@ -657,7 +606,7 @@ export default {
     },
     // Context menu actions
     'contextmenu/create-folder'() {
-      const path = this['path/full']
+      const path = this.$core.location.path
       const name = this.i18n('New folder#!8')
       const create = times => {
         const realname = this['file/avoid']({name, times})
@@ -668,7 +617,7 @@ export default {
       create(0)
     },
     'contextmenu/create-file'({data}) {
-      const path = this['path/full']
+      const path = this.$core.location.path
       const name = (data && basename(data)) || this.i18n('New file#!10')
       const create = times => {
         const realname = this['file/avoid']({name, times})
@@ -722,7 +671,7 @@ export default {
     'contextmenu/open'({data}) {
       const {path, isDirectory} = data
       if (isDirectory) {
-        this['path/redirect'](path)
+        this.$core.location.assign(path)
       } else {
         this['file/execute'](path)
       }

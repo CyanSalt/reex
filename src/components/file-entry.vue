@@ -30,7 +30,7 @@ export default {
     }
   },
   computed: {
-    location: state('path/full'),
+    location: state('location.path'),
     selected: state('files/selected'),
     isImage() {
       return this.$relax.dispatch('file/type', this.real.path) === 'image'

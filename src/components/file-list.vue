@@ -27,7 +27,7 @@ export default {
     }
   },
   computed: {
-    path: state('path/full'),
+    path: state('location.path'),
     files: state('files/visible'),
     selected: state('files/selected'),
     loading: state('explorer/loading'),

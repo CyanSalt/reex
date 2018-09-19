@@ -43,7 +43,7 @@ export default {
       // load startup path
       const path = additionalArguments.path ||
         this.$relax.dispatch('path/interpret', data['explorer.startup.path'])
-      this.$relax.dispatch('path/replace', path)
+      this.$core.location.replace(path)
     })
     this.$relax.dispatch('types/load')
     this.$relax.dispatch('icons/load')

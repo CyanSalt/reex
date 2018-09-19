@@ -34,8 +34,7 @@ export default {
     },
     color() {
       if (this.background) return this.background
-      const {settings} = this.$core
-      const color = settings.user['theme.icons.background']
+      const color = this.$core.settings.user['theme.icons.background']
       if (!Array.isArray(color)) return color
       const digit = Array.from(this.ext).reduce((total, char) =>
         total + char.charCodeAt(0), 0)

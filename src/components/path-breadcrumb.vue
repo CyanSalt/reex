@@ -23,11 +23,11 @@ export default {
     }
   },
   computed: {
-    path: state('path/full'),
-    steps: state('path/steps'),
+    path: state('location.path'),
+    steps: state('location.steps'),
   },
   methods: {
-    redirect: action('path/redirect'),
+    redirect: action('location.assign'),
     edit() {
       this.editing = true
       this.$relax.dispatch('file/specify', [])

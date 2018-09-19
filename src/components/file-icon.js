@@ -41,8 +41,8 @@ export default {
       if (colors[0]) props.background = colors[0]
       if (colors[1]) props.foreground = colors[1]
     }
-    const {settings} = vm.$core
-    const style = settings.user['theme.icons.style']
+    const settings = vm.$core.settings.user
+    const style = settings['theme.icons.style']
     let UserFileIcon = SingleFileIcon
     if (style === 'sketch') UserFileIcon = SingleFileIconSketch
     if (style === 'impress') UserFileIcon = SingleFileIconImpress
