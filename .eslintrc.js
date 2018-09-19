@@ -127,7 +127,7 @@ module.exports = {
     'no-delete-var': 'error',
     'no-label-var': 'error',
     // 'no-restricted-globals': 'off',
-    // 'no-shadow': 'off',
+    'no-shadow': 'warn',
     'no-shadow-restricted-names': 'error',
     'no-undef': 'error',
     'no-undef-init': 'error',

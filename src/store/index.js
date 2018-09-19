@@ -120,11 +120,11 @@ export default {
       }
     },
     'file/hidden'(path) {
-      const settings = this.$core.settings.user
+      const config = this.$core.settings.user
       if (process.platform !== 'win32') {
         return basename(path).charAt(0) === '.'
       }
-      const hideDotFiles = settings['explorer.win32.hidedotfiles']
+      const hideDotFiles = config['explorer.win32.hidedotfiles']
       if (hideDotFiles) {
         const isDotFile = basename(path).charAt(0) === '.'
         if (isDotFile) return true
@@ -491,13 +491,13 @@ export default {
       return files
     },
     'terminal/open'() {
-      const settings = this.$core.settings.user
+      const config = this.$core.settings.user
       const path = this.$core.location.path
-      const command = settings['terminal.command']
+      const command = config['terminal.command']
         .replace('%PATH%', path)
       // TODO: cross platform
       if (process.platform === 'darwin') {
-        const name = settings['terminal.darwin.name']
+        const name = config['terminal.darwin.name']
         let script
         if (name === 'iTerm2') {
           script = `tell application "iTerm"
