@@ -6,9 +6,11 @@
 </template>
 
 <script>
-import {ipcRenderer} from 'electron'
+import {ipcRenderer, remote} from 'electron'
 import QuickAccess from './quick-access'
 import FileExplorer from './file-explorer'
+
+const {additionalArguments} = remote.getCurrentWindow()
 
 export default {
   el: '#main',
@@ -32,11 +34,16 @@ export default {
       document.head.appendChild(element)
     }
   },
+  // eslint-disable-next-line max-lines-per-function
   created() {
     this.$relax.dispatch('path/preload')
-    this.$relax.dispatch('settings/load').then(data => {
+    this.$core.settings.load().then(data => {
       // emit loaded event
       this.$emit('settings/loaded', data)
+      // load startup path
+      const path = additionalArguments.path ||
+        this.$relax.dispatch('path/interpret', data['explorer.startup.path'])
+      this.$relax.dispatch('path/replace', path)
     })
     this.$relax.dispatch('types/load')
     this.$relax.dispatch('icons/load')

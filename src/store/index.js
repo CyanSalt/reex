@@ -9,11 +9,11 @@ import {promisify} from 'util'
 import {exec, spawn} from 'child_process'
 
 import history from './modules/history'
+import settings from './modules/settings'
 import fileTypes from '../presets/file-types'
 import fileIcons from '../presets/file-icons'
 import fileColors from '../presets/file-colors'
 import folderIcons from '../presets/folder-icons'
-import defaultSettings from '../resources/default/settings.json'
 
 const promises = {
   readdir: promisify(readdir),
@@ -25,17 +25,14 @@ const promises = {
   unlink: promisify(unlink),
 }
 
-const {additionalArguments} = remote.getCurrentWindow()
-
 // TODO: support permission like jorangreef/sudo-prompt
 // TODO: use session to share in different window
 export default {
   modules: {
+    settings,
     history,
   },
   states: {
-    'settings/default': {},
-    'settings/user': {},
     'path/full': '',
     'path/defined': [],
     'path/watcher': [],
@@ -76,37 +73,6 @@ export default {
     },
   },
   actions: {
-    async 'settings/load'() {
-      // load default settings
-      this['settings/default'] = defaultSettings
-      // load user settings
-      const copied = JSON.parse(JSON.stringify(defaultSettings))
-      const declared = await this.$storage.load('settings.json')
-      const data = declared ? {...copied, ...declared} : copied
-      this['settings/user'] = data
-      // load other states in store
-      const path = additionalArguments.path ||
-        this['path/interpret'](data['explorer.startup.path'])
-      this['path/replace'](path)
-      const favorites = data['quickaccess.favorites']
-        .map(entry => this['path/interpret'](entry))
-      this['file/read'](favorites).then(entries => {
-        this['path/favorites'] = entries
-      })
-      return data
-    },
-    'settings/save'() {
-      // filter default values on saving
-      const data = this['settings/user']
-      const reducer = (diff, [key, value]) => {
-        if (JSON.stringify(value) !== JSON.stringify(data[key])) {
-          diff[key] = data[key]
-        }
-        return diff
-      }
-      const computed = Object.entries(defaultSettings).reduce(reducer, {})
-      this.$storage.save('settings.json', computed)
-    },
     async 'path/load'() {
       const path = this['path/full']
       try {
@@ -205,10 +171,11 @@ export default {
       }
     },
     'file/hidden'(path) {
+      const {settings} = this.$core
       if (process.platform !== 'win32') {
         return basename(path).charAt(0) === '.'
       }
-      const hideDotFiles = this['settings/user']['explorer.win32.hidedotfiles']
+      const hideDotFiles = settings.user['explorer.win32.hidedotfiles']
       if (hideDotFiles) {
         const isDotFile = basename(path).charAt(0) === '.'
         if (isDotFile) return true
@@ -617,12 +584,13 @@ export default {
       return files
     },
     'terminal/open'() {
+      const {settings} = this.$core
       const path = this['path/full']
-      const command = this['settings/user']['terminal.command']
+      const command = settings.user['terminal.command']
         .replace('%PATH%', path)
       // TODO: cross platform
       if (process.platform === 'darwin') {
-        const name = this['settings/user']['terminal.darwin.name']
+        const name = settings.user['terminal.darwin.name']
         let script
         if (name === 'iTerm2') {
           script = `tell application "iTerm"

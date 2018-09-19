@@ -18,8 +18,6 @@
 </template>
 
 <script>
-import {state} from '../plugins/relax'
-
 export default {
   name: 'single-file-icon',
   props: {
@@ -31,13 +29,13 @@ export default {
     foreground: String,
   },
   computed: {
-    settings: state('settings/user'),
     linkIcon() {
       return this.$relax.dispatch('icons/detail', '@feather/icon-corner-up-right')
     },
     color() {
       if (this.background) return this.background
-      const color = this.settings['theme.icons.background']
+      const {settings} = this.$core
+      const color = settings.user['theme.icons.background']
       if (!Array.isArray(color)) return color
       const digit = Array.from(this.ext).reduce((total, char) =>
         total + char.charCodeAt(0), 0)
