@@ -82,7 +82,7 @@ export default {
       this.$relax.dispatch('contextmenu/selectall', e)
     })
     ipcRenderer.on('confirm', (event, args) => {
-      this.$relax.dispatch('confirm/receive', args)
+      this.$core.dialog.receive(args)
     })
     // custom script
     const initScript = this.$storage.require('custom.js')

@@ -12,6 +12,7 @@ import settings from './modules/settings'
 import location from './modules/location'
 import history from './modules/history'
 import devices from './modules/devices'
+import dialog from './modules/dialog'
 import fileTypes from '../presets/file-types'
 import fileIcons from '../presets/file-icons'
 import fileColors from '../presets/file-colors'
@@ -35,6 +36,7 @@ export default {
     location,
     history,
     devices,
+    dialog,
   },
   states: {
     'path/defined': [],
@@ -47,7 +49,6 @@ export default {
     'file/executed': null,
     'templates/all': [],
     'explorer/loading': false,
-    'confirm/waiting': null,
     'icons/cache': {},
     'types/all': [],
     'icons/all': [],
@@ -525,29 +526,8 @@ export default {
         spawn('osascript', ['-e', script])
       }
     },
-    'confirm/send'(options) {
-      const waiting = this['confirm/waiting']
-      if (waiting) {
-        return waiting.promise.then(() => {
-          return this['confirm/send'](options)
-        })
-      }
-      const current = {}
-      current.promise = new Promise(fulfill => {
-        current.fulfill = fulfill
-        ipcRenderer.send('confirm', options)
-      })
-      this['confirm/waiting'] = current
-      return current.promise
-    },
-    'confirm/receive'(response) {
-      const waiting = this['confirm/waiting']
-      if (waiting) {
-        waiting.fulfill(response)
-      }
-    },
     'confirm/duplicate'(name, target) {
-      return this['confirm/send']({
+      return this.$core.dialog.confirm({
         type: 'question',
         title: this.i18n('Duplicate file name#!18'),
         message: this.i18n('There has been a file named "%NAME%". What to do with %TARGET%?#!19')
