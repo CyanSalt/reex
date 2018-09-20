@@ -283,21 +283,20 @@ export default {
       } catch (e) {}
       return watchers
     },
-    async 'templates/load'() {
-      const templates = this.$storage.filename('templates')
-      const files = await promises.readdir(templates).catch(() => [])
-      const paths = files.map(file => join(templates, file))
+    async 'templates/load'(folder) {
+      const files = await promises.readdir(folder).catch(() => [])
+      const paths = files.map(file => join(folder, file))
       const entries = await this['file/read'](paths)
       this['templates/all'] = entries
         .filter(({stats}) => stats.isFile())
         .map(({path}) => path)
     },
-    'templates/watch'() {
-      this['templates/load']()
+    'templates/watch'(folder) {
+      this['templates/load'](folder)
       this['folder/watch']({
-        path: this.$storage.filename('templates'),
+        path: folder,
         callback: () => {
-          this['templates/load']()
+          this['templates/load'](folder)
         }
       })
     },

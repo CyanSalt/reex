@@ -44,9 +44,12 @@ export default {
       const path = additionalArguments.path ||
         this.$core.presets.interpretPath(data['explorer.startup.path'])
       this.$core.location.replace(path)
+      // load file templates
+      const folder = this.$core.presets.interpretPath(
+        this.$core.settings.user['explorer.templates.path']
+      )
+      this.$relax.dispatch('templates/watch', folder)
     })
-    // load file templates
-    this.$relax.dispatch('templates/watch')
     this.$core.devices.watch()
     ipcRenderer.on('contextmenu', (e, args) => {
       if (!args.action) return

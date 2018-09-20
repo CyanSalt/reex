@@ -1,5 +1,6 @@
 {
   "explorer.startup.path": "[home]",
+  "explorer.templates.path": "[reex]/storage/templates",
   "explorer.win32.hidedotfiles": true,
   "theme.icons.background": "#61737f",
   "theme.icons.style": "default",
