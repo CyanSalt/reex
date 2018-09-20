@@ -392,9 +392,6 @@ export default {
       }
       create(0)
     },
-    'contextmenu/refresh'() {
-      this['path/load']()
-    },
     'contextmenu/delete'() {
       const files = this['files/selected']
       for (const file of files) {
