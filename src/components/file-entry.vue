@@ -33,7 +33,7 @@ export default {
     location: state('location.path'),
     selected: state('files/selected'),
     isImage() {
-      return this.$relax.dispatch('file/type', this.real.path) === 'image'
+      return this.$core.presets.getFileType(this.real.path) === 'image'
     },
     focused() {
       return this.selected.includes(this.file.path)

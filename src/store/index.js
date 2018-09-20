@@ -14,10 +14,7 @@ import history from './modules/history'
 import devices from './modules/devices'
 import dialog from './modules/dialog'
 import clipboard from './modules/clipboard'
-import fileTypes from '../presets/file-types'
-import fileIcons from '../presets/file-icons'
-import fileColors from '../presets/file-colors'
-import folderIcons from '../presets/folder-icons'
+import presets from './modules/presets'
 
 const promises = {
   readdir: promisify(readdir),
@@ -39,6 +36,7 @@ export default {
     devices,
     dialog,
     clipboard,
+    presets,
   },
   states: {
     'path/defined': [],
@@ -209,26 +207,6 @@ export default {
         data: {path, isDirectory: stats.isDirectory()}
       })
     },
-    'file/type'(path) {
-      // TODO: consider using `mdls`
-      path = path.toLowerCase()
-      for (const {type, rules} of this['types/all']) {
-        if (this['rules/match']({path, rules})) return type
-      }
-      return null
-    },
-    'file/icon'(path) {
-      for (const {icon, rules} of this['icons/all']) {
-        if (this['rules/match']({path, rules})) return icon
-      }
-      return null
-    },
-    'file/color'(path) {
-      for (const {color, rules} of this['colors/all']) {
-        if (this['rules/match']({path, rules})) return color
-      }
-      return null
-    },
     'file/avoid'({name, times}) {
       if (!times) return name
       return `${basename(name)} (${times})${extname(name)}`
@@ -338,12 +316,6 @@ export default {
       }
       return false
     },
-    'folder/icon'(path) {
-      for (const {icon, rules} of this['icons/haystack']) {
-        if (this['rules/match']({path, rules})) return icon
-      }
-      return null
-    },
     'folder/watch'({path, callback}) {
       const parent = dirname(path)
       const watchers = []
@@ -368,86 +340,6 @@ export default {
         }
       } catch (e) {}
       return watchers
-    },
-    'types/define'(definition) {
-      if (Array.isArray(definition)) {
-        definition.forEach(item => this['types/define'](item))
-        return
-      }
-      let {type, rules} = definition
-      if (!Array.isArray(rules)) {
-        rules = [rules]
-      }
-      const allTypes = this['types/all']
-      const group = allTypes.find(item => item.type === type)
-      if (!group) {
-        allTypes.unshift({type, rules})
-      } else {
-        group.rules = rules.concat(group.rules)
-      }
-    },
-    'types/load'() {
-      this['types/define'](fileTypes)
-    },
-    'icons/load'() {
-      this['icons/define'](fileIcons)
-      this['icons/tell'](folderIcons)
-    },
-    'icons/define'(definition) {
-      if (Array.isArray(definition)) {
-        definition.forEach(item => this['icons/define'](item))
-        return
-      }
-      let {icon, rules} = definition
-      if (!Array.isArray(rules)) rules = [rules]
-      this['icons/all'].unshift({icon, rules})
-    },
-    'icons/tell'(definition) {
-      if (Array.isArray(definition)) {
-        definition.forEach(item => this['icons/tell'](item))
-        return
-      }
-      let {icon, rules} = definition
-      if (!Array.isArray(rules)) rules = [rules]
-      this['icons/haystack'].unshift({icon, rules})
-    },
-    'icons/detail'(icon) {
-      if (this['icons/cache'][icon]) {
-        return this['icons/cache'][icon]
-      }
-      const matches = icon.match(/^@([^/]+)\/(.+)$/)
-      if (!matches) return null
-      const span = document.createElement('span')
-      span.style.display = 'none'
-      span.className = [matches[1] + '-icon', matches[2]].join(' ')
-      document.body.appendChild(span)
-      const style = getComputedStyle(span, '::before')
-      const family = style.fontFamily
-      const char = style.getPropertyValue('content')[1]
-      document.body.removeChild(span)
-      const detail = {char, family}
-      this['icons/cache'][icon] = detail
-      return detail
-    },
-    'colors/load'() {
-      this['colors/define'](fileColors)
-    },
-    'colors/define'(definition) {
-      if (Array.isArray(definition)) {
-        definition.forEach(item => this['colors/define'](item))
-        return
-      }
-      let {color, rules} = definition
-      if (!Array.isArray(color)) color = [color]
-      if (!Array.isArray(rules)) rules = [rules]
-      this['colors/all'].unshift({color, rules})
-    },
-    'rules/match'({path, rules}) {
-      return rules.find(rule => {
-        if (typeof rule !== 'string') return path.match(rule)
-        return rule.startsWith('*.') ? path.endsWith(rule.slice(1)) :
-          basename(path) === rule
-      })
     },
     async 'templates/load'() {
       const templates = this.$storage.filename('templates')

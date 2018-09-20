@@ -6,6 +6,6 @@
 module.exports = function (vm) {
 
   // an example to hack your software
-  // vm.$relax.dispatch('types/define', {type: 'package', rules: '*.crx'})
+  // vm.$core.presets.defineFileType({type: 'package', rules: '*.crx'})
 
 }

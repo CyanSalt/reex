@@ -45,9 +45,7 @@ export default {
         this.$relax.dispatch('path/interpret', data['explorer.startup.path'])
       this.$core.location.replace(path)
     })
-    this.$relax.dispatch('types/load')
-    this.$relax.dispatch('icons/load')
-    this.$relax.dispatch('colors/load')
+    this.$core.presets.load()
     // load file templates
     this.$relax.dispatch('templates/watch')
     this.$core.devices.watch()

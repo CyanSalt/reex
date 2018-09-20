@@ -19,15 +19,15 @@ export default {
     let subicon = vm.$relax.dispatch('path/icon', real.path)
     if (!subicon) {
       if (isFolder) {
-        subicon = vm.$relax.dispatch('folder/icon', real.path)
+        subicon = vm.$core.presets.getFolderIcon(real.path)
       } else {
-        subicon = vm.$relax.dispatch('file/icon', real.path)
+        subicon = vm.$core.presets.getFileIcon(real.path)
       }
     }
     if (subicon) {
       if (subicon.startsWith('@')) {
-        const detail = vm.$relax.dispatch('icons/detail', subicon)
-        props.watermark = detail
+        const details = vm.$core.presets.getIconDetails(subicon)
+        props.watermark = details
       } else if (!isFolder) {
         props.subicon = subicon
       }
@@ -36,7 +36,7 @@ export default {
       return h(FolderIcon, {props}, context.children)
     }
     props.ext = extname(real.path)
-    const colors = vm.$relax.dispatch('file/color', real.path)
+    const colors = vm.$core.presets.getFileColor(real.path)
     if (colors) {
       if (colors[0]) props.background = colors[0]
       if (colors[1]) props.foreground = colors[1]
