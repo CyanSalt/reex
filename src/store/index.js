@@ -92,7 +92,8 @@ export default {
       this['files/selected'] = paths
     },
     'file/name'(path) {
-      return this.$core.presets.getVariableName(path) || basename(path) || '/'
+      const variable = this.$core.presets.getVariable(path)
+      return (variable && variable.name) || basename(path) || '/'
     },
     async 'file/follow'({type, path}) {
       if (type === 'shortcut') {

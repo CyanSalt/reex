@@ -49,9 +49,11 @@ export default {
     icon(file) {
       const path = file.link ? file.link.path : file.path
       const stats = file.link ? file.link.stats : file.stats
-      const icon = this.$core.presets.getVariableIcon(path)
+      const variable = this.$core.presets.getVariable(path)
       const prefix = '@feather/'
-      if (icon && icon.startsWith(prefix)) return icon.slice(prefix.length)
+      if (variable && variable.icon && variable.icon.startsWith(prefix)) {
+        return variable.icon.slice(prefix.length)
+      }
       return stats.isDirectory() ? 'icon-folder' : 'icon-file'
     },
     loose(device) {

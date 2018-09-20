@@ -16,13 +16,14 @@ export default {
     const vm = context.parent
     const real = file.link || file
     const isFolder = real.stats.isDirectory()
-    let subicon = vm.$core.presets.getVariableIcon(real.path)
-    if (!subicon) {
-      if (isFolder) {
-        subicon = vm.$core.presets.getFolderIcon(real.path)
-      } else {
-        subicon = vm.$core.presets.getFileIcon(real.path)
-      }
+    let subicon
+    const variable = vm.$core.presets.getVariable(real.path)
+    if (variable) {
+      subicon = variable.icon
+    } else if (isFolder) {
+      subicon = vm.$core.presets.getFolderIcon(real.path)
+    } else {
+      subicon = vm.$core.presets.getFileIcon(real.path)
     }
     if (subicon) {
       if (subicon.startsWith('@')) {
