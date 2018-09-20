@@ -204,7 +204,8 @@ function buildRendererMenu(contents, args) {
     args.click = () => {
       // Note: the second argument might be null on macOS
       contents.send('contextmenu', {
-        action: args.action, data: args.data
+        action: args.action,
+        data: args.data,
       })
     }
   }

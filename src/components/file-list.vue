@@ -70,7 +70,7 @@ export default {
           return {
             label: basename(template, extname(template)),
             data: template,
-            action: 'create-file'
+            action: 'contextmenu/create-file'
           }
         })
       } else {
@@ -94,19 +94,19 @@ export default {
       ipcRenderer.send('contextmenu', [
         {
           label: this.i18n('Refresh#!11'),
-          action: 'refresh',
+          action: 'contextmenu/refresh',
         },
         ...pasting,
         {type: 'separator'},
         {
           label: this.i18n('Create new folder#!7'),
-          action: 'create-folder',
+          action: 'contextmenu/create-folder',
         },
         creation,
         {type: 'separator'},
         {
           label: this.i18n('Properties#!28'),
-          action: 'property',
+          action: 'contextmenu/property',
           data: this.path,
         },
       ])

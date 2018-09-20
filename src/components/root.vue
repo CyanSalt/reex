@@ -53,7 +53,7 @@ export default {
     this.$core.devices.watch()
     ipcRenderer.on('contextmenu', (e, args) => {
       if (!args.action) return
-      this.$relax.dispatch(`contextmenu/${args.action}`, args)
+      this.$relax.dispatch(args.action, args)
     })
     document.addEventListener('copy', e => {
       if (this.editing()) return

@@ -80,7 +80,7 @@ export default {
         open = [
           {
             label: this.i18n('Open#!26'),
-            action: 'open',
+            action: 'contextmenu/open',
             data: {
               path: this.real.path,
               isDirectory,
@@ -92,14 +92,14 @@ export default {
           {type: 'separator'},
           {
             label: this.i18n('Properties#!28'),
-            action: 'property',
+            action: 'contextmenu/property',
             data: this.file.path,
           },
         ]
         if (isDirectory) {
           open.splice(1, 0, {
             label: this.i18n('Open in new window#!27'),
-            action: 'open-window',
+            action: 'contextmenu/open-window',
             data: this.real.path,
           })
         }
@@ -108,11 +108,11 @@ export default {
         ...open,
         {
           label: this.i18n('Copy#!16'),
-          action: 'copy',
+          action: 'contextmenu/copy',
         },
         {
           label: this.i18n('Delete#!12'),
-          action: 'delete',
+          action: 'contextmenu/delete',
         },
         ...property,
       ])
