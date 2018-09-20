@@ -1,4 +1,4 @@
-import {remote, shell, clipboard, ipcRenderer} from 'electron'
+import {remote, shell, ipcRenderer} from 'electron'
 import {join, basename, dirname, resolve, extname} from 'path'
 import {
   readdir, watch, mkdir, copyFile, writeFile,
@@ -13,6 +13,7 @@ import location from './modules/location'
 import history from './modules/history'
 import devices from './modules/devices'
 import dialog from './modules/dialog'
+import clipboard from './modules/clipboard'
 import fileTypes from '../presets/file-types'
 import fileIcons from '../presets/file-icons'
 import fileColors from '../presets/file-colors'
@@ -37,6 +38,7 @@ export default {
     history,
     devices,
     dialog,
+    clipboard,
   },
   states: {
     'path/defined': [],
@@ -477,20 +479,6 @@ export default {
         this['files/selecting'] = []
       }
     },
-    'clipboard/files'() {
-      const files = []
-      // TODO: cross platform
-      if (process.platform === 'darwin') {
-        const plist = clipboard.read('NSFilenamesPboardType')
-        const regex = /<string>(.+)<\/string>/g
-        while (true) {
-          const matches = regex.exec(plist)
-          if (!matches) break
-          files.push(matches[1])
-        }
-      }
-      return files
-    },
     'terminal/open'() {
       const config = this.$core.settings.user
       const path = this.$core.location.path
@@ -585,22 +573,10 @@ export default {
     },
     'contextmenu/copy'() {
       const files = this['files/selected']
-      // TODO: cross platform
-      if (process.platform === 'darwin') {
-        clipboard.writeBuffer('NSFilenamesPboardType', Buffer.from(`
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-            <array>
-              ${ files.map(path => `<string>${path}</string>`).join('') }
-            </array>
-          </plist>
-        `))
-      }
+      this.$core.clipboard.writeFiles(files)
     },
     'contextmenu/paste'() {
-      const files = this['clipboard/files']()
+      const files = this.$core.clipboard.readFiles()
       this['file/copy'](files)
     },
     'contextmenu/selectall'() {

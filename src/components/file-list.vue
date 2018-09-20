@@ -83,7 +83,7 @@ export default {
           role: 'paste'
         }
       ]
-      const files = this.$relax.dispatch('clipboard/files')
+      const files = this.$core.clipboard.readFiles()
       if (!files.length) {
         if (process.platform === 'darwin') {
           pasting = []
