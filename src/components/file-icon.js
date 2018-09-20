@@ -16,7 +16,7 @@ export default {
     const vm = context.parent
     const real = file.link || file
     const isFolder = real.stats.isDirectory()
-    let subicon = vm.$relax.dispatch('path/icon', real.path)
+    let subicon = vm.$core.presets.getVariableIcon(real.path)
     if (!subicon) {
       if (isFolder) {
         subicon = vm.$core.presets.getFolderIcon(real.path)

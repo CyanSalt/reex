@@ -36,16 +36,15 @@ export default {
   },
   // eslint-disable-next-line max-lines-per-function
   created() {
-    this.$relax.dispatch('path/preload')
+    this.$core.presets.load()
     this.$core.settings.load().then(data => {
       // emit loaded event
       this.$emit('settings/loaded', data)
       // load startup path
       const path = additionalArguments.path ||
-        this.$relax.dispatch('path/interpret', data['explorer.startup.path'])
+        this.$core.presets.interpretPath(data['explorer.startup.path'])
       this.$core.location.replace(path)
     })
-    this.$core.presets.load()
     // load file templates
     this.$relax.dispatch('templates/watch')
     this.$core.devices.watch()

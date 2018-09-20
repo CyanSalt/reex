@@ -1,18 +1,49 @@
 import {basename} from 'path'
+import variables from '../../presets/variables'
 import fileTypes from '../../presets/file-types'
 import fileIcons from '../../presets/file-icons'
 import fileColors from '../../presets/file-colors'
 import folderIcons from '../../presets/folder-icons'
 
+const windowsVariables = /%([^%]+)%/g
+const unixVariables = /\$\{([^}]+)\}/g
+
 export default {
   states: {
-    iconCache: {},
+    variables: [],
     fileTypes: [],
     fileIcons: [],
     folderIcons: [],
     fileColors: [],
+    iconCache: {},
   },
   actions: {
+    defineVariable(definition) {
+      if (Array.isArray(definition)) {
+        definition.forEach(item => this.defineVariable(item))
+        return
+      }
+      if (definition.name) {
+        definition.name = this.i18n(definition.name)
+      }
+      this.variables.unshift(definition)
+    },
+    interpretPath(path) {
+      const ids = this.variables.map(data => data.id)
+      const presetVariables = new RegExp(`\\[(${ids.join('|')})\\]`, 'g')
+      const systemReplacement = (full, name) => {
+        return process.env[name] || full
+      }
+      const presetReplacement = (full, name) => {
+        const target = this.variables.find(
+          data => data.id === name
+        )
+        return target ? target.path : full
+      }
+      return path.replace(windowsVariables, systemReplacement)
+        .replace(unixVariables, systemReplacement)
+        .replace(presetVariables, presetReplacement)
+    },
     defineFileType(definition) {
       if (Array.isArray(definition)) {
         definition.forEach(item => this.defineFileType(item))
@@ -46,7 +77,7 @@ export default {
       }
       let {icon, rules} = definition
       if (!Array.isArray(rules)) rules = [rules]
-      this['icons/haystack'].unshift({icon, rules})
+      this.folderIcons.unshift({icon, rules})
     },
     getIconDetails(icon) {
       if (this.iconCache[icon]) {
@@ -77,6 +108,7 @@ export default {
       this.fileColors.unshift({color, rules})
     },
     load() {
+      this.defineVariable(variables)
       this.defineFileType(fileTypes)
       this.defineFileIcon(fileIcons)
       this.defineFolderIcon(folderIcons)
@@ -88,6 +120,14 @@ export default {
         return rule.startsWith('*.') ? path.endsWith(rule.slice(1)) :
           basename(path) === rule
       })
+    },
+    getVariableIcon(path) {
+      const target = this.variables.find(data => data.path === path)
+      return (target && target.icon) || null
+    },
+    getVariableName(path) {
+      const target = this.variables.find(data => data.path === path)
+      return (target && target.name) || null
     },
     getFileType(path) {
       // TODO: consider using `mdls`

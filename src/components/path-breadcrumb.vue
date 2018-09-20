@@ -44,7 +44,7 @@ export default {
       this.editing = false
       const {value} = e.target
       if (value === this.path) return
-      const path = this.$relax.dispatch('path/interpret', value)
+      const path = this.$core.presets.interpretPath(value)
       this.redirect(path)
     },
   },

@@ -25,7 +25,7 @@ export default {
     }
   },
   created() {
-    this.$relax.dispatch('path/preload')
+    this.$core.presets.load()
     this.$core.settings.load().then(data => {
       // emit loaded event
       this.$emit('settings/loaded', data)

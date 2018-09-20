@@ -1,4 +1,4 @@
-import {remote, shell, ipcRenderer} from 'electron'
+import {shell, ipcRenderer} from 'electron'
 import {join, basename, dirname, resolve, extname} from 'path'
 import {
   readdir, watch, mkdir, copyFile, writeFile,
@@ -39,7 +39,6 @@ export default {
     presets,
   },
   states: {
-    'path/defined': [],
     'path/favorites': [],
     'files/info': [],
     'files/vision': false,
@@ -49,11 +48,6 @@ export default {
     'file/executed': null,
     'templates/all': [],
     'explorer/loading': false,
-    'icons/cache': {},
-    'types/all': [],
-    'icons/all': [],
-    'icons/haystack': [],
-    'colors/all': [],
   },
   getters: {
     'files/visible'() {
@@ -62,57 +56,6 @@ export default {
     },
   },
   actions: {
-    'path/preload'() {
-      const electronPaths = [
-        {shortname: 'reex'},
-        {shortname: 'home', icon: '@feather/icon-home'},
-        {shortname: 'appData'},
-        {shortname: 'temp'},
-        {shortname: 'desktop', name: 'Desktop#!1', icon: '@feather/icon-monitor'},
-        {shortname: 'documents', name: 'Documents#!2', icon: '@feather/icon-file-text'},
-        {shortname: 'downloads', name: 'Downloads#!3', icon: '@feather/icon-download'},
-        {shortname: 'music', name: 'Music#!4', icon: '@feather/icon-music'},
-        {shortname: 'pictures', name: 'Pictures#!5', icon: '@feather/icon-image'},
-        {shortname: 'videos', name: 'Videos#!6', icon: '@feather/icon-film'},
-      ]
-      for (const data of electronPaths) {
-        if (data.name) {
-          data.name = this.i18n(data.name)
-        }
-        if (!data.path) {
-          if (data.shortname === 'reex') {
-            data.path = remote.app.getAppPath()
-          } else {
-            data.path = remote.app.getPath(data.shortname)
-          }
-        }
-      }
-      this['path/defined'] = electronPaths
-    },
-    'path/interpret'(path) {
-      const windowsVariables = /%([^%]+)%/g
-      const unixVariables = /\$\{([^}]+)\}/g
-      const electronPaths = this['path/defined'].map(data => data.shortname)
-      const electronVariables = new RegExp(`\\[(${
-        electronPaths.join('|')
-      })\\]`, 'g')
-      const systemReplacement = (full, name) => {
-        return process.env[name] || full
-      }
-      const electronReplacement = (full, name) => {
-        const target = this['path/defined'].find(
-          data => data.shortname === name
-        )
-        return target ? target.path : full
-      }
-      return path.replace(windowsVariables, systemReplacement)
-        .replace(unixVariables, systemReplacement)
-        .replace(electronVariables, electronReplacement)
-    },
-    'path/icon'(path) {
-      const target = this['path/defined'].find(data => data.path === path)
-      return target && target.icon
-    },
     'vision/toggle'() {
       this['files/vision'] = !this['files/vision']
       if (!this['files/vision']) {
@@ -149,8 +92,7 @@ export default {
       this['files/selected'] = paths
     },
     'file/name'(path) {
-      const target = this['path/defined'].find(data => data.path === path)
-      return (target && target.name) || basename(path) || '/'
+      return this.$core.presets.getVariableName(path) || basename(path) || '/'
     },
     async 'file/follow'({type, path}) {
       if (type === 'shortcut') {

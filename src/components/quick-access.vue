@@ -49,7 +49,7 @@ export default {
     icon(file) {
       const path = file.link ? file.link.path : file.path
       const stats = file.link ? file.link.stats : file.stats
-      const icon = this.$relax.dispatch('path/icon', path)
+      const icon = this.$core.presets.getVariableIcon(path)
       const prefix = '@feather/'
       if (icon && icon.startsWith(prefix)) return icon.slice(prefix.length)
       return stats.isDirectory() ? 'icon-folder' : 'icon-file'
