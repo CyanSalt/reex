@@ -79,7 +79,7 @@ export default {
       manually = true
       const selection = window.getSelection()
       selection.removeAllRanges()
-      this.$relax.dispatch('contextmenu/selectall', e)
+      this.$core.selection.selectAll()
     })
     ipcRenderer.on('confirm', (event, args) => {
       this.$core.dialog.receive(args)

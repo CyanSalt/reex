@@ -31,7 +31,7 @@ export default {
   },
   computed: {
     location: state('location.path'),
-    selected: state('files/selected'),
+    selected: state('selection.range'),
     isImage() {
       return this.$core.presets.getFileType(this.real.path) === 'image'
     },
@@ -39,7 +39,7 @@ export default {
       return this.selected.includes(this.file.path)
     },
     hidden() {
-      return this.$relax.dispatch('file/hidden', this.file.path)
+      return this.$core.explorer.isHidden(this.file.path)
     },
     nickname() {
       let name = this.$relax.dispatch('file/name', this.file.path)
@@ -62,14 +62,14 @@ export default {
       const selected = this.selected.includes(path)
       if (rightclick) {
         if (!selected) {
-          this.$relax.dispatch('file/specify', path)
+          this.$core.selection.select([path])
         }
       } else if (!multiple) {
-        this.$relax.dispatch('file/specify', path)
+        this.$core.selection.select([path])
       } else if (selected) {
-        this.$relax.dispatch('file/unselect', path)
+        this.$core.selection.remove(path)
       } else {
-        this.$relax.dispatch('file/select', path)
+        this.$core.selection.add(path)
       }
     },
     contextmenu() {

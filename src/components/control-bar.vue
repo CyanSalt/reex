@@ -13,8 +13,8 @@
         @click="upward">
         <span class="feather-icon icon-arrow-up"></span>
       </div>
-      <div class="vision button" @click="blink">
-        <span :class="['feather-icon', vision ?
+      <div class="visibility button" @click="blink">
+        <span :class="['feather-icon', visibility ?
           'icon-eye-off' : 'icon-eye']"></span>
       </div>
       <div class="terminal button" @click="terminal">
@@ -57,14 +57,16 @@ export default {
     floors: state('location.floors'),
     stack: state('history.stack'),
     forwards: state('history.forwards'),
-    vision: state('files/vision'),
+    visibility: state('explorer.visibility'),
   },
   methods: {
     back: action('history.back'),
     forward: action('history.forward'),
     upward: action('location.upward'),
-    blink: action('vision/toggle'),
     terminal: action('terminal/open'),
+    blink() {
+      this.$core.explorer.setVisibility(!this.visibility)
+    },
     external() {
       shell.openItem(this.path)
     },

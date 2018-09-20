@@ -30,7 +30,7 @@ export default {
       const path = this.path
       try {
         const files = await promises.readdir(path)
-        this.$core['explorer/show'](files.map(file => join(path, file)))
+        this.$core.explorer.show(files.map(file => join(path, file)))
       } catch (e) {
         if (e.code === 'ENOENT') this.upward()
       }

@@ -28,8 +28,8 @@ export default {
   },
   computed: {
     path: state('location.path'),
-    files: state('files/visible'),
-    selected: state('files/selected'),
+    files: state('explorer.files'),
+    selected: state('selection.range'),
     loading: state('explorer/loading'),
     selection() {
       if (!this.dragging) return null
@@ -57,7 +57,7 @@ export default {
     },
   },
   methods: {
-    select: action('file/specify'),
+    select: action('selection.select'),
     // eslint-disable-next-line max-lines-per-function
     contextmenu() {
       this.select([])

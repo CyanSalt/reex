@@ -30,7 +30,7 @@ export default {
     redirect: action('location.assign'),
     edit() {
       this.editing = true
-      this.$relax.dispatch('file/specify', [])
+      this.$core.selection.select([])
       this.$nextTick(() => {
         const {editor} = this.$refs
         editor.focus()

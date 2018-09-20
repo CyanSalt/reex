@@ -10,6 +10,8 @@ import {spawn} from 'child_process'
 
 import settings from './modules/settings'
 import location from './modules/location'
+import explorer from './modules/explorer'
+import selection from './modules/selection'
 import history from './modules/history'
 import devices from './modules/devices'
 import dialog from './modules/dialog'
@@ -32,6 +34,8 @@ export default {
   modules: {
     settings,
     location,
+    explorer,
+    selection,
     history,
     devices,
     dialog,
@@ -40,57 +44,12 @@ export default {
   },
   states: {
     'path/favorites': [],
-    'files/info': [],
-    'files/vision': false,
-    'files/selected': [],
-    'files/selecting': [],
     'files/recentlog': {},
     'file/executed': null,
     'templates/all': [],
     'explorer/loading': false,
   },
-  getters: {
-    'files/visible'() {
-      if (this['files/vision']) return this['files/info']
-      return this['files/info'].filter(file => !this['file/hidden'](file.path))
-    },
-  },
   actions: {
-    'vision/toggle'() {
-      this['files/vision'] = !this['files/vision']
-      if (!this['files/vision']) {
-        this['files/selected'] = this['files/selected']
-          .filter(path => !this['file/hidden'](path))
-      }
-    },
-    'file/hidden'(path) {
-      const config = this.$core.settings.user
-      if (process.platform !== 'win32') {
-        return basename(path).charAt(0) === '.'
-      }
-      const hideDotFiles = config['explorer.win32.hidedotfiles']
-      if (hideDotFiles) {
-        const isDotFile = basename(path).charAt(0) === '.'
-        if (isDotFile) return true
-      }
-      // TODO: support winattr
-      return false
-    },
-    'file/select'(path) {
-      if (!this['files/selected'].includes(path)) {
-        this['files/selected'].push(path)
-      }
-    },
-    'file/unselect'(path) {
-      const index = this['files/selected'].indexOf(path)
-      if (index !== -1) {
-        this['files/selected'].splice(index, 1)
-      }
-    },
-    'file/specify'(path) {
-      const paths = Array.isArray(path) ? path : [path]
-      this['files/selected'] = paths
-    },
     'file/name'(path) {
       const variable = this.$core.presets.getVariable(path)
       return (variable && variable.name) || basename(path) || '/'
@@ -105,17 +64,6 @@ export default {
       const targetPath = resolve(dirname(path), link)
       const targetStats = await promises.stat(targetPath)
       return {path: targetPath, stats: targetStats}
-    },
-    'file/sort'([a, b]) {
-      const statsA = a.link ? a.link.stats : a.stats
-      const statsB = b.link ? b.link.stats : b.stats
-      const dirA = statsA.isDirectory()
-      const dirB = statsB.isDirectory()
-      const baseA = basename(a.path)
-      const baseB = basename(b.path)
-      if (dirA && !dirB) return -1
-      if (!dirA && dirB) return 1
-      return baseA.localeCompare(baseB)
     },
     'file/link'(info) {
       const {path, stats} = info
@@ -138,10 +86,6 @@ export default {
           return Object.assign(info, {link: info})
         }
       })).then(all => all.filter(Boolean))
-    },
-    'file/execute'(path) {
-      this['file/executed'] = path
-      shell.openItem(path)
     },
     'file/open'(info) {
       const path = info.link ? info.link.path : info.path
@@ -199,7 +143,7 @@ export default {
         }
         return create(locally ? 1 : 0)
       }).then(paths => {
-        this['files/selecting'] = paths.filter(Boolean)
+        this.$core.selection.willSelect(paths.filter(Boolean))
         this['files/recentlog'] = {
           action: 'copy',
           target: paths,
@@ -243,7 +187,7 @@ export default {
         }
         return create(0)
       }).then(paths => {
-        this['files/selecting'] = paths.filter(Boolean)
+        this.$core.selection.willSelect(paths.filter(Boolean))
         this['files/recentlog'] = {
           action: 'move',
           target: paths,
@@ -300,18 +244,6 @@ export default {
           this['templates/load'](folder)
         }
       })
-    },
-    async 'explorer/show'(paths) {
-      this['files/info'] = []
-      this['files/selected'] = []
-      this['explorer/loading'] = true
-      const entries = await this['file/read'](paths)
-      this['explorer/loading'] = false
-      this['files/info'] = entries.sort((a, b) => this['file/sort']([a, b]))
-      if (this['files/selecting'].length) {
-        this['files/selected'] = this['files/selecting']
-        this['files/selecting'] = []
-      }
     },
     'terminal/open'() {
       const config = this.$core.settings.user
@@ -393,7 +325,7 @@ export default {
       create(0)
     },
     'contextmenu/delete'() {
-      const files = this['files/selected']
+      const files = this.$core.selection.range
       for (const file of files) {
         shell.moveItemToTrash(file)
       }
@@ -403,22 +335,20 @@ export default {
       }
     },
     'contextmenu/copy'() {
-      const files = this['files/selected']
+      const files = this.$core.selection.range
       this.$core.clipboard.writeFiles(files)
     },
     'contextmenu/paste'() {
       const files = this.$core.clipboard.readFiles()
       this['file/copy'](files)
     },
-    'contextmenu/selectall'() {
-      this['file/specify'](this['files/visible'].map(file => file.path))
-    },
     'contextmenu/open'({data}) {
       const {path, isDirectory} = data
       if (isDirectory) {
         this.$core.location.assign(path)
       } else {
-        this['file/execute'](path)
+        this['file/executed'] = path
+        shell.openItem(path)
       }
     },
     'contextmenu/open-window'({data}) {
