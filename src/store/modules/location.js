@@ -43,9 +43,8 @@ export default {
     replace(path) {
       if (path === this.path) return
       this.path = path
-      this.load()
-      this.watch()
       document.title = this.$core['file/name'](path)
+      this.watch()
     },
     watch() {
       if (this.watchers) {
@@ -55,6 +54,7 @@ export default {
         path: this.path,
         callback: () => this.load(),
       })
+      this.load()
     },
     upward() {
       const {length} = this.floors

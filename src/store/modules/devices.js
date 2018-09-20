@@ -11,6 +11,7 @@ export default {
   states: {
     list: [],
     removable: [],
+    watchers: null,
   },
   actions: {
     async load() {
@@ -37,14 +38,17 @@ export default {
       }
     },
     watch() {
-      this.load()
+      if (this.watchers) {
+        this.watchers.forEach(watcher => watcher.close())
+      }
       // TODO: cross platform
       if (process.platform === 'darwin') {
-        this.$core['folder/watch']({
+        this.watchers = this.$core['folder/watch']({
           path: '/Volumes',
           callback: () => this.load(),
         })
       }
+      this.load()
     },
     unmount(info) {
       // TODO: cross platform
