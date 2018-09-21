@@ -48,7 +48,7 @@ export default {
       const folder = this.$core.presets.interpretPath(
         this.$core.settings.user['explorer.templates.path']
       )
-      this.$relax.dispatch('templates/watch', folder)
+      this.$core.templates.watch(folder)
     })
     this.$core.devices.watch()
     ipcRenderer.on('contextmenu', (e, args) => {

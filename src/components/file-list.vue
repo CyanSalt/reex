@@ -64,7 +64,7 @@ export default {
       const creation = {
         label: this.i18n('Create new file#!9'),
       }
-      const templates = this.$relax.access('templates/all')
+      const templates = this.$core.templates.list
       if (templates.length) {
         creation.submenu = templates.map(template => {
           return {
@@ -162,7 +162,11 @@ export default {
     drop(e) {
       const copying = process.platform === 'darwin' ? e.altKey : e.ctrlKey
       const paths = Array.from(e.dataTransfer.files).map(file => file.path)
-      this.$relax.dispatch(copying ? 'file/copy' : 'file/move', paths)
+      if (copying) {
+        this.$core.shell.copy(paths, this.path)
+      } else {
+        this.$core.shell.move(paths, this.path)
+      }
     },
   },
 }
