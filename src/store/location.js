@@ -64,7 +64,7 @@ export default {
       }
     },
     start() {
-      let {path} = additionalArguments.path
+      let {path} = additionalArguments
       if (!path) {
         const startupPath = this.$core.settings.user['explorer.startup.path']
         path = this.$core.presets.interpretPath(startupPath)

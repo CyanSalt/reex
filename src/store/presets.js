@@ -1,9 +1,9 @@
 import {basename} from 'path'
-import variables from '../../presets/variables'
-import fileTypes from '../../presets/file-types'
-import fileIcons from '../../presets/file-icons'
-import fileColors from '../../presets/file-colors'
-import folderIcons from '../../presets/folder-icons'
+import variables from '../presets/variables'
+import fileTypes from '../presets/file-types'
+import fileIcons from '../presets/file-icons'
+import fileColors from '../presets/file-colors'
+import folderIcons from '../presets/folder-icons'
 
 const windowsVariables = /%([^%]+)%/g
 const unixVariables = /\$\{([^}]+)\}/g
