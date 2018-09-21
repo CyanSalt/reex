@@ -28,7 +28,6 @@ export default {
       }
       this.variables.unshift(definition)
     },
-    // TODO: remove from presets API
     interpretPath(path) {
       const ids = this.variables.map(data => data.id)
       const presetVariables = new RegExp(`\\[(${ids.join('|')})\\]`, 'g')
@@ -80,7 +79,6 @@ export default {
       if (!Array.isArray(rules)) rules = [rules]
       this.folderIcons.unshift({icon, rules})
     },
-    // TODO: remove from presets API
     getIconDetails(icon) {
       if (this.iconCache[icon]) {
         return this.iconCache[icon]
@@ -127,7 +125,7 @@ export default {
       return this.variables.find(data => data.path === path)
     },
     getBasename(path) {
-      const variable = this.$core.presets.getVariable(path)
+      const variable = this.getVariable(path)
       return (variable && variable.name) || basename(path) || '/'
     },
     getFileType(path) {
