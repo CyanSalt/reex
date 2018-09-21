@@ -1,7 +1,7 @@
 import {shell, ipcRenderer} from 'electron'
-import {join, basename, dirname, resolve, extname} from 'path'
+import {join, basename, dirname, extname} from 'path'
 import {
-  readdir, watch, mkdir, copyFile, writeFile,
+  readdir, mkdir, copyFile, writeFile,
   lstat, readlink, stat, rename, unlink,
   constants as fsconst,
 } from 'fs'
@@ -17,6 +17,7 @@ import devices from './modules/devices'
 import dialog from './modules/dialog'
 import clipboard from './modules/clipboard'
 import presets from './modules/presets'
+import system from './modules/system'
 
 const promises = {
   readdir: promisify(readdir),
@@ -41,51 +42,17 @@ export default {
     dialog,
     clipboard,
     presets,
+    system,
   },
   states: {
     'path/favorites': [],
     'files/recentlog': {},
-    'file/executed': null,
     'templates/all': [],
-    'explorer/loading': false,
   },
   actions: {
     'file/name'(path) {
       const variable = this.$core.presets.getVariable(path)
       return (variable && variable.name) || basename(path) || '/'
-    },
-    async 'file/follow'({type, path}) {
-      if (type === 'shortcut') {
-        const {target, args} = shell.readShortcutLink(path)
-        const targetStats = await promises.stat(target)
-        return {path: target, stats: targetStats, args}
-      }
-      const link = await promises.readlink(path)
-      const targetPath = resolve(dirname(path), link)
-      const targetStats = await promises.stat(targetPath)
-      return {path: targetPath, stats: targetStats}
-    },
-    'file/link'(info) {
-      const {path, stats} = info
-      if (process.platform === 'win32' &&
-        extname(path) === '.lnk') return 'shortcut'
-      if (stats.isSymbolicLink()) return 'symbolic'
-      return false
-    },
-    'file/read'(paths) {
-      return Promise.all(paths.map(async path => {
-        const stats = await promises.lstat(path).catch(() => {})
-        if (!stats) return null
-        const info = {path, stats}
-        const type = this['file/link'](info)
-        if (!type) return info
-        try {
-          const link = await this['file/follow']({type, path})
-          return Object.assign(info, {link})
-        } catch (e) {
-          return Object.assign(info, {link: info})
-        }
-      })).then(all => all.filter(Boolean))
     },
     'file/open'(info) {
       const path = info.link ? info.link.path : info.path
@@ -203,46 +170,18 @@ export default {
       }
       return false
     },
-    'folder/watch'({path, callback}) {
-      const parent = dirname(path)
-      const watchers = []
-      try {
-        watchers[0] = watch(path, (type, file) => {
-          if (file === '.DS_Store') return
-          if (this['file/executed'] &&
-            join(path, file) === this['file/executed']
-          ) {
-            this['file/executed'] = null
-            return
-          }
-          callback()
-        })
-        if (parent && parent !== path) {
-          watchers[1] = watch(parent, (type, file) => {
-            if (file === '.DS_Store') return
-            if (join(parent, file) === path) {
-              callback()
-            }
-          })
-        }
-      } catch (e) {}
-      return watchers
-    },
     async 'templates/load'(folder) {
       const files = await promises.readdir(folder).catch(() => [])
       const paths = files.map(file => join(folder, file))
-      const entries = await this['file/read'](paths)
+      const entries = await this.$core.system.readAll(paths)
       this['templates/all'] = entries
         .filter(({stats}) => stats.isFile())
         .map(({path}) => path)
     },
     'templates/watch'(folder) {
       this['templates/load'](folder)
-      this['folder/watch']({
-        path: folder,
-        callback: () => {
-          this['templates/load'](folder)
-        }
+      this.$core.system.watch(folder, () => {
+        this['templates/load'](folder)
       })
     },
     'terminal/open'() {
@@ -347,8 +286,7 @@ export default {
       if (isDirectory) {
         this.$core.location.assign(path)
       } else {
-        this['file/executed'] = path
-        shell.openItem(path)
+        this.$core.system.open(path)
       }
     },
     'contextmenu/open-window'({data}) {

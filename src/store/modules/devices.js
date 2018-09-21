@@ -21,7 +21,7 @@ export default {
         // Note: display error in console
         const files = await promises.readdir(path)
         const paths = files.map(file => join(path, file))
-        const entries = await this.$core['file/read'](paths)
+        const entries = await this.$core.system.readAll(paths)
         this.list = entries
         files.forEach(file => {
           const name = file.replace(/\s/g, c => '\\' + c)
@@ -43,10 +43,7 @@ export default {
       }
       // TODO: cross platform
       if (process.platform === 'darwin') {
-        this.watchers = this.$core['folder/watch']({
-          path: '/Volumes',
-          callback: () => this.load(),
-        })
+        this.watchers = this.$core.system.watch('/Volumes', () => this.load())
       }
       this.load()
     },

@@ -17,7 +17,7 @@ export default {
       this.fileList = []
       this.$core.selection.range = []
       this.loading = true
-      const entries = await this.$core['file/read'](paths)
+      const entries = await this.$core.system.readAll(paths)
       this.loading = false
       this.fileList = entries.sort(this.compare)
       this.$core.selection.ensure()

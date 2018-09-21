@@ -58,4 +58,7 @@ module.exports = {
     new webpack.ProgressPlugin(),
     new VueLoaderPlugin(),
   ],
+  optimization: {
+    minimize: false
+  },
 }

@@ -16,7 +16,7 @@ export default {
       // load other states in store
       const favorites = data['quickaccess.favorites']
         .map(entry => this.$core.presets.interpretPath(entry))
-      this.$core['file/read'](favorites).then(entries => {
+      this.$core.system.readAll(favorites).then(entries => {
         this.$core['path/favorites'] = entries
       })
       return data

@@ -50,10 +50,7 @@ export default {
       if (this.watchers) {
         this.watchers.forEach(watcher => watcher.close())
       }
-      this.watchers = this.$core['folder/watch']({
-        path: this.path,
-        callback: () => this.load(),
-      })
+      this.watchers = this.$core.system.watch(this.path, () => this.load())
       this.load()
     },
     upward() {

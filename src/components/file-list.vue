@@ -30,7 +30,7 @@ export default {
     path: state('location.path'),
     files: state('explorer.files'),
     selected: state('selection.range'),
-    loading: state('explorer/loading'),
+    loading: state('explorer.loading'),
     selection() {
       if (!this.dragging) return null
       const {start, end} = this.dragging
