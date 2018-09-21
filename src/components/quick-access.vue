@@ -39,7 +39,7 @@ export default {
     removable: state('devices.removable'),
   },
   methods: {
-    name: action('file/name'),
+    name: action('presets.getBasename'),
     open: action('file/open'),
     unmount: action('devices.unmount'),
     active(file) {

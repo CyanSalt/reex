@@ -17,7 +17,7 @@
         <span :class="['feather-icon', visibility ?
           'icon-eye-off' : 'icon-eye']"></span>
       </div>
-      <div class="terminal button" @click="terminal">
+      <div class="terminal button" @click="openTerminal(path)">
         <span class="feather-icon icon-terminal"></span>
       </div>
       <div class="external button" @click="external">
@@ -63,7 +63,7 @@ export default {
     back: action('history.back'),
     forward: action('history.forward'),
     upward: action('location.upward'),
-    terminal: action('terminal/open'),
+    terminal: action('shell.openTerminal'),
     blink() {
       this.$core.explorer.setVisibility(!this.visibility)
     },

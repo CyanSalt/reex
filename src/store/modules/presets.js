@@ -126,6 +126,10 @@ export default {
     getVariable(path) {
       return this.variables.find(data => data.path === path)
     },
+    getBasename(path) {
+      const variable = this.$core.presets.getVariable(path)
+      return (variable && variable.name) || basename(path) || '/'
+    },
     getFileType(path) {
       // TODO: consider using `mdls`
       path = path.toLowerCase()

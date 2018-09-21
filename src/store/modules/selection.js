@@ -5,8 +5,8 @@ export default {
   },
   actions: {
     selectable(path) {
-      const {explorer} = this.$core
-      if (!explorer.visibility && explorer.isHidden(path)) return false
+      const {explorer, system} = this.$core
+      if (!explorer.visibility && system.isHidden(path)) return false
       return true
     },
     add(path) {

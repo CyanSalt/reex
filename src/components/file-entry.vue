@@ -39,12 +39,12 @@ export default {
       return this.selected.includes(this.file.path)
     },
     hidden() {
-      return this.$core.explorer.isHidden(this.file.path)
+      return this.$core.system.isHidden(this.file.path)
     },
     nickname() {
-      let name = this.$relax.dispatch('file/name', this.file.path)
+      let name = this.$core.presets.getBasename(this.file.path)
       if (process.platform === 'darwin' &&
-        this.$relax.dispatch('file/executable', this.real)
+        this.$core.system.isExecutable(this.real)
       ) name = name.slice(0, -4)
       return name
     },

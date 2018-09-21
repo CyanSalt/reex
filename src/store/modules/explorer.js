@@ -9,7 +9,9 @@ export default {
   getters: {
     files() {
       if (this.visibility) return this.fileList
-      return this.fileList.filter(file => !this.isHidden(file.path))
+      return this.fileList.filter(file => {
+        return !this.$core.system.isHidden(file.path)
+      })
     },
   },
   actions: {
@@ -36,19 +38,6 @@ export default {
     setVisibility(visibility) {
       this.visibility = visibility
       if (!visibility) this.$core.selection.update()
-    },
-    isHidden(path) {
-      const config = this.$core.settings.user
-      if (process.platform !== 'win32') {
-        return basename(path).charAt(0) === '.'
-      }
-      const hideDotFiles = config['explorer.win32.hidedotfiles']
-      if (hideDotFiles) {
-        const isDotFile = basename(path).charAt(0) === '.'
-        if (isDotFile) return true
-      }
-      // TODO: support winattr
-      return false
     },
   },
 }

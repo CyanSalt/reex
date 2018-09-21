@@ -1,6 +1,6 @@
 import {shell} from 'electron'
 import {stat, lstat, readlink, watch} from 'fs'
-import {resolve, dirname, extname, join} from 'path'
+import {resolve, dirname, extname, join, basename} from 'path'
 import {promisify} from 'util'
 
 const promises = {
@@ -11,7 +11,7 @@ const promises = {
 
 export default {
   states: {
-    executed: null,
+    ignored: null,
   },
   actions: {
     linking(info) {
@@ -49,14 +49,17 @@ export default {
       const all = await Promise.all(paths.map(path => this.read(path)))
       return all.filter(Boolean)
     },
+    ignoreOnce(path) {
+      this.ignored = path
+    },
     watch(path, callback) {
       const parent = dirname(path)
       const watchers = []
       try {
         watchers[0] = watch(path, (type, file) => {
           if (file === '.DS_Store') return
-          if (this.executed && join(path, file) === this.executed) {
-            this.executed = null
+          if (this.ignored && join(path, file) === this.ignored) {
+            this.ignored = null
             return
           }
           callback()
@@ -72,9 +75,26 @@ export default {
       } catch (e) {}
       return watchers
     },
-    open(path) {
-      this.executed = path
-      shell.openItem(path)
+    isExecutable(info) {
+      const {path, stats} = info
+      // TODO: cross platform
+      if (process.platform === 'darwin') {
+        return stats.isDirectory() && path.endsWith('.app')
+      }
+      return false
+    },
+    isHidden(path) {
+      const config = this.$core.settings.user
+      if (process.platform !== 'win32') {
+        return basename(path).charAt(0) === '.'
+      }
+      const hideDotFiles = config['explorer.win32.hidedotfiles']
+      if (hideDotFiles) {
+        const isDotFile = basename(path).charAt(0) === '.'
+        if (isDotFile) return true
+      }
+      // TODO: support winattr
+      return false
     },
   },
 }

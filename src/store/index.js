@@ -1,12 +1,10 @@
-import {shell, ipcRenderer} from 'electron'
 import {join, basename, dirname, extname} from 'path'
 import {
-  readdir, mkdir, copyFile, writeFile,
+  readdir, copyFile,
   lstat, readlink, stat, rename, unlink,
   constants as fsconst,
 } from 'fs'
 import {promisify} from 'util'
-import {spawn} from 'child_process'
 
 import settings from './modules/settings'
 import location from './modules/location'
@@ -18,6 +16,7 @@ import dialog from './modules/dialog'
 import clipboard from './modules/clipboard'
 import presets from './modules/presets'
 import system from './modules/system'
+import shell from './modules/shell'
 
 const promises = {
   readdir: promisify(readdir),
@@ -43,6 +42,7 @@ export default {
     clipboard,
     presets,
     system,
+    shell,
   },
   states: {
     'path/favorites': [],
@@ -50,16 +50,15 @@ export default {
     'templates/all': [],
   },
   actions: {
-    'file/name'(path) {
-      const variable = this.$core.presets.getVariable(path)
-      return (variable && variable.name) || basename(path) || '/'
-    },
     'file/open'(info) {
       const path = info.link ? info.link.path : info.path
       const stats = info.link ? info.link.stats : info.stats
-      return this['contextmenu/open']({
-        data: {path, isDirectory: stats.isDirectory()}
-      })
+      const isDirectory = stats.isDirectory()
+      if (isDirectory) {
+        this.$core.location.assign(path)
+      } else {
+        this.$core.shell.openFile(path)
+      }
     },
     'file/avoid'({name, times}) {
       if (!times) return name
@@ -162,14 +161,6 @@ export default {
         }
       })
     },
-    'file/executable'(info) {
-      const {path, stats} = info
-      // TODO: cross platform
-      if (process.platform === 'darwin') {
-        return stats.isDirectory() && path.endsWith('.app')
-      }
-      return false
-    },
     async 'templates/load'(folder) {
       const files = await promises.readdir(folder).catch(() => [])
       const paths = files.map(file => join(folder, file))
@@ -183,41 +174,6 @@ export default {
       this.$core.system.watch(folder, () => {
         this['templates/load'](folder)
       })
-    },
-    'terminal/open'() {
-      const config = this.$core.settings.user
-      const path = this.$core.location.path
-      const command = config['terminal.command']
-        .replace('%PATH%', path)
-      // TODO: cross platform
-      if (process.platform === 'darwin') {
-        const name = config['terminal.darwin.name']
-        let script
-        if (name === 'iTerm2') {
-          script = `tell application "iTerm"
-            try
-              set created to current window
-              tell created
-                create tab with default profile
-                set context to current session
-              end tell
-            on error
-              set created to (create window with default profile)
-              tell created
-                set context to current session
-              end tell
-            end try
-            tell context to write text "${command}"
-            activate
-          end tell`
-        } else {
-          script = `tell application "Terminal"
-            do script "${command}"
-            activate
-          end tell`
-        }
-        spawn('osascript', ['-e', script])
-      }
     },
     'confirm/duplicate'(name, target) {
       return this.$core.dialog.confirm({
@@ -238,40 +194,15 @@ export default {
     // Context menu actions
     'contextmenu/create-folder'() {
       const path = this.$core.location.path
-      const name = this.i18n('New folder#!8')
-      const create = times => {
-        const realname = this['file/avoid']({name, times})
-        mkdir(join(path, realname), err => {
-          if (err) create(times + 1)
-        })
-      }
-      create(0)
+      this.$core.shell.createFolder(path)
     },
     'contextmenu/create-file'({data}) {
       const path = this.$core.location.path
-      const name = (data && basename(data)) || this.i18n('New file#!10')
-      const create = times => {
-        const realname = this['file/avoid']({name, times})
-        const callback = err => {
-          if (err) create(times + 1)
-        }
-        if (data) {
-          copyFile(data, join(path, realname), fsconst.COPYFILE_EXCL, callback)
-        } else {
-          writeFile(join(path, realname), '', {flag: 'wx'}, callback)
-        }
-      }
-      create(0)
+      this.$core.shell.createFile(path, data)
     },
     'contextmenu/delete'() {
       const files = this.$core.selection.range
-      for (const file of files) {
-        shell.moveItemToTrash(file)
-      }
-      this['files/recentlog'] = {
-        action: 'delete',
-        target: files,
-      }
+      this.$core.shell.delete(files)
     },
     'contextmenu/copy'() {
       const files = this.$core.selection.range
@@ -286,14 +217,17 @@ export default {
       if (isDirectory) {
         this.$core.location.assign(path)
       } else {
-        this.$core.system.open(path)
+        this.$core.shell.openFile(path)
       }
     },
     'contextmenu/open-window'({data}) {
-      ipcRenderer.send('open-window', {path: data})
+      this.$core.shell.openWindow(data)
     },
     'contextmenu/property'({data}) {
-      ipcRenderer.send('property', {path: data})
+      this.$core.shell.openProperty(data)
+    },
+    'contextmenu/refresh'() {
+      this.$core.location.load()
     },
   },
 }

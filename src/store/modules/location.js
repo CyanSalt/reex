@@ -20,7 +20,7 @@ export default {
       return this.floors.map((floor, index) => {
         const path = index === 0 && !floor ? '/' :
           this.floors.slice(0, index + 1).join(sep)
-        const name = this.$core['file/name'](path)
+        const name = this.$core.presets.getBasename(path)
         return {name, path}
       })
     },
@@ -43,7 +43,7 @@ export default {
     replace(path) {
       if (path === this.path) return
       this.path = path
-      document.title = this.$core['file/name'](path)
+      document.title = this.$core.presets.getBasename(path)
       this.watch()
     },
     watch() {

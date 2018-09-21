@@ -94,7 +94,7 @@ export default {
       ipcRenderer.send('contextmenu', [
         {
           label: this.i18n('Refresh#!11'),
-          action: 'location.load',
+          action: 'contextmenu/refresh',
         },
         ...pasting,
         {type: 'separator'},
