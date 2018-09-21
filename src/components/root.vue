@@ -47,19 +47,19 @@ export default {
     })
     this.$core.devices.watch()
     ipcRenderer.on('contextmenu', (e, args) => {
-      if (!args.action) return
-      this.$relax.dispatch(args.action, args)
+      if (!args.command) return
+      this.$core.commands.exec(args.command, args.data)
     })
     document.addEventListener('copy', e => {
       if (this.editing()) return
       e.preventDefault()
-      this.$relax.dispatch('contextmenu/copy')
+      this.$core.commands.exec('copy')
     })
     ipcRenderer.on('paste', (e, args) => {
       if (this.editing()) {
         document.execCommand('paste')
       } else {
-        this.$relax.dispatch('contextmenu/paste')
+        this.$core.commands.exec('paste')
       }
     })
     // make selection change every time except after `removeAllRanges`

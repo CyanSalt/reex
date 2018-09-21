@@ -69,12 +69,12 @@ export default {
         creation.submenu = templates.map(template => {
           return {
             label: basename(template, extname(template)),
+            command: 'create-file',
             data: template,
-            action: 'contextmenu/create-file'
           }
         })
       } else {
-        creation.action = 'create-file'
+        creation.command = 'create-file'
       }
       let pasting = [
         {type: 'separator'},
@@ -94,19 +94,19 @@ export default {
       ipcRenderer.send('contextmenu', [
         {
           label: this.i18n('Refresh#!11'),
-          action: 'contextmenu/refresh',
+          command: 'refresh',
         },
         ...pasting,
         {type: 'separator'},
         {
           label: this.i18n('Create new folder#!7'),
-          action: 'contextmenu/create-folder',
+          command: 'create-folder',
         },
         creation,
         {type: 'separator'},
         {
           label: this.i18n('Properties#!28'),
-          action: 'contextmenu/property',
+          command: 'open-property',
           data: this.path,
         },
       ])

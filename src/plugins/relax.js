@@ -1,16 +1,5 @@
 let instance = null
 
-const context = {
-  access(name) {
-    const {target, key} = visit(instance, name)
-    return target[key]
-  },
-  dispatch(name, payload) {
-    const {target, key} = visit(instance, name)
-    return target[key](payload)
-  },
-}
-
 function construct(Vue, store) {
   const model = {
     data: store.states || {},
@@ -62,8 +51,6 @@ export function action(name) {
 export default {
   install(Vue, store) {
     instance = construct(Vue, store)
-    // TODO: deprecated
-    Vue.prototype.$relax = context
     Vue.prototype.$core = instance
   }
 }
