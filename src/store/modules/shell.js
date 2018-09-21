@@ -168,6 +168,16 @@ export default {
         target: files,
       }
     },
+    openEntry(info) {
+      const path = info.link ? info.link.path : info.path
+      const stats = info.link ? info.link.stats : info.stats
+      const isDirectory = stats.isDirectory()
+      if (isDirectory) {
+        this.$core.location.assign(path)
+      } else {
+        this.openFile(path)
+      }
+    },
     openFile(path) {
       this.$core.system.ignoreOnce(path)
       shell.openItem(path)

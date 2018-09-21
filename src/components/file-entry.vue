@@ -53,7 +53,7 @@ export default {
     },
   },
   methods: {
-    open: action('file/open'),
+    open: action('shell.openEntry'),
     select(e) {
       const {path} = this.file
       const multiple = process.platform === 'darwin' ?

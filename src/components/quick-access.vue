@@ -34,13 +34,13 @@ export default {
   name: 'quick-access',
   computed: {
     path: state('location.path'),
-    favorites: state('path/favorites'),
+    favorites: state('favorites.list'),
     devices: state('devices.list'),
     removable: state('devices.removable'),
   },
   methods: {
     name: action('presets.getBasename'),
-    open: action('file/open'),
+    open: action('shell.openEntry'),
     unmount: action('devices.unmount'),
     active(file) {
       return file.path === this.path || (

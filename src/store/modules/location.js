@@ -1,3 +1,4 @@
+import {remote} from 'electron'
 import {sep, join} from 'path'
 import {readdir} from 'fs'
 import {promisify} from 'util'
@@ -5,6 +6,8 @@ import {promisify} from 'util'
 const promises = {
   readdir: promisify(readdir),
 }
+
+const {additionalArguments} = remote.getCurrentWindow()
 
 export default {
   states: {
@@ -60,5 +63,13 @@ export default {
         this.assign(path)
       }
     },
+    start() {
+      let {path} = additionalArguments.path
+      if (!path) {
+        const startupPath = this.$core.settings.user['explorer.startup.path']
+        path = this.$core.presets.interpretPath(startupPath)
+      }
+      this.replace(path)
+    }
   }
 }

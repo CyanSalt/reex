@@ -5,6 +5,7 @@ import selection from './modules/selection'
 import history from './modules/history'
 import templates from './modules/templates'
 import devices from './modules/devices'
+import favorites from './modules/favorites'
 import dialog from './modules/dialog'
 import clipboard from './modules/clipboard'
 import presets from './modules/presets'
@@ -22,27 +23,14 @@ export default {
     history,
     templates,
     devices,
+    favorites,
     dialog,
     clipboard,
     presets,
     system,
     shell,
   },
-  states: {
-    'path/favorites': [],
-    'files/recentlog': {},
-  },
   actions: {
-    'file/open'(info) {
-      const path = info.link ? info.link.path : info.path
-      const stats = info.link ? info.link.stats : info.stats
-      const isDirectory = stats.isDirectory()
-      if (isDirectory) {
-        this.$core.location.assign(path)
-      } else {
-        this.$core.shell.openFile(path)
-      }
-    },
     // Context menu actions
     'contextmenu/create-folder'() {
       const path = this.$core.location.path

@@ -4,7 +4,6 @@ export default {
   states: {
     default: settings,
     user: {},
-    favorites: [],
   },
   actions: {
     async load() {
@@ -13,12 +12,6 @@ export default {
       const declared = await this.$storage.load('settings.json')
       const data = declared ? {...copied, ...declared} : copied
       this.user = data
-      // load other states in store
-      const favorites = data['quickaccess.favorites']
-        .map(entry => this.$core.presets.interpretPath(entry))
-      this.$core.system.readAll(favorites).then(entries => {
-        this.$core['path/favorites'] = entries
-      })
       return data
     },
     save() {

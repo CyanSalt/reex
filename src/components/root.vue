@@ -6,11 +6,9 @@
 </template>
 
 <script>
-import {ipcRenderer, remote} from 'electron'
+import {ipcRenderer} from 'electron'
 import QuickAccess from './quick-access'
 import FileExplorer from './file-explorer'
-
-const {additionalArguments} = remote.getCurrentWindow()
 
 export default {
   el: '#main',
@@ -41,14 +39,11 @@ export default {
       // emit loaded event
       this.$emit('settings/loaded', data)
       // load startup path
-      const path = additionalArguments.path ||
-        this.$core.presets.interpretPath(data['explorer.startup.path'])
-      this.$core.location.replace(path)
+      this.$core.location.start()
       // load file templates
-      const folder = this.$core.presets.interpretPath(
-        this.$core.settings.user['explorer.templates.path']
-      )
-      this.$core.templates.watch(folder)
+      this.$core.templates.watch()
+      // load favorites
+      this.$core.favorites.load()
     })
     this.$core.devices.watch()
     ipcRenderer.on('contextmenu', (e, args) => {

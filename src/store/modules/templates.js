@@ -8,10 +8,14 @@ const promises = {
 
 export default {
   states: {
-    list: []
+    list: [],
+    watchers: null,
   },
   actions: {
-    async load(folder) {
+    async load() {
+      const folder = this.$core.presets.interpretPath(
+        this.$core.settings.user['explorer.templates.path']
+      )
       const files = await promises.readdir(folder).catch(() => [])
       const paths = files.map(file => join(folder, file))
       const entries = await this.$core.system.readAll(paths)
@@ -19,9 +23,15 @@ export default {
         .filter(({stats}) => stats.isFile())
         .map(({path}) => path)
     },
-    watch(folder) {
-      this.load(folder)
-      this.$core.system.watch(folder, () => this.load(folder))
+    watch() {
+      const folder = this.$core.presets.interpretPath(
+        this.$core.settings.user['explorer.templates.path']
+      )
+      if (this.watchers) {
+        this.watchers.forEach(watcher => watcher.close())
+      }
+      this.watchers = this.$core.system.watch(folder, () => this.load())
+      this.load()
     },
   },
 }
