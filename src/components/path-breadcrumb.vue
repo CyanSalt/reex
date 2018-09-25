@@ -44,7 +44,7 @@ export default {
       this.editing = false
       const {value} = e.target
       if (value === this.path) return
-      const path = this.$core.presets.interpretPath(value)
+      const path = this.$core.utilities.interpretPath(value)
       this.redirect(path)
     },
   },

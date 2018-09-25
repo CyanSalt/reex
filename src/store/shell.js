@@ -15,7 +15,7 @@ const promises = {
 
 export default {
   states: {
-    recentLog: [],
+    recentLog: null,
   },
   actions: {
     generateName(name, times) {

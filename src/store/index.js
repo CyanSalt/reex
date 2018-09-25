@@ -10,6 +10,7 @@ import dialog from './dialog'
 import clipboard from './clipboard'
 import presets from './presets'
 import system from './system'
+import utilities from './utilities'
 import shell from './shell'
 import commands from './commands'
 
@@ -29,6 +30,7 @@ export default {
     clipboard,
     presets,
     system,
+    utilities,
     shell,
     commands,
   },

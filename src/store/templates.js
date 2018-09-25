@@ -13,7 +13,7 @@ export default {
   },
   actions: {
     async load() {
-      const folder = this.$core.presets.interpretPath(
+      const folder = this.$core.utilities.interpretPath(
         this.$core.settings.user['explorer.templates.path']
       )
       const files = await promises.readdir(folder).catch(() => [])
@@ -24,7 +24,7 @@ export default {
         .map(({path}) => path)
     },
     watch() {
-      const folder = this.$core.presets.interpretPath(
+      const folder = this.$core.utilities.interpretPath(
         this.$core.settings.user['explorer.templates.path']
       )
       if (this.watchers) {

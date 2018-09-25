@@ -42,7 +42,7 @@ export default {
       return this.$core.system.isHidden(this.file.path)
     },
     nickname() {
-      let name = this.$core.presets.getBasename(this.file.path)
+      let name = this.$core.utilities.basename(this.file.path)
       if (process.platform === 'darwin' &&
         this.$core.system.isExecutable(this.real)
       ) name = name.slice(0, -4)

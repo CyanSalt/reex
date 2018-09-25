@@ -27,7 +27,7 @@ export default {
     }
     if (subicon) {
       if (subicon.startsWith('@')) {
-        const details = vm.$core.presets.getIconDetails(subicon)
+        const details = vm.$core.utilities.icon(subicon)
         props.watermark = details
       } else if (!isFolder) {
         props.subicon = subicon

@@ -30,7 +30,7 @@ export default {
   },
   computed: {
     linkIcon() {
-      return this.$core.presets.getIconDetails('@feather/icon-corner-up-right')
+      return this.$core.utilities.icon('@feather/icon-corner-up-right')
     },
     color() {
       if (this.background) return this.background

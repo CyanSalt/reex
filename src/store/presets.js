@@ -5,9 +5,6 @@ import fileIcons from '../presets/file-icons'
 import fileColors from '../presets/file-colors'
 import folderIcons from '../presets/folder-icons'
 
-const windowsVariables = /%([^%]+)%/g
-const unixVariables = /\$\{([^}]+)\}/g
-
 export default {
   states: {
     variables: [],
@@ -15,7 +12,6 @@ export default {
     fileIcons: [],
     folderIcons: [],
     fileColors: [],
-    iconCache: {},
   },
   actions: {
     defineVariable(definition) {
@@ -27,22 +23,6 @@ export default {
         definition.name = this.i18n(definition.name)
       }
       this.variables.unshift(definition)
-    },
-    interpretPath(path) {
-      const ids = this.variables.map(data => data.id)
-      const presetVariables = new RegExp(`\\[(${ids.join('|')})\\]`, 'g')
-      const systemReplacement = (full, name) => {
-        return process.env[name] || full
-      }
-      const presetReplacement = (full, name) => {
-        const target = this.variables.find(
-          data => data.id === name
-        )
-        return target ? target.path : full
-      }
-      return path.replace(windowsVariables, systemReplacement)
-        .replace(unixVariables, systemReplacement)
-        .replace(presetVariables, presetReplacement)
     },
     defineFileType(definition) {
       if (Array.isArray(definition)) {
@@ -79,24 +59,6 @@ export default {
       if (!Array.isArray(rules)) rules = [rules]
       this.folderIcons.unshift({icon, rules})
     },
-    getIconDetails(icon) {
-      if (this.iconCache[icon]) {
-        return this.iconCache[icon]
-      }
-      const matches = icon.match(/^@([^/]+)\/(.+)$/)
-      if (!matches) return null
-      const span = document.createElement('span')
-      span.style.display = 'none'
-      span.className = [matches[1] + '-icon', matches[2]].join(' ')
-      document.body.appendChild(span)
-      const style = getComputedStyle(span, '::before')
-      const family = style.fontFamily
-      const char = style.getPropertyValue('content')[1]
-      document.body.removeChild(span)
-      const detail = {char, family}
-      this.iconCache[icon] = detail
-      return detail
-    },
     defineFileColor(definition) {
       if (Array.isArray(definition)) {
         definition.forEach(item => this.defineFileColor(item))
@@ -123,10 +85,6 @@ export default {
     },
     getVariable(path) {
       return this.variables.find(data => data.path === path)
-    },
-    getBasename(path) {
-      const variable = this.getVariable(path)
-      return (variable && variable.name) || basename(path) || '/'
     },
     getFileType(path) {
       // TODO: consider using `mdls`

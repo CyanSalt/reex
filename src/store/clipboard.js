@@ -1,5 +1,6 @@
 import {clipboard} from 'electron'
 
+// TODO: add XML parser and builder
 export default {
   actions: {
     readFiles() {
