@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "css-loader": "^1.0.0",
-    "electron": "^3.0.0",
+    "electron": "^3.0.1",
     "electron-packager": "^12.1.2",
     "mini-css-extract-plugin": "^0.4.3",
     "png2icons": "^1.0.1",
@@ -28,7 +28,7 @@
     "vue-loader": "^15.4.2",
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.5.17",
-    "webpack": "^4.19.1",
-    "webpack-cli": "^3.1.0"
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.1"
   }
 }

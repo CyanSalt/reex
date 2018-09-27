@@ -20,6 +20,9 @@ const commands = {
     const path = this.$core.location.path
     this.$core.shell.copy(files, path)
   },
+  'navigate'(data) {
+    this.$core.location.assign(data)
+  },
   'open'(data) {
     const {path, isDirectory} = data
     if (isDirectory) {
@@ -27,9 +30,6 @@ const commands = {
     } else {
       this.$core.shell.openFile(path)
     }
-  },
-  'open-path'(data) {
-    this.$core.location.assign(data)
   },
   'open-window'(data) {
     this.$core.shell.openWindow(data)

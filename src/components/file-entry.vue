@@ -112,7 +112,7 @@ export default {
           if (this.$core.system.isExecutable(this.real)) {
             open.splice(1, 0, {
               label: this.i18n('Show package content#!29'),
-              command: 'open-path',
+              command: 'navigate',
               data: this.real.path,
             })
           }
