@@ -28,6 +28,9 @@ const commands = {
       this.$core.shell.openFile(path)
     }
   },
+  'open-path'(data) {
+    this.$core.location.assign(data)
+  },
   'open-window'(data) {
     this.$core.shell.openWindow(data)
   },

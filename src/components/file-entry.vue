@@ -72,6 +72,7 @@ export default {
         this.$core.selection.add(path)
       }
     },
+    // eslint-disable-next-line max-lines-per-function
     contextmenu() {
       let open = []
       let property = []
@@ -102,6 +103,13 @@ export default {
             command: 'open-window',
             data: this.real.path,
           })
+          if (this.$core.system.isExecutable(this.real)) {
+            open.splice(1, 0, {
+              label: this.i18n('Show package content#!29'),
+              command: 'open-path',
+              data: this.real.path,
+            })
+          }
         }
       }
       ipcRenderer.send('contextmenu', [

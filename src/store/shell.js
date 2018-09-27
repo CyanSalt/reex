@@ -172,7 +172,7 @@ export default {
       const path = info.link ? info.link.path : info.path
       const stats = info.link ? info.link.stats : info.stats
       const isDirectory = stats.isDirectory()
-      if (isDirectory) {
+      if (isDirectory && !this.$core.system.isExecutable(info)) {
         this.$core.location.assign(path)
       } else {
         this.openFile(path)
