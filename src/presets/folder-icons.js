@@ -1,10 +1,10 @@
 const icons = [
   {
-    icon: '@brands/icon-nodejs',
+    icon: '@brands/icon-node-dot-js',
     rules: ['node_modules'],
   },
   {
-    icon: '@brands/icon-adobe',
+    icon: '@brands/icon-adobecreativecloud',
     rules: ['Creative Cloud Files'],
   },
 ]

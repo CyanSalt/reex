@@ -78,11 +78,11 @@ const icons = [
     rules: ['*.json', '*.map'],
   },
   {
-    icon: '@brands/icon-nodejs',
+    icon: '@brands/icon-node-dot-js',
     rules: ['package.json', 'package-lock.json'],
   },
   {
-    icon: '@brands/icon-vuejs',
+    icon: '@brands/icon-vue-dot-js',
     rules: ['*.vue'],
   },
   {
