@@ -22,7 +22,13 @@ export default {
     'file-icon': FileIcon,
   },
   props: {
-    file: Object,
+    file: {
+      type: Object,
+      required: true,
+      validator(value) {
+        return value.path && value.stats
+      }
+    },
   },
   data() {
     return {

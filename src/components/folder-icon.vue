@@ -15,7 +15,13 @@
 export default {
   name: 'folder-icon',
   props: {
-    watermark: Object,
+    watermark: {
+      type: Object,
+      required: true,
+      validator(value) {
+        return value.family && value.char
+      }
+    },
     link: Boolean,
   },
   computed: {

@@ -23,7 +23,13 @@ export default {
   props: {
     ext: String,
     subicon: String,
-    watermark: Object,
+    watermark: {
+      type: Object,
+      required: true,
+      validator(value) {
+        return value.family && value.char
+      }
+    },
     link: Boolean,
     background: String,
     foreground: String,
