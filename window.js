@@ -1,5 +1,6 @@
 const {app, BrowserWindow, Menu, ipcMain, dialog} = require('electron')
 const {resolve} = require('path')
+const {format} = require('url')
 
 const frames = []
 
@@ -22,20 +23,14 @@ function createWindow(args = {}) {
     options.y = args.position.y
   }
   const frame = new BrowserWindow(options)
-  frame.loadURL(`file://${__dirname}/src/index.html`)
+  loadHTMLFile(frame, 'src/index.html')
   if (process.platform !== 'darwin') {
     createWindowMenu(frame)
   }
   // these handler must be binded in main process
   transferWindowEvents(frame)
   // reference to avoid GC
-  frames.push(frame)
-  frame.on('closed', () => {
-    const index = frames.indexOf(frame)
-    if (index !== -1) {
-      frames.splice(index, 1)
-    }
-  })
+  collectWindow(frame)
   frame.additionalArguments = args
 }
 
@@ -55,11 +50,25 @@ function createPropertyWindow(parent, args = {}) {
     },
   }
   const frame = new BrowserWindow(options)
-  frame.loadURL(`file://${__dirname}/src/index.html`)
+  loadHTMLFile(frame, 'src/index.html')
   if (process.platform !== 'darwin') {
     createPropertyWindowMenu(frame)
   }
   // reference to avoid GC
+  collectWindow(frame)
+  args.type = 'property'
+  frame.additionalArguments = args
+}
+
+function loadHTMLFile(frame, path) {
+  frame.loadURL(format({
+    protocol: 'file',
+    slashes: true,
+    pathname: resolve(__dirname, path)
+  }))
+}
+
+function collectWindow(frame) {
   frames.push(frame)
   frame.on('closed', () => {
     const index = frames.indexOf(frame)
@@ -67,8 +76,6 @@ function createPropertyWindow(parent, args = {}) {
       frames.splice(index, 1)
     }
   })
-  args.type = 'property'
-  frame.additionalArguments = args
 }
 
 function createApplicationMenu() {

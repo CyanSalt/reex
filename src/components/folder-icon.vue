@@ -17,7 +17,6 @@ export default {
   props: {
     watermark: {
       type: Object,
-      required: true,
       validator(value) {
         return value.family && value.char
       }

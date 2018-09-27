@@ -25,7 +25,6 @@ export default {
     subicon: String,
     watermark: {
       type: Object,
-      required: true,
       validator(value) {
         return value.family && value.char
       }
