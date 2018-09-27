@@ -1,4 +1,4 @@
-import settings from '../resources/default/settings.json'
+import * as settings from '../resources/default/settings.json'
 
 export default {
   states: {
