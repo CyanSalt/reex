@@ -5,7 +5,7 @@ import I18N from './plugins/i18n'
 import FileStorage from './plugins/storage'
 import Root from './components/root'
 import PropertyRoot from './components/property-root'
-import store from './store'
+import store from './core'
 
 Vue.use(I18N)
 Vue.use(FileStorage)
