@@ -17,6 +17,10 @@ import commands from './commands'
 // TODO: support permission like jorangreef/sudo-prompt
 // TODO: use session to share in different window
 export default {
+  exports: {
+    // global: 'reex',
+    prototype: '$core',
+  },
   modules: {
     settings,
     location,

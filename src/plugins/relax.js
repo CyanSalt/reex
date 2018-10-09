@@ -51,6 +51,12 @@ export function action(name) {
 export default {
   install(Vue, store) {
     instance = construct(Vue, store)
-    Vue.prototype.$core = instance
+    if (!store.exports) return
+    if (store.exports.prototype) {
+      Vue.prototype[store.exports.prototype] = instance
+    }
+    if (store.exports.global) {
+      window[store.exports.global] = instance
+    }
   }
 }
