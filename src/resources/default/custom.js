@@ -1,11 +1,12 @@
 /**
  * Your init script
- * @param {Vue} vm ViewModal for root element of Vue.js
+ * @param {Vue} reex ViewModal for Reex Core API
+ * @param {Vue} $root ViewModal for root element of Vue.js
  * @return {void}
  */
-module.exports = function (vm) {
+module.exports = function (reex, $root) {
 
   // an example to hack your software
-  // vm.$core.presets.defineFileType({type: 'package', rules: '*.crx'})
+  // reex.presets.defineFileType({type: 'package', rules: '*.crx'})
 
 }

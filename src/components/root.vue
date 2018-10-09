@@ -81,7 +81,7 @@ export default {
     })
     // custom script
     const initScript = this.$storage.require('custom.js')
-    initScript && initScript(this)
+    initScript && initScript(this.$core, this)
   }
 }
 </script>
