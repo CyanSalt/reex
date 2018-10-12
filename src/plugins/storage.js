@@ -1,6 +1,7 @@
 import {readFile, readFileSync, writeFile, mkdir, access} from 'fs'
 import {dirname, resolve} from 'path'
 import {promisify} from 'util'
+import * as JSON from 'json5'
 
 const promises = {
   readFile: promisify(readFile),

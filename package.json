@@ -22,6 +22,7 @@
     "css-loader": "^1.0.0",
     "electron": "^3.0.3",
     "electron-packager": "^12.2.0",
+    "json5": "^2.1.0",
     "mini-css-extract-plugin": "^0.4.3",
     "png2icons": "^1.0.1",
     "vue": "^2.5.17",
