@@ -5,7 +5,7 @@
     <div class="file-icon-wrapper">
       <img class="image-preview" :src="real.path" v-if="preview && isImage"
         @error="preview = false">
-      <file-icon :file="file" v-else></file-icon>
+      <file-icon :file="file" v-once v-else></file-icon>
     </div>
     <div class="file-name">{{ nickname }}</div>
   </div>
